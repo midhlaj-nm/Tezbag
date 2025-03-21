@@ -1,0 +1,51 @@
+# **Tezbag**
+
+### Overview
+
+Tezbag is an e-commerce website designed for quick grocery deliveries, ensuring that users receive their essential items within 10 minutes.
+
+### Features
+
+- Fast and efficient grocery delivery service
+
+- User-friendly interface for seamless shopping
+
+- Secure payment gateway integration
+
+- Real-time order tracking
+
+### Technologies Used
+
+> Frontend: EJS (Embedded JavaScript Templates)
+
+> Backend: Node.js with Express.js
+
+> Database: MongoDB
+
+### Installation & Setup
+
+_Clone the repository:_
+
+`git clone https://github.com/midhlaj-nm/Tezbag.git`
+
+_Navigate to the project directory:_
+
+`cd Tezbag`
+
+_Install dependencies:_
+
+`npm install`
+
+_Start the application:_
+
+`npm start`
+
+### Contributing
+
+Contributions are welcome! Feel free to submit a pull request or report issues.
+
+### License
+
+This project is licensed under the MIT License.
+
+`Happy Shopping with Tezbag!` 🚀
