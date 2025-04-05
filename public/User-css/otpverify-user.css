@@ -1,0 +1,71 @@
+/* Center the OTP box */
+.otp-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 65vh;
+    background: #f8f8f8;
+}
+
+/* OTP Box */
+.otp-box {
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 400px;
+}
+
+/* Title */
+.otp-title {
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+/* OTP Input Fields */
+.otp-inputs {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.otp-field {
+    width: 50px;
+    height: 50px;
+    text-align: center;
+    font-size: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.otp-field:focus {
+    border-color: #00B207;
+    outline: none;
+}
+
+/* Resend Text */
+.resend-text {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 15px;
+}
+
+/* Verify Button */
+.verify-btn {
+    width: 100%;
+    background: #00B207;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 25px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.verify-btn:hover {
+    background: #008C04;
+}

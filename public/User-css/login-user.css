@@ -1,0 +1,405 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+a {
+    text-decoration: none;
+}
+
+
+body{
+    font-family: 'Poppins', sans-serif;    
+}
+
+#top {
+    width: 100%;
+    background-color: #EDF2EE;
+    height: 27px; 
+    padding: 5px 0;
+    display: flex;
+    justify-content: space-between; 
+    align-items: center;
+    flex-wrap: wrap;
+    padding: 0 5%; 
+}
+
+.left-content, .right-content {
+    display: flex;
+    align-items: center;
+}
+
+.img-icon {
+    width: 9px;
+    height: auto;
+}
+
+.location {
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.8rem; 
+    color: #2B572E;
+    margin-left: 5px;
+}
+
+/* Language and Country Spacing */
+#lang, #country {
+    margin: 0 8px;
+}
+
+.logo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%; 
+}
+
+.logo img {
+    width: 150px;
+    transform: translate3d(10px, 10px, 10px)
+}
+
+/* General Styling */
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f8f9fa;
+}
+
+/* Navbar */
+.navbar {
+    text-align: center;
+    padding: 20px 0;
+}
+.logo img {
+    width: 120px;
+}
+
+/* Login Container */
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 70vh;
+}
+
+.login-box {
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 500px;
+}
+
+.login-title {
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+    position: relative;
+}
+
+.form-control {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.password-group .eye-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+}
+
+.remember-me {
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.remember-me label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: #333;
+}
+
+.forgot-password-container {
+    flex-shrink: 0; /* Prevents resizing */
+}
+
+.forgot-password {
+    text-decoration: none;
+    color: #00B207;
+    font-weight: 500;
+}
+
+.forgot-password:hover {
+    text-decoration: underline;
+}
+
+
+.login-btn {
+    width: 100%;
+    background: #00B207;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.login-btn:hover {
+    background: #008C04;
+}
+
+.google-signin {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background: white;
+    color: #333;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 15px;
+    transition: all 0.3s;
+}
+
+.google-signin img {
+    width: 20px;
+    height: 20px;
+}
+
+.google-signin:hover {
+    background: #f1f1f1;
+}
+
+
+.register-link {
+    margin-top: 15px;
+    font-size: 14px;
+}
+
+.register-link a {
+    color: #00B207;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+/* Footer */
+.footer {
+    margin-top: 20px;
+    background-color: #111;
+    color: white;
+    padding: 50px 0;
+}
+
+.footer-container {
+    display: flex;
+    justify-content: space-between;
+    width: 80%;
+    margin: auto;
+    flex-wrap: wrap;
+}
+
+.footer-left {
+    width: 30%;
+}
+
+.footer-logo {
+    width: 120px;
+    margin-bottom: 10px;
+}
+
+.footer-description {
+    font-size: 14px;
+    color: #ddd;
+    line-height: 1.5;
+}
+
+.footer-contact {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.contact-email,
+.contact-number {
+    text-decoration: none;
+    color: white;
+    border-bottom: 2px solid #00B207;
+}
+
+.contact-email:hover,
+.contact-number:hover {
+    color: #00B207;
+    border-color: white;
+}
+
+.footer-links {
+    width: 65%;
+    display: flex;
+    justify-content: space-between;
+}
+
+.footer-column h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.footer-column ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-column ul li {
+    margin-bottom: 8px;
+}
+
+.footer-column ul li a {
+    text-decoration: none;
+    color: #ccc;
+    font-size: 14px;
+}
+
+.footer-column ul li a:hover {
+    color: #00B207;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .footer-container {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+
+
+/* Footer Styling */
+.footer {
+    color: white;
+    padding: 50px 0;
+    position: relative;
+    background-image: url('/Footer.png'); /* Your image */
+    background-repeat: no-repeat;
+    background-position: right top;
+    background-size: cover; /* Ensures image scales with the footer */
+}
+
+
+
+.footer-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    width: 80%;
+    margin: auto;
+    flex-wrap: wrap;
+}
+
+/* Left Section */
+.footer-left {
+    width: 30%;
+}
+
+.footer-logo {
+    width: 120px; /* Adjust if needed */
+    margin-bottom: 10px;
+}
+
+.footer-description {
+    font-size: 14px;
+    color: #ddd;
+    line-height: 1.5;
+    margin-bottom: 15px;
+}
+
+.footer-contact {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.contact-number {
+    border-bottom: 2px solid #00B207; /* Green underline effect */
+}
+
+.contact-email,
+.contact-number {
+    text-decoration: none;
+    color: white;
+    border-bottom: 2px solid #00B207; /* Green underline */
+    transition: color 0.3s, border-color 0.3s;
+}
+
+.contact-email:hover,
+.contact-number:hover {
+    color: #00B207;
+    border-color: white;
+}
+
+/* Right Section - Links */
+.footer-links {
+    width: 65%;
+    display: flex;
+    justify-content: space-between;
+}
+
+.footer-column h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.footer-column ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-column ul li {
+    margin-bottom: 8px;
+}
+
+.footer-column ul li a {
+    text-decoration: none;
+    color: #ccc;
+    font-size: 14px;
+    transition: color 0.3s;
+}
+
+.footer-column ul li a:hover {
+    color: #00B207; /* Green hover effect */
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .footer-container {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .footer-left,
+    .footer-links {
+        width: 100%;
+    }
+
+    .footer-links {
+        margin-top: 20px;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .footer-column {
+        margin-bottom: 20px;
+    }
+}

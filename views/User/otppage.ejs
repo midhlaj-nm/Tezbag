@@ -1,0 +1,20 @@
+<%-include("../../views/Partials/user/header-simple")%>
+<link rel="stylesheet" href="/User-css/otpverify-user.css">
+<!-- otpVerify-->
+<div class="otp-container">
+    <div class="otp-box">
+        <h2 class="otp-title">OTP Verification</h2>
+        <form id="otp-form">
+            <div class="otp-inputs">
+                <input type="text" maxlength="1" class="otp-field" required>
+                <input type="text" maxlength="1" class="otp-field" required>
+                <input type="text" maxlength="1" class="otp-field" required>
+                <input type="text" maxlength="1" class="otp-field" required>
+            </div>
+            <p class="resend-text">Resend (<span id="timer">31</span> s)</p>
+            <button type="submit" class="verify-btn">Verify</button>
+        </form>
+    </div>
+</div>
+
+<%-include("../../views/Partials/user/footer")%>

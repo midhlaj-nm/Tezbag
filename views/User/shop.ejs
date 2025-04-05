@@ -1,0 +1,113 @@
+<%-include("../../views/Partials/user/header-srch")%>
+    <div class="ccontainer">
+        <div id="offer-banner">
+
+        </div>
+    </div>
+    <div class="shop-wrapper">
+        <div class="filters">
+            <div class="filters-left">
+                <select>
+                    <option disabled selected>Filter by Category</option>
+                    <option>Fruits & Vegetables</option>
+                    <option>Meat & Fish</option>
+                    <option>Bread & Bakery</option>
+                    <option>Beauty & Health</option>
+                </select>
+    
+                <select>
+                    <option disabled selected>Filter by Price Range</option>
+                    <option>$0 - $10</option>
+                    <option>$10 - $50</option>
+                    <option>$50 - $100</option>
+                    <option>$100+</option>
+                </select>
+            </div>
+    
+            <div class="filters-right">
+                <select>
+                    <option disabled selected>Sort by Price</option>
+                    <option>Low to High</option>
+                    <option>High to Low</option>
+                </select>
+    
+                <select>
+                    <option disabled selected>Sort by Name</option>
+                    <option>A - Z</option>
+                    <option>Z - A</option>
+                </select>
+            </div>
+        </div>
+
+        <p id="prdct-count">4 items found</p>
+    
+        <div class="products-grid">
+            <!-- Product cards go here -->
+            <div class="product-grid">
+                <!-- Product Card 1 -->
+                <div class="product-card">
+                    <img src="chili.jpg" alt="Red Chili">
+                    <p class="product-name">Red Chili</p>
+                    <p class="price">14.99₹</p>
+                    <a href="#">
+                        <button class="cart-btn">
+                            <img src="cart-icon.png" alt="Add to cart">
+                        </button>
+                    </a>
+                    <div class="rating">⭐⭐⭐⭐</div>
+                    <i class="bi bi-lock-fill lock-icon"></i>
+                </div>
+            
+                <!-- Product Card 2 -->
+                <div class="product-card">
+                    <img src="potato.jpg" alt="Big Potatoes">
+                    <p class="product-name">Big Potatoes</p>
+                    <p class="price">14.99₹</p>
+                    <a href="#">
+                        <button class="cart-btn">
+                            <img src="cart-icon.png" alt="Add to cart">
+                        </button>
+                    </a>
+                    <div class="rating">⭐⭐⭐⭐</div>
+                    <i class="bi bi-lock-fill lock-icon"></i>
+                </div>
+            
+                <!-- Product Card 3 -->
+                <div class="product-card">
+                    <img src="/cabbage.png" alt="Chinese Cabbage">
+                    <p class="product-name">Chinese Cabbage</p>
+                    <p class="price">14.99₹</p>
+                    <a href="#">
+                        <button class="cart-btn">
+                            <img src="cart-icon.png" alt="Add to cart">
+                        </button>
+                    </a>
+                    <div class="rating">⭐⭐⭐⭐</div>
+                    <i class="bi bi-lock-fill lock-icon"></i>
+                    <i class="bi bi-heart fav-icon"></i>
+                </div>
+            
+                <!-- Product Card 4 (Out of Stock) -->
+                <div class="product-card out-of-stock">
+                    <span class="out-of-stock-label">Out of Stock</span>
+                    <img src="/ladies-finger.png" alt="Ladies Finger">
+                    <p class="product-name">Ladies Finger</p>
+                    <p class="price"><span class="old-price">20.99₹ </span> 14.99₹</p>
+                    <a href="#">
+                        <button class="cart-btn">
+                            <img src="cart-icon.png" alt="Add to cart">
+                        </button>
+                    </a>
+                    <div class="rating">⭐⭐⭐⭐</div>
+                    <i class="bi bi-lock-fill lock-icon"></i>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+    
+        
+        <div class="footer-wrapper">
+            <%- include("../../views/Partials/user/footer") %>
+        </div>
+        

@@ -1,0 +1,174 @@
+<%-include("../../views/Partials/user/header-srch")%>
+<link rel="stylesheet" href="/User-css/products-user.css">
+
+<div class="prdctData-wrapper">
+    <div class="prdctData">
+        <div class="left">
+            <div class="subs">
+                <div class="subImg active" data-image="image1.jpg"></div>
+                <div class="subImg" data-image="image2.jpg"></div>
+                <div class="subImg" data-image="image3.jpg"></div>
+                <div class="subImg" data-image="image4.jpg"></div>
+        </div>
+        <div class="mainImage">
+            <img id="mainImage" src="image1.jpg" alt="Main Image">
+        </div>
+    </div>
+        <div class="right">
+            <div class="prdctname">
+                <h2 class="name">Cabbage</h2>
+                <div class="stockstatus">In stock</div>
+            </div>
+            <div class="prdctdata">
+                <span class="stars">⭐⭐⭐⭐</span><span class="many">4 review</span>
+                <span class="dot">•</span>
+                <span class="sku">SKU:</span><span class="skuu">2,51,594</span>
+            </div>
+            <div class="price-section">
+                <span class="old-price">48.00₹</span>
+                <span class="new-price">17.28₹</span>
+                <span class="discount">64% Off</span>
+            </div>
+<hr style="border: 1px solid #898989; margin-top: 10px;">
+            <div class="cart-containerr">
+                <div class="quantity-selector">
+                    <button class="decrease">−</button>
+                    <span class="quantity">5</span>
+                    <button class="increase">+</button>
+                </div>
+        
+                <button class="add-to-cart">
+                Add to Cart <span class="cart-icon"><img src="/Cart.svg" alt="cart"></span>
+                </button>
+
+                <div class="wishlist">
+                    <img src="/wishlist_green.svg" alt="wishlist">
+                </div>
+            </div>
+<hr style="border: 1px solid #898989; margin-top: 10px;">
+            <div class="product-meta">
+                <p><strong>Category:</strong> <span class="veg">Vegetables</span></p>
+                <p><strong>Tag:</strong> 
+                    <span class="tags-e">Vegetables</span> 
+                    <span class="tags-e">Healthy</span> 
+                    <span class="tags-e">Chinese Cabbage</span> 
+                    <span class="tags-e">Green Cabbage</span>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="product-info">
+    <ul class="tab-menu">
+        <li class="tab-item active" onclick="showTab('description',this)">Descriptions</li>
+        <li class="tab-item" onclick="showTab('additional',this)">Additional Information</li>
+        <li class="tab-item" onclick="showTab('feedback',this)">Customer Feedback</li>
+    </ul>
+    
+    <div class="tab-content">
+        <div id="description" class="tab-pane active section-wrapper">
+            <div class="left-area">
+                <span class="product-des">
+                    <p>Sed commodo aliquam i interdum sollicitudin. Mauris sem ante, vestibulum nec orci vitae, aliquam mollis lacus. Sed et condimentum arcu, id molestie tellus. Nulla facilisi. Nam scelerisque vitae justo a convallis. Morbi urna ipsum, placerat quis commodo quis, egestas elementum leo. Donec convallis mollis enim. Aliquam id mi quam. Phasellus nec fringilla elit.
+                        <br><br>
+                        Nulla mauris tellus, feugiat quis pharetra sed, gravida ac dui. Sed iaculis, metus faucibus elementum tincidunt, turpis mi viverra velit, pellentesque tristique neque mi eget nulla. Proin luctus elementum neque et pharetra. </p>    
+                </span>
+                <ul class="product-pros">
+                    <li>
+                        <img src="/Check.svg" alt="check">
+                        <span>Good battery life</span>
+                    </li>
+                    <li>
+                        <img src="/Check.svg" alt="check">
+                        <span>Affordable price</span>
+                    </li>
+                    <li>
+                        <img src="/Check.svg" alt="check">
+                        <span>Lightweight design</span>
+                    </li>
+                    <li>
+                        <img src="/Check.svg" alt="check">
+                        <span>Long-lasting materials</span>
+                    </li>
+                </ul>
+            </div>
+            <div class="right-area">
+                <img class="delivery-boy" src="/delivery_boy.jpg">
+                 <img class="features" src="/Feature.jpg">
+            </div>
+        </div>
+      
+        <div id="additional" class="tab-pane section-wrapper">
+            <p>This is the additional information section.</p>
+        </div>
+      
+        <div id="feedback" class="tab-pane section-wrapper">
+            <p>This is customer feedback section.</p>
+        </div>
+    </div> 
+</div>
+<div class="related-container">
+    <div class="relatedPrdcts">
+        <span class="txt">Related Products</span>
+        <div class="product-grid">
+            <!-- Product Cards Go Here -->
+            <div class="product-card">
+                <img src="/apple.png" alt="Red Chili">
+                <p class="product-name">Red Chili</p>
+                <p class="price">14.99₹</p>
+                <div class="rating">⭐⭐⭐⭐⭐</div>
+                <a href="#"><button class="cart-btn"><img src="cart-icon.png"></button></a>
+                <i class="bi bi-lock-fill lock-icon"></i>
+            </div>
+
+            <!-- Product Cards Go Here -->
+            <div class="product-card">
+                <img src="/cabbage.png" alt="Red Chili">
+                <p class="product-name">Cuccumber</p>
+                <p class="price">14.99₹</p>
+                <div class="rating">⭐⭐⭐⭐⭐</div>
+                <a href="#"><button class="cart-btn"><img src="cart-icon.png"></button></a>
+                <i class="bi bi-lock-fill lock-icon"></i>
+            </div>
+        </div>
+    </div>
+</div>
+    
+<%-include("../../views/Partials/user/footer")%>
+
+
+<script>
+    document.querySelectorAll(".subImg").forEach((img) => {
+    img.addEventListener("click", function () {
+        // Remove active class from all sub-images
+        document.querySelectorAll(".subImg").forEach((el) => el.classList.remove("active"));
+        
+        // Add active class to clicked sub-image
+        this.classList.add("active");
+        
+        // Change the main image
+        const newImage = this.getAttribute("data-image");
+        document.getElementById("mainImage").src = newImage;
+    });
+});
+
+function showTab(tabId) {
+    // Hide all tab contents
+    document.querySelectorAll('.tab-pane').forEach(el => el.style.display = 'none');
+
+    // Remove 'active' class from all tabs
+    document.querySelectorAll('.tab-item').forEach(el => el.classList.remove('active'));
+
+    // Show the selected tab content
+    document.getElementById(tabId).style.display = 'flex';
+
+    // Add 'active' class to clicked tab
+    document.querySelector(`.tab-item[onclick*="${tabId}"]`).classList.add('active');
+}
+// Set default tab to "Descriptions" on page load
+document.addEventListener("DOMContentLoaded", function() {
+    showTab('description');
+});
+
+</script>
+<script src="/main.js"></script>
