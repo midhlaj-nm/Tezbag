@@ -1,0 +1,168 @@
+<%-include("../../views/Partials/user/header-simple")%>
+<link rel="stylesheet" href="/User-css/createAcc-user.css">
+        <!-- Login Form -->
+        <div class="login-container">
+            <div class="login-box">
+                <h2 class="login-title">Create Account</h2>
+                
+                <form id="signForm" method="POST" action="/register">
+                    <div class="form-group">
+                        <input type="text" class="form-control" name="f_name" placeholder="First Name" required>
+                        <div id="err1" class="err-msg"></div>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control" name="l_name" placeholder="Last Name" required>
+                        <div id="err2" class="err-msg"></div>
+                    </div>
+                    <div class="form-group">
+                        <input type="email" class="form-control" name="email" placeholder="Email">
+                        <div id="err3" class="err-msg"></div>
+                    </div>
+                    <div class="form-group password-group">
+                        <input type="password" class="form-control" name="password" id="password" placeholder="Password">                   
+                        <div id="err4" class="err-msg"></div>
+                    </div>
+                    
+                    <div class="form-group password-group">
+                        <input type="password" class="form-control" name="cPassword" id="cPassword" placeholder="Confirm Password">
+                        <div id="err5" class="err-msg"></div>
+                    </div>
+                    <div class="form-group remember-me">
+                        <label>
+                            <input type="checkbox"> Accept all terms & Condition
+                        </label>
+                    </div>                    
+                    <button type="submit" class="login-btn">Continue</button>
+
+
+                    <!-- Google Sign-in Button -->
+                    <div class="google-signin">
+                        <img src="/g-logo-removebg-preview.png" alt="Google Logo">
+                        <span>Sign in with Google</span>
+                    </div>
+                </form>
+                
+                <p class="register-link">Have an account?<a href="/login"> Log In</a></p>
+            </div>
+        </div>
+        <%-include("../../views/Partials/user/footer")%>
+        <script>
+
+            const f_nameid = document.getElementsByName('f_Name')[0]
+            const l_nameid = document.getElementsByName('l_Name')[0]
+            const emailid = document.getElementsByName('email')[0]
+            const passwordid = document.getElementsByName('password')[0]
+            const cPasswordid = document.getElementsByName('cPassword')[0]
+            const err1id = document.getElementById('err1')
+            const err2id = document.getElementById('err2')
+            const err3id = document.getElementById('err3')
+            const err4id = document.getElementById('err4')
+            const err5id = document.getElementById('err5')
+            const signformid = document.getElementById('signForm')
+
+            function f_nameValidateCheck(e){
+                const f_nameval = f_nameid.value;
+                const f_namePattern = /^[A-Za-z]{2,20}$/
+
+                if(f_nameval.trim() === ""){
+                    err1id.style.display='block';
+                    err1id.innerHTML="Please enter a valid last name"
+                } else if (!f_namePattern.test(f_nameval)) {
+                    err1id.style.display='block'
+                    err1id.innerHTML='Special characters and numbers are not allowed.'
+                } else if(f_nameval.length<2){
+                    err1id.style.display = "block"
+                    err1id.innerHTML = "Atleast 2 characters needed"
+                } else {
+                    err1id.style.display='none'
+                    err1id.innerHTML = ""
+                }
+            }
+
+            function l_nameValidateCheck(e){
+                const l_nameval = l_nameid.value;
+                const l_namePattern = /^[A-Za-z]{2,20}$/
+
+                if(l_nameval.trim() === ""){
+                    err2id.style.display='block';
+                    err2id.innerHTML="Please enter a valid last name"
+                } else if (!l_namePattern.test(l_nameval)) {
+                    err2id.style.display='block'
+                    err2id.innerHTML='Special characters and numbers are not allowed.'
+                } else {
+                    err2id.style.display='none'
+                    err2id.innerHTML = ""
+                }
+            }
+
+            function emailValidateCheck(e){
+                const emailval = emailid.value;
+                const emailpattern = /^[a-z0-9._%+-]+@[a-z.-]+\.[a-z]{2,}$/;
+
+                if(!emailpattern.test(emailval)){
+                    err3id.style.display = 'block';
+                    err3id.innerHTML = "Please enter a valid email address"
+
+                } else {
+                    err3id.style.display = "none"
+                    err3id.innerHTML = ""
+                }
+            }
+
+            function passValidateCheck(e){
+                const passval = passwordid.value;
+                const cpassval = cPasswordid.value;
+
+                const alpha = /[a-zA-Z]/;
+                const digit = /\d/;
+                
+                if(passval.length<8){
+                    err4id.style.display = "block"
+                    err4id.innerHTML = "Should contain atleast 8 characters"
+                } else if (!alpha.test(passval) || !digit.test(passval)){
+                    err4id.style.display = 'block'
+                    err4id.innerHTML = "Should contain NUMBER and ALPHABETS"
+                } else {
+                    err4id.style.display = "none"
+                    err4id.innerHTML = "";
+                }
+
+                if(passval !== cpassval){
+                    err5id.style.display = "block";
+                    err5id.innerHTML = "Password do not matching"
+                } else {
+                    err5id.style.display = "none"
+                    err5id.innerHTML = ""
+                }
+
+
+            }
+
+
+
+            document.addEventListener('DOMContentLoaded',function(){
+                signformid.addEventListener("submit",function(e){
+                    f_nameValidateCheck();
+                    l_nameValidateCheck();
+                    emailValidateCheck();
+                    passValidateCheck();
+
+                    if(
+                        !f_nameid || !l_nameid || !emailid || !passwordid 
+                        || !err1id || !err2id || !err3id || !err4id || !err5id || !signformid
+                     ){
+                        console.error("One or more elements not found")
+                     }
+
+                    if(
+                        err1id.innerHTML || err2id.innerHTML || err3id.innerHTML || err4id.innerHTML ||
+                        err5id.innerHTML
+                    ){
+                        e.preventDefault()
+                    }
+                })
+            })
+
+
+
+        </script>

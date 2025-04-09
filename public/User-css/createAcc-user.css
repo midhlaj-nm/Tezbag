@@ -3,10 +3,11 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 85vh;
+    height: 100vh;
 }
 
 .login-box {
+    height: 590px;
     background: white;
     padding: 30px;
     border-radius: 8px;
@@ -82,8 +83,29 @@
 }
 
 .login-btn:hover {
+    text-decoration: none;
     background: #008C04;
 }
+
+a.login-btn {
+    text-decoration: none;
+    display: block;
+    text-align: center;
+    color: white;           /* Ensures white text */
+}
+
+a.login-btn:visited {
+    color: white;           /* Prevents purple text after clicking */
+}
+
+a.login-btn:hover,
+a.login-btn:focus {
+    color: white;           /* Keeps hover/focus text white */
+    outline: none;          /* Removes blue outline in some browsers */
+    text-decoration: none;  /* Ensures no underline */
+}
+
+
 
 .google-signin {
     display: flex;
@@ -121,4 +143,76 @@
     color: #00B207;
     font-weight: bold;
     text-decoration: none;
+}
+
+
+.err-msg {
+    color: red;
+    font-size: 0.9rem;
+    margin-top: 5px;
+    padding-left: 2px;
+    font-weight: 500;
+    display: none; /* you can toggle this with JS */
+    text-align: left;
+  }
+  
+
+
+  /* RESPONSIVE STYLES */
+@media (max-width: 768px) {
+    .login-container {
+        padding: 20px;
+        height: auto;
+        align-items: flex-start;
+    }
+
+    .login-box {
+        width: 100%;
+        max-width: 100%;
+        height: auto;
+        padding: 20px 15px;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-group {
+        margin-bottom: 18px;
+    }
+
+    .password-group .eye-icon {
+        right: 8px;
+    }
+
+    .remember-me {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .google-signin {
+        font-size: 15px;
+        padding: 8px;
+    }
+
+    .register-link {
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .form-control {
+        padding: 8px;
+    }
+
+    .login-title {
+        font-size: 22px;
+    }
+
+    .login-btn, .google-signin {
+        font-size: 15px;
+    }
+
+    .google-signin img {
+        width: 18px;
+        height: 18px;
+    }
 }

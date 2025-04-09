@@ -1,0 +1,66 @@
+.pagenotfound {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 70vh;
+    padding: 20px;
+    text-align: center;
+  }
+  
+  .err img {
+    width: 40%;
+    height: auto;
+    object-fit: contain;
+    transition: max-width 0.3s ease;
+  }
+  
+  .back {
+    margin: 20px 0;
+    padding: 12px 24px;
+    background-color: #00B207;
+    color: white;
+    text-decoration: none;
+    border-radius: 30px;
+    font-weight: bold;
+    font-size: 1rem;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+  
+  .back:hover {
+    background-color: #008f05;
+    color: white;
+    text-decoration: none;
+    transform: scale(1.05); /* smooth zoom on hover */
+  }
+  
+  /* ---------- Responsive Breakpoints ---------- */
+  @media (max-width: 768px) {
+    .err img {
+      max-width: 80%;
+    }
+  
+    .back {
+      padding: 10px 20px;
+      font-size: 0.95rem;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .pagenotfound {
+      height: auto;
+      padding: 40px 10px;
+    }
+  
+    .err img {
+      max-width: 100%;
+    }
+  
+    .back {
+      width: 100%;
+      text-align: center;
+      padding: 12px;
+      font-size: 1rem;
+    }
+  }
+  
