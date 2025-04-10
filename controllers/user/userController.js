@@ -70,37 +70,39 @@ async function sendVeriEmail(email, otp) {
 // Register POST handler
 const regpost = async (req, res) => {
     try {
-        const { f_name, l_name, email, password, cPassword } = req.body;
+            const { f_name, l_name, email, password, cPassword } = req.body;
 
-        if (password !== cPassword) {
-            return res.render('regpost', { message: "Password do not match" });
-        }
+            if (password !== cPassword) {
+                return res.render('register', { message: "Password do not match" });
+            }
 
-        const findUser = await User.findOne({ email });
-        if (findUser) {
-            return res.render('regpost', { message: "This email ID is already registered" });
-        }
+            const findUser = await User.findOne({ email });
+            if (findUser) {
+                return res.render('register', { message: "This email ID is already registered" });
+            }
 
-        const otp = generateOtp();
-        const emailSent = await sendVeriEmail(email, otp);
-        if (!emailSent) {
-            return res.json("email-error");
-        }
+            const otp = generateOtp();
+            const emailSent = await sendVeriEmail(email, otp);
+            if (!emailSent) {
+                return res.json("email-error");
+            }
 
-        req.session.userOtp = otp;
-        req.session.userData = { f_name, l_name, email, password };
+            req.session.userOtp = otp;
+            req.session.userData = { f_name, l_name, email, password };
 
-        res.redirect("/otp-page");
-        console.log("OTP sent", otp);
-    } catch (error) {
-        console.error("Register error", error);
-        res.redirect('/page-not-found');
+            res.redirect("/otp-page");
+        } catch (error) {
+            console.error("Register error", error);
+            res.redirect('/page-not-found');
     }
 };
 
 // Load OTP Page
 const otpver = async (req, res) => {
     try {
+        if (!req.session.userData || !req.session.userOtp) {
+            return res.redirect('/'); // or '/login' or homepage
+        }
         res.render('otppage');
     } catch (err) {
         console.log('Something Happened: ', err);
@@ -122,10 +124,8 @@ const verifyOtp = async (req, res) => {
     try {
         const { otp } = req.body;
         console.log("OTP entered:", otp);
-
         if (otp === req.session.userOtp) {
             const user = req.session.userData;
-            console.log("Session userData:", user);
 
             const passwordHash = await securePass(user.password);
 
@@ -136,7 +136,8 @@ const verifyOtp = async (req, res) => {
                 password: passwordHash
             });
 
-            await saveUserData.save();
+            const sav = await saveUserData.save();
+            
             req.session.user = saveUserData._id;
             res.json({ success: true, redirectUrl: "/login" });
         } else {
@@ -150,16 +151,21 @@ const verifyOtp = async (req, res) => {
 
 const resendOtp = async (req, res) => {
     try {
+
+        if (!req.session.userData || !req.session.userOtp) {
+            return res.redirect('/'); // or '/login' or homepage
+        }
+
         const userData = req.session.userData;
         const lastSentTime = req.session.lastOtpSentTime;
         const now = Date.now();
-
+        
         if (!userData || !userData.email) {
             return res.status(400).json({ success: false, message: "No user data in session." });
         }
 
         // Check if 30 seconds have passed
-        if (lastSentTime && (now - lastSentTime < 30000)) {
+        if (lastSentTime && (now - lastSentTime < 60000)) {
             const secondsLeft = Math.ceil((30000 - (now - lastSentTime)) / 1000);
             return res.status(429).json({
                 success: false,

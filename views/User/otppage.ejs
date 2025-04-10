@@ -19,7 +19,7 @@
       </div>
 
       <p class="resend-text">
-        <button type="button" id="resend-link" class="resend-btn">Resend</button>
+        <button type="button" id="resend-link" class="resend-btn" onclick="resendOtp()">Resend</button>
         (<span id="timer">30</span> s)
       </p>
 
@@ -29,11 +29,11 @@
 </div>
 
 <script>
-  let timer = 30;
+  let timer = 60;
   const timerEl = document.getElementById("timer");
   const resendLink = document.getElementById("resend-link");
 
-  // Start countdown
+  // ============================Start countdown==============================
   const startCountdown = () => {
     resendLink.disabled = true;
     resendLink.style.color = "grey";
@@ -53,57 +53,18 @@
     }, 1000);
   };
 
-  // Resend OTP function
-  function resendOtp() {
-    if (timer > 0) return;
 
-    timer = 30;
-    resendLink.textContent = "Resend";
-    timerEl.textContent = timer;
-    startCountdown();
-
-    // Call backend to resend OTP
-    fetch("/resend-otp")
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          toastr.success("OTP resent successfully!");
-        } else {
-          toastr.error("Failed to resend OTP.");
-        }
-      })
-      .catch(() => toastr.error("Something went wrong"));
-  }
-
-  resendLink.addEventListener("click", resendOtp);
-  window.onload = startCountdown;
-
-  // Auto move to next field
-  const inputs = document.querySelectorAll(".otp-field");
-  inputs.forEach((input, index) => {
-    input.addEventListener("input", (e) => {
-      const value = e.target.value;
-      if (value.length === 1 && index < inputs.length - 1) {
-        inputs[index + 1].focus();
-      }
-    });
-
-    input.addEventListener("keydown", (e) => {
-      if (e.key === "Backspace" && !e.target.value && index > 0) {
-        inputs[index - 1].focus();
-      }
-    });
-  });
-
-  // Get OTP from inputs
-  function getOtpFromInputs() {
+    // ========================Get OTP from inputs==========================
+    function getOtpFromInputs() {
     let otp = "";
     inputs.forEach((input) => otp += input.value);
     return otp;
   }
 
-  // Submit OTP via AJAX
+  // ======================Submit OTP via AJAX============================
   function validateOTPform() {
+
+
     const otpInput = getOtpFromInputs();
 
     $.ajax({
@@ -127,6 +88,54 @@
 
     return false;
   }
+
+
+
+
+
+  // ==========================Resend OTP function=========================
+  function resendOtp() {
+    if (timer > 0) return;
+
+    timer = 60;
+    resendLink.textContent = "Resend";
+    timerEl.textContent = timer;
+    startCountdown();
+
+    // =========================Call backend to resend OTP===============================
+    fetch("/resend-otp")
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          toastr.success("OTP resent successfully!");
+        } else {
+          toastr.error("Failed to resend OTP.");
+        }
+      })
+      .catch(() => toastr.error("Something went wrong"));
+  }
+
+  resendLink.addEventListener("click", resendOtp);
+  window.onload = startCountdown;
+
+
+
+  // =======================Auto move to next field=================================
+  const inputs = document.querySelectorAll(".otp-field");
+  inputs.forEach((input, index) => {
+    input.addEventListener("input", (e) => {
+      const value = e.target.value;
+      if (value.length === 1 && index < inputs.length - 1) {
+        inputs[index + 1].focus();
+      }
+    });
+
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Backspace" && !e.target.value && index > 0) {
+        inputs[index - 1].focus();
+      }
+    });
+  });
 </script>
 
 <%-include("../../views/Partials/user/footer")%>
