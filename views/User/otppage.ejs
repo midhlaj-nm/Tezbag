@@ -11,6 +11,11 @@
   <div class="otp-box">
     <h2 class="otp-title">OTP Verification</h2>
     <form id="otp-form" onsubmit="return validateOTPform()">
+
+      <% if (message) { %>
+        <div class="server-error-message"><%= message %></div>
+      <% } %>
+
       <div class="otp-inputs">
         <input type="text" maxlength="1" class="otp-field" required>
         <input type="text" maxlength="1" class="otp-field" required>

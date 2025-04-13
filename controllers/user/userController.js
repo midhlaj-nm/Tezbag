@@ -4,32 +4,46 @@ const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
 
 // Load Homepage
-const loadHomepage = async (req, res) => {
+const loadHomepage = async (req, res, next) => {
     try {
-        return res.render('beforelogin');
+      // Check for passport login (Google or any passport strategy)
+      if (req.isAuthenticated && req.isAuthenticated()) {
+        console.log("✅ Passport-authenticated user:", req.user?.email);
+        return res.render('homepage', { user: req.user });
+      }
+  
+      // Check for manually set session user
+      if (req.session && req.session.user) {
+        console.log("✅ Session-authenticated user:", req.session.user?.email);
+        return res.render('homepage', { user: req.session.user });
+      }
+  
+      // If not logged in at all
+      console.log("🔒 No user session found. Rendering beforelogin.");
+      return res.render('beforelogin');
     } catch (err) {
-        console.log('Something Happened', err);
-        res.status(500).send('Server Error');
+      console.error('❌ Error loading homepage:', err);
+      next(err);
     }
-};
+  };
 
 // Load Login Page
-const login_user = async (req, res) => {
+const login_user = async (req, res, next) => {
     try {
         return res.render('login_user');
     } catch (err) {
         console.log('Something Happened', err);
-        res.status(500).send('Server Error');
+        next(err);
     }
 };
 
 // Load Register Page
-const register = async (req, res) => {
+const register = async (req, res, next) => {
     try {
-        res.render('register');
+        res.render('register', { message: null });
     } catch (err) {
         console.log('Something Happened While Rendering Register Page', err);
-        res.status(500).send('Server Error');
+        next(err);
     }
 };
 
@@ -69,18 +83,18 @@ async function sendVeriEmail(email, otp) {
 }
 
 // Register POST handler
-const regpost = async (req, res) => {
+const regpost = async (req, res, next) => {
     try {
         console.log("Received registration data:", req.body);
         const { f_name, l_name, email, password, cPassword } = req.body;
 
         if (password !== cPassword) {
-            return res.render('register', { message: "Password do not match" });
+            return res.render('register', { message: "Passwords do not match. Please re-enter." });
         }
 
         const findUser = await User.findOne({ email });
         if (findUser) {
-            return res.render('register', { message: "This email ID is already registered" });
+            return res.render('register', { message: "This email ID is already registered. Try logging in." });
         }
 
         const otp = generateOtp();
@@ -88,31 +102,30 @@ const regpost = async (req, res) => {
 
         const emailSent = await sendVeriEmail(email, otp);
         if (!emailSent) {
-            return res.json("email-error");
+            return res.render('register', { message: "Something went wrong while sending OTP. Try again later." });
         }
 
         req.session.userOtp = otp;
         req.session.userData = { f_name, l_name, email, password };
         console.log("Stored in session: ", req.session.userData);
 
-        res.redirect("/otp-page");
+        return res.redirect("/otp-page");
     } catch (error) {
-        console.error("Register error", error);
-        res.redirect('/page-not-found');
+        next(error);
     }
 };
 
 // Load OTP Page
-const otpver = async (req, res) => {
+const otpver = async (req, res, next) => {
     try {
         console.log("Opening OTP Page. Session data:", req.session.userData, "OTP:", req.session.userOtp);
         if (!req.session.userData || !req.session.userOtp) {
             return res.redirect('/');
         }
-        res.render('otppage');
+        res.render('otppage', { message: null });
     } catch (err) {
         console.log('Something Happened: ', err);
-        res.status(500).send('Server Error');
+        next(err);
     }
 };
 
@@ -121,46 +134,50 @@ const securePass = async (password) => {
     try {
         return await bcrypt.hash(password, 10);
     } catch (error) {
-        console.error("Password hashing error", error);
+        throw new Error("Error occurred during hashing password");
     }
 };
 
 // OTP Verification
-const verifyOtp = async (req, res) => {
+const verifyOtp = async (req, res, next) => {
     try {
         const { otp } = req.body;
         console.log("OTP entered by user:", otp);
         console.log("OTP in session:", req.session.userOtp);
 
-        if (otp === req.session.userOtp) {
-            const user = req.session.userData;
-            console.log("User data from session before saving:", user);
-
-            const passwordHash = await securePass(user.password);
-
-            const saveUserData = new User({
-                f_Name: user.f_name,
-                l_Name: user.l_name,
-                email: user.email,
-                password: passwordHash
-            });
-
-            const sav = await saveUserData.save();
-            console.log("User saved successfully:", sav);
-
-            req.session.user = saveUserData._id;
-            res.json({ success: true, redirectUrl: "/login" });
-        } else {
-            res.status(400).json({ success: false, message: 'Invalid OTP, Please try again' });
+        if (otp !== req.session.userOtp) {
+            return next({ status: 400, message: 'Invalid OTP, please try again' });
         }
+
+        const user = req.session.userData;
+        if (!user) {
+            return next({ status: 400, message: 'Session expired. Please register again.' });
+        }
+
+        const passwordHash = await securePass(user.password);
+
+        const saveUserData = new User({
+            f_Name: user.f_name,
+            l_Name: user.l_name,
+            email: user.email,
+            password: passwordHash
+        });
+
+        const savedUser = await saveUserData.save();
+        console.log("User saved successfully:", savedUser);
+
+        req.session.user = savedUser._id;
+        delete req.session.userOtp;
+        delete req.session.userData;
+
+        return res.status(200).json({ success: true, redirectUrl: "/login" });
     } catch (error) {
-        console.error("OTP verification failed: ", error);
-        res.status(500).json({ success: false, message: 'An error occurred' });
+        next(error);
     }
 };
 
 // Resend OTP
-const resendOtp = async (req, res) => {
+const resendOtp = async (req, res, next) => {
     try {
         console.log("Resend OTP triggered. Session userData:", req.session.userData);
 
@@ -173,14 +190,14 @@ const resendOtp = async (req, res) => {
         const now = Date.now();
 
         if (!userData || !userData.email) {
-            return res.status(400).json({ success: false, message: "No user data in session." });
+            return next({ status: 400, message: "No user data in session." });
         }
 
         if (lastSentTime && (now - lastSentTime < 60000)) {
             const secondsLeft = Math.ceil((60000 - (now - lastSentTime)) / 1000);
             console.log(`Blocked resend: wait ${secondsLeft} more seconds`);
-            return res.status(429).json({
-                success: false,
+            return next({
+                status: 429,
                 message: `Please wait ${secondsLeft} seconds before resending OTP.`
             });
         }
@@ -190,17 +207,15 @@ const resendOtp = async (req, res) => {
 
         const emailSent = await sendVeriEmail(userData.email, newOtp);
         if (!emailSent) {
-            return res.status(500).json({ success: false, message: "Failed to resend OTP." });
+            return next({ status: 500, message: "Failed to resend OTP." });
         }
 
         req.session.userOtp = newOtp;
         req.session.lastOtpSentTime = now;
 
         return res.status(200).json({ success: true, message: "OTP resent successfully." });
-
     } catch (error) {
-        console.error("Resend OTP error:", error);
-        res.status(500).json({ success: false, message: "Internal Server Error" });
+        next(error);
     }
 };
 

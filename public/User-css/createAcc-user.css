@@ -1,20 +1,44 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    height: auto;
+    overflow-y: auto;
+}
+
+.server-error-message {
+    background-color: #ffe5e5;
+    color: #d10000;
+    font-weight: 500;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    text-align: left;
+  }
+  
+
+
 /* Login Container */
 .login-container {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    height: auto;
 }
 
 .login-box {
-    height: 590px;
+    min-height: auto;               /* Let it grow dynamically */
+    height: auto;                   /* Ensure no fixed height issues */
     background: white;
-    padding: 30px;
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     text-align: center;
     width: 500px;
+    overflow: visible;              /* Ensure inner elements aren't clipped */
+    box-sizing: border-box;
+    margin: 1% 0px;      /* Important for proper padding handling */
 }
+
 
 .login-title {
     font-weight: 600;
@@ -116,12 +140,21 @@ a.login-btn:focus {
     padding: 10px;
     border: 1px solid #ddd;
     border-radius: 5px;
-    background: white;
+    background-color: white;
     color: #333;
     font-size: 16px;
     cursor: pointer;
     margin-top: 15px;
-    transition: all 0.3s;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    text-decoration: none; /* Removes blue underline */
+}
+
+.google-signin-btn span{
+    text-decoration: none;
+}
+
+.google-signin:hover {
+    background-color: #f1f1f1;
 }
 
 .google-signin img {
@@ -129,10 +162,27 @@ a.login-btn:focus {
     height: 20px;
 }
 
-.google-signin:hover {
-    background: #f1f1f1;
+/* Optional: if <a> tag also has this class, reset it */
+.google-signin-btn {
+    all: unset; /* resets all default <a> or <button> styles */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    cursor: pointer;
 }
 
+.google-signin a {
+    color: inherit;
+    text-decoration: none;
+  }
+  
+  .google-signin a:hover {
+    color: inherit;
+    text-decoration: none;
+  }
+  
 
 .register-link {
     margin-top: 15px;

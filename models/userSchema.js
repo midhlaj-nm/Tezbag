@@ -19,20 +19,20 @@ const userSchema = new Schema({
         required: true,
         unique: true,
     }, 
-    // phone: {
-    //     type: String,
-    //     required: false,
-    //     unique: true,
-    //     sparse: true,
-    //     default:null
-    // },
-    // googleId: {
-    //     type: String,
-    //     unique: true
-    // },
+    phone: {
+        type: String,
+        required: false,
+        unique: true,
+        sparse: true,
+        default:null
+    },
+    googleId: {
+        type: String,
+        unique: true
+    },
     password: {
         type: String,
-        required: true
+        required: false
     },
     isBlocked: {
         type: Boolean,
@@ -42,22 +42,6 @@ const userSchema = new Schema({
         type: Boolean,
         default: false
     },
-    cart: [{
-        type: Schema.Types.ObjectId,
-        ref: 'Cart',
-    }],
-    wallet: {
-        type: Number,
-        default: 0
-    },
-    wishlist: [{
-        type:Schema.Types.ObjectId,
-        ref:"Wishlist"
-    }],
-    orderHistory:[{
-        type: Schema.Types.ObjectId,
-        ref:"Order"
-    }],
     createdOn: {
         type: Date,
         default: Date.now
@@ -67,21 +51,7 @@ const userSchema = new Schema({
     },
     redeemed: {
         type : Boolean,
-    },
-    redeemedUsers: [{
-        type: Schema.Types.ObjectId,
-        ref: 'User'
-    }],
-    searchHistory: [{
-        category: {
-            type: Schema.Types.ObjectId,
-            ref: 'Category'
-        },
-        searchOn: {
-           type: Date,
-           default: Date.now 
-        }
-    }]
+    }
 })
 
 

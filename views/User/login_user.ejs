@@ -5,6 +5,14 @@
                 <h2 class="login-title">Log In</h2>
                 
                 <form>
+
+                    
+                    <% if (message && message.length > 0) { %>
+                        <div class="server-error-message"><%= message %></div>
+                      <% } %>
+
+                      
+
                     <div class="form-group">
                         <input type="email" class="form-control" placeholder="Email">
                     </div>

@@ -9,6 +9,18 @@ body{
     font-family: 'Poppins', sans-serif;    
 }
 
+
+.server-error-message {
+    background-color: #ffe5e5;
+    color: #d10000;
+    font-weight: 500;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    text-align: left;
+  }
+
+
 #top {
     width: 100%;
     background-color: #EDF2EE;
@@ -75,7 +87,8 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 70vh;
+    height: auto;
+    margin: 20px 0px;
 }
 
 .login-box {
