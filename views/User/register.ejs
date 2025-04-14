@@ -8,9 +8,11 @@
                 <form id="signForm" method="POST" action="/register" novalidate>
 
 
-                  <% if (message) { %>
+                  <% if (message && message.length > 0) { %>
                     <div class="server-error-message"><%= message %></div>
-                  <% } %>
+                  <% } %>                 
+                  
+                  
 
 
                     <div class="form-group">
@@ -26,12 +28,14 @@
                         <div id="err3" class="err-msg"></div>
                     </div>
                     <div class="form-group password-group">
-                        <input type="password" class="form-control" name="password" id="password" placeholder="Password">                   
+                        <input type="password" class="form-control" name="password" id="password" placeholder="Password"> 
+                        <span class="eye-icon" onclick="togglePassword('password', this)">👁️</span>                  
                         <div id="err4" class="err-msg"></div>
                     </div>
                     
                     <div class="form-group password-group">
                         <input type="password" class="form-control" name="cPassword" id="cPassword" placeholder="Confirm Password">
+                        <span class="eye-icon" onclick="togglePassword('cPassword', this)">👁️</span>
                         <div id="err5" class="err-msg"></div>
                     </div>
                     <div class="form-group remember-me">
@@ -45,7 +49,7 @@
 
                     <!-- Google Sign-in Button -->
                     <div class="google-signin">
-                      <a href="/auth/google" class="google-signin-btn">
+                      <a href="/auth/google/signup" class="google-signin-btn">
                         <img src="/g-logo-removebg-preview.png" alt="Google Logo">
                         <span>Sign in with Google</span>
                     </a>                    
@@ -62,6 +66,17 @@
     <script>
 
 
+//Password Hider
+function togglePassword(inputId, iconElement) {
+  const input = document.getElementById(inputId);
+  const isVisible = input.type === "text";
+  input.type = isVisible ? "password" : "text";
+
+  // Optional: Toggle icon text
+  iconElement.textContent = isVisible ? "👁️" : "🙈";
+}
+
+//Client Side Verification
         const f_nameid = document.getElementsByName('f_name')[0];
         const l_nameid = document.getElementsByName('l_name')[0];
         const emailid = document.getElementsByName('email')[0];

@@ -3,49 +3,106 @@ const env = require('dotenv').config();
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
 
+
+//Load 404
+const load404 = async (req, res) => {
+    try {
+      res.render('404');
+    } catch (err) {
+        res.redirect('/404Error')
+    }
+};
+
+
 // Load Homepage
 const loadHomepage = async (req, res, next) => {
     try {
-      // Check for passport login (Google or any passport strategy)
-      if (req.isAuthenticated && req.isAuthenticated()) {
-        console.log("✅ Passport-authenticated user:", req.user?.email);
-        return res.render('homepage', { user: req.user });
-      }
-  
-      // Check for manually set session user
-      if (req.session && req.session.user) {
-        console.log("✅ Session-authenticated user:", req.session.user?.email);
-        return res.render('homepage', { user: req.session.user });
-      }
-  
-      // If not logged in at all
-      console.log("🔒 No user session found. Rendering beforelogin.");
-      return res.render('beforelogin');
+        // Check if user is logged in via session OR via Passport
+        if (req.session.user || req.user) {
+            console.log("✅ User is logged in:", req.session.user || req.user?.email);
+            res.render('homepage');  // Render your actual home page for logged-in users
+        } else {
+            console.log("⚠️ User not logged in");
+            res.render('beforelogin');  // Public landing page
+        }
     } catch (err) {
-      console.error('❌ Error loading homepage:', err);
-      next(err);
+        console.error('❌ Error loading homepage:', err);
+        next(err);
     }
-  };
+};
 
 // Load Login Page
 const login_user = async (req, res, next) => {
     try {
-        return res.render('login_user');
+        res.render('login_user', { message: res.locals.message || null })
     } catch (err) {
         console.log('Something Happened', err);
-        next(err);
+        res.redirect('/404Error')
     }
 };
+
+/*
+const register = async (req, res, next) => {
+  try {
+    res.render('register', { message: res.locals.message || null });
+  } catch (err) {
+    console.log('Something Happened While Rendering Register Page', err);
+    next(err);
+  }
+};
+*/
+
+//Login post
+const logpost = async (req, res, next) => {
+    try {
+        const { email, password, rememberMe } = req.body;
+
+        console.log("🛂 Login Attempt:", email, "| Remember Me:", rememberMe);
+
+        const findUser = await User.findOne({ isAdmin: 0, email });
+
+        if (!findUser) {
+            return res.render('login_user', { message: 'Incorrect Email Address' });
+        }
+
+        if (findUser.isBlocked) {
+            return res.render('login_user', { message: "Your entry is Blocked by Authorities" });
+        }
+
+        const passwordMatch = await bcrypt.compare(password, findUser.password);
+
+        if (!passwordMatch) {
+            return res.render('login_user', { message: "Incorrect Password" });
+        }
+
+        req.session.user = findUser._id;
+
+        // 🌟 If 'Remember Me' is checked, extend session cookie
+        if (rememberMe) {
+            req.session.cookie.maxAge = 7 * 24 * 60 * 60 * 1000; // 7 days
+            console.log("🕒 Remember Me enabled: Session will persist for 7 days");
+        } else {
+            req.session.cookie.expires = false; // Session cookie
+            console.log("⏱️ Session will expire on browser close");
+        }
+
+        res.redirect('/');
+    } catch (error) {
+        next(error);
+        res.render('login_user', { message: 'Login failed. Please try again' });
+    }
+};
+
 
 // Load Register Page
 const register = async (req, res, next) => {
     try {
-        res.render('register', { message: null });
+      res.render('register', { message: res.locals.message || null });
     } catch (err) {
-        console.log('Something Happened While Rendering Register Page', err);
-        next(err);
+      console.log('Something Happened While Rendering Register Page', err);
+      res.redirect('/404Error')
     }
-};
+  };  
 
 // Generate 4-digit OTP
 function generateOtp() {
@@ -219,10 +276,15 @@ const resendOtp = async (req, res, next) => {
     }
 };
 
+
+
+
 module.exports = {
+    load404,
     loadHomepage,
     register,
     login_user,
+    logpost,
     regpost,
     otpver,
     verifyOtp,

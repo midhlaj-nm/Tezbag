@@ -2,12 +2,13 @@ const express = require("express");
 const app = express();
 const path = require("path");
 const session = require("express-session");
-const env = require("dotenv").config();
 const flash = require('connect-flash');
+const env = require("dotenv").config();
 const db = require("./config/db");
 const userRouter = require("./routes/userRouter");
 const errorHandler = require('./middlewares/errorHandler');
 const passport = require('./config/passport')
+const passport_login = require('./config/passport-login')
 db();
 
 app.use(express.json());
@@ -28,9 +29,11 @@ app.use(
 app.use(flash());
 
 app.use((req, res, next) => {
-  res.locals.message = req.flash('error');
+  const error = req.flash('error');
+  res.locals.message = error.length > 0 ? error[0] : null; // single message fallback
   next();
 });
+
 
 app.set("view engine", "ejs");
 app.set("views", [
@@ -40,6 +43,8 @@ app.set("views", [
 app.use(express.static(path.join(__dirname, "public")));
 app.use(passport.initialize());
 app.use(passport.session())
+app.use(passport_login.initialize());
+app.use(passport_login.session())
 app.use("/", userRouter);
 app.use(errorHandler);
 

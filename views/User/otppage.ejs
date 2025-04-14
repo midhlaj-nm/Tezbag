@@ -68,31 +68,37 @@
 
   // ======================Submit OTP via AJAX============================
   function validateOTPform() {
+  const otpInput = getOtpFromInputs();
+  console.log("🔐 Collected OTP from inputs:", otpInput); // Log entered OTP
 
+  $.ajax({
+    type: "POST",
+    url: "/verify-otp",
+    data: { otp: otpInput },
+    success: function (response) {
+      console.log("✅ Server responded with:", response); // Full server response
 
-    const otpInput = getOtpFromInputs();
-
-    $.ajax({
-      type: "POST",
-      url: "/verify-otp",
-      data: { otp: otpInput },
-      success: function (response) {
-        if (response.success) {
-          toastr.success("OTP verified!");
-          setTimeout(() => {
-            window.location.href = response.redirectUrl;
-          }, 1000);
-        } else {
-          toastr.error("Invalid OTP");
-        }
-      },
-      error: function () {
-        toastr.error("Something went wrong");
+      if (response.success) {
+        console.log("🎉 OTP Verified Successfully. Redirecting to:", response.redirectUrl);
+        toastr.success("OTP verified!");
+        setTimeout(() => {
+          window.location.href = response.redirectUrl;
+        }, 1000);
+      } else {
+        console.warn("❌ Server rejected OTP. Message:", response.message || "Invalid OTP");
+        toastr.error("Invalid OTP");
       }
-    });
+    },
+    error: function (xhr, status, error) {
+      console.error("🚨 AJAX error occurred:", error);
+      console.log("🚨 Full error response:", xhr.responseText);
+      toastr.error("Something went wrong");
+    }
+  });
 
-    return false;
-  }
+  return false; // Prevent default form submission
+}
+
 
 
 

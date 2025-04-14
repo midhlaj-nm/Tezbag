@@ -4,40 +4,57 @@
             <div class="login-box">
                 <h2 class="login-title">Log In</h2>
                 
-                <form>
-
+                <form method="POST" action="/login">
                     
                     <% if (message && message.length > 0) { %>
                         <div class="server-error-message"><%= message %></div>
                       <% } %>
-
                       
-
+                
                     <div class="form-group">
-                        <input type="email" class="form-control" placeholder="Email">
+                        <input type="email" name="email" class="form-control" placeholder="Email" required>
                     </div>
+                
                     <div class="form-group password-group">
-                        <input type="password" class="form-control" placeholder="Password">
-                        <span class="eye-icon">👁️</span>
+                        <input type="password" name="password" id="password" class="form-control" placeholder="Password" required>
+                        <span class="eye-icon" onclick="togglePassword('password', this)">👁️</span>
                     </div>
+                
                     <div class="form-group remember-me">
                         <label>
-                            <input type="checkbox"> Remember me
+                            <input type="checkbox" name="rememberMe"> Remember me
                         </label>
                         <div class="forgot-password-container">
                             <a href="#" class="forgot-password">Forget Password?</a>
                         </div>
                     </div>                    
+                
                     <button type="submit" class="login-btn">Login</button>
-
+                
                     <!-- Google Sign-in Button -->
                     <div class="google-signin">
-                        <img src="/g-logo-removebg-preview.png" alt="Google Logo">
-                        <span>Sign in with Google</span>
-                    </div>
+                        <a href="/auth/google/login" class="google-signin-btn">
+                          <img src="/g-logo-removebg-preview.png" alt="Google Logo">
+                          <span>Sign in with Google</span>
+                      </a>                    
+                      </div>
                 </form>
+                
                 
                 <p class="register-link">Don't have an account? <a href="/register">Register</a></p>
             </div>
         </div>
+
+<script>
+function togglePassword(inputId, iconElement) {
+  const input = document.getElementById(inputId);
+  const isVisible = input.type === "text";
+  input.type = isVisible ? "password" : "text";
+
+  // Optional: Toggle icon text
+  iconElement.textContent = isVisible ? "👁️" : "🙈";
+}
+
+</script>
+
 <%-include("../../views/Partials/user/footer")%>
