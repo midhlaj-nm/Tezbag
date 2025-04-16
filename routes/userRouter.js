@@ -31,6 +31,6 @@ router.get('/auth/google/callback/login',
     res.redirect('/');
   }
 );
-
+router.get('/account-settings',userController.loadSettings)
 
 module.exports = router

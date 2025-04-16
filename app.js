@@ -9,6 +9,7 @@ const userRouter = require("./routes/userRouter");
 const errorHandler = require('./middlewares/errorHandler');
 const passport = require('./config/passport')
 const passport_login = require('./config/passport-login')
+const stateRouter = require('./routes/countryStateApi');
 db();
 
 app.use(express.json());
@@ -49,8 +50,10 @@ app.use("/", userRouter);
 app.use(errorHandler);
 
 
+app.use('/api', stateRouter);
+
 app.listen(process.env.PORT, () => {
   console.log("Server running");
 });
 
-module.exports = app;
+

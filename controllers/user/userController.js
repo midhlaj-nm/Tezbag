@@ -276,7 +276,13 @@ const resendOtp = async (req, res, next) => {
     }
 };
 
-
+const loadSettings = async(req,res) => {
+    try {
+        res.render('settings')
+    } catch (error) {
+        res.redirect('/404Error')
+    }
+}
 
 
 module.exports = {
@@ -288,5 +294,6 @@ module.exports = {
     regpost,
     otpver,
     verifyOtp,
-    resendOtp
+    resendOtp,
+    loadSettings,
 };
