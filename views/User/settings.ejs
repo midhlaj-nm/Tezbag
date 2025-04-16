@@ -18,32 +18,33 @@
 <div class="page-wrapper">
     <!-- =======================Left area================= -->
     <div class="navigation-panel">
-        <div class="nav-header">Navigation</div>
-        
-        <div class="nav-item">
-            <span class="material-symbols-outlined">Dashboard</span>Dashboard
-        </div>
-        <div class="nav-item">
-          <i class="fa-solid fa-rotate"></i> Order History
-        </div>
-        <div class="nav-item">
-            <span class="material-symbols-outlined">favorite</span>Wishlist
-        </div>
-        <div class="nav-item">
-            <span class="material-symbols-outlined">shopping_cart</span>Shopping Cart
-        </div>
-        <div class="nav-item active">
-            <span class="material-symbols-outlined">settings</span>Settings
-        </div>
-        <div class="nav-item">
-            <span class="material-symbols-outlined">wallet</span>Wallet
-        </div>
-        <div class="nav-item">
-            <span class="material-symbols-outlined">logout</span>Log-out
-        </div>
+      <div class="nav-header">Navigation</div>
+      
+      <div class="nav-item" onclick="window.location.href='/account'">
+          <span class="material-symbols-outlined">Dashboard</span>Dashboard
       </div>
+      <div class="nav-item" onclick="window.location.href=''">
+        <i class="fa-solid fa-rotate"></i> Order History
+      </div>
+      <div class="nav-item" onclick="window.location.href=''">
+          <span class="material-symbols-outlined">favorite</span>Wishlist
+      </div>
+      <div class="nav-item" onclick="window.location.href=''">
+          <span class="material-symbols-outlined">shopping_cart</span>Shopping Cart
+      </div>
+      <div class="nav-item active" onclick="window.location.href='/account-settings'">
+          <span class="material-symbols-outlined">settings</span>Settings
+      </div>
+      <div class="nav-item" onclick="window.location.href='#'">
+          <span class="material-symbols-outlined">wallet</span>Wallet
+      </div>
+      <div class="nav-item" onclick="window.location.href='/logout'">
+          <span class="material-symbols-outlined">logout</span>Log-out
+      </div>
+    </div>
 
-      <!-- =============================right area================================ -->
+
+      <!-- =============================Right area================================ -->
       <div class="rght-container">
         <h2 style="margin-bottom: 1.5rem;">Account Settings</h2>
         <div style="border-bottom: 1px solid #ccc; width: 100%; margin-bottom: 1.5rem;"></div>             
@@ -65,7 +66,7 @@
       </div>
 
 <!-- ======Address-editing-Section============ -->
-<div class="rght-container-add">
+<div class="rght-container-add"  id="edit-address">
     <form class="settings-form-add">
       <div class="address-form">
         <h2>Edit Address</h2>
@@ -140,12 +141,8 @@
       </div>
     </form>
   </div>
-  
-
-
-
-
 </div>
+
 
 
 

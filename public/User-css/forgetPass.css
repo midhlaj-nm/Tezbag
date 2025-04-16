@@ -1,3 +1,15 @@
+.server-error-message {
+    background-color: #ffe5e5;
+    color: #d10000;
+    font-weight: 500;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    text-align: left;
+  }
+
+
+
 /* Center the Forget Password box */
 .forget-password-container {
     display: flex;

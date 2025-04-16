@@ -1,0 +1,190 @@
+<%-include("../../views/Partials/user/header-srch")%>
+
+<link rel="stylesheet" href="/User-css/dashboard.css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Toastr CSS & JS -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+<!-- Font&Icon -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+
+<div class="page-wrapper">
+    <!-- =======================Left area================= -->
+    <div class="navigation-panel">
+        <div class="nav-header">Navigation</div>
+        
+        <div class="nav-item active" onclick="window.location.href='/account'">
+            <span class="material-symbols-outlined">Dashboard</span>Dashboard
+        </div>
+        <div class="nav-item" onclick="window.location.href=''">
+          <i class="fa-solid fa-rotate"></i> Order History
+        </div>
+        <div class="nav-item" onclick="window.location.href=''">
+            <span class="material-symbols-outlined">favorite</span>Wishlist
+        </div>
+        <div class="nav-item" onclick="window.location.href=''">
+            <span class="material-symbols-outlined">shopping_cart</span>Shopping Cart
+        </div>
+        <div class="nav-item" onclick="window.location.href='/account-settings'">
+            <span class="material-symbols-outlined">settings</span>Settings
+        </div>
+        <div class="nav-item" onclick="window.location.href='#'">
+            <span class="material-symbols-outlined">wallet</span>Wallet
+        </div>
+        <div class="nav-item" onclick="window.location.href='/logout'">
+            <span class="material-symbols-outlined">logout</span>Log-out
+        </div>
+      </div>
+
+<!-- =================== right container ======================= -->
+<div class="rgh-container">
+    <img src="/profile pic.jpg" alt="TezBag Profile Pic">
+    <h4>Middhlaj VK</h4>
+    <p class="user-role">Customer</p>
+    <a href="/account-settings" class="custom-link">
+        <h5>Edit Profile</h5>
+    </a>      
+</div>  
+<div class="rgh-container2">
+    <p class="add">ADDRESS</p>
+    <h4>Middhlaj VK</h4>
+    <p class="add">4140 Parker Rd. Allentown, New Mexico 31134</p>
+    <h5 class="mail">midhlajrocks@gmail.com</h5>
+    <h5 class="num">8891941474</h5>
+    <a href="/account-settings#edit-address" class="custom-link-add">
+        <h5>Edit Address</h5>
+    </a>
+</div>
+<div class="rgh-container3">
+    <div class="order-history-header">
+        <h2>Recet Order History</h2>
+        <a href="#" class="view-all">View All</a>
+    </div>
+    
+    <table class="order-table">
+        <thead>
+            <tr>
+                <th>ORDER ID</th>
+                <th>DATE</th>
+                <th>TOTAL</th>
+                <th>STATUS</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>#738</td>
+                <td>8 Sep, 2020</td>
+                <td>$135.00 (5 Products)</td>
+                <td>Processing</td>
+                <td><a href="#" class="view-details">View Details</a></td>
+            </tr>
+            <tr>
+                <td>#703</td>
+                <td>24 May, 2020</td>
+                <td>$25.00 (1 Product)</td>
+                <td>on the way</td>
+                <td><a href="#" class="view-details">View Details</a></td>
+            </tr>
+            <tr>
+                <td>#130</td>
+                <td>22 Oct, 2020</td>
+                <td>$250.00 (4 Products)</td>
+                <td>Completed</td>
+                <td><a href="#" class="view-details">View Details</a></td>
+            </tr>
+            <tr>
+                <td>#561</td>
+                <td>1 Feb, 2020</td>
+                <td>$35.00 (1 Products)</td>
+                <td>Completed</td>
+                <td><a href="#" class="view-details">View Details</a></td>
+            </tr>
+            <tr>
+                <td>#536</td>
+                <td>21 Sep, 2020</td>
+                <td>$578.00 (13 Products)</td>
+                <td>Completed</td>
+                <td><a href="#" class="view-details">View Details</a></td>
+            </tr>
+            <tr>
+                <td>#492</td>
+                <td>22 Oct, 2020</td>
+                <td>$345.00 (7 Products)</td>
+                <td>Completed</td>
+                <td><a href="#" class="view-details">View Details</a></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+</div>
+
+
+<!-- ======================== logout modal ================================= -->
+<div id="logout-modal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <h3>Are you sure?</h3>
+      <div class="modal-buttons">
+        <button id="cancel-logout" class="btn-no">NO</button>
+        <button id="confirm-logout" class="btn-yes">YES</button>
+      </div>
+    </div>
+  </div>
+
+
+
+<script>
+    // JavaScript to handle the modal functionality
+document.addEventListener('DOMContentLoaded', function() {
+  // Get the logout button - update the selector to match your actual logout button
+  const logoutBtn = document.querySelector('.nav-item[onclick*="logout"]') || document.querySelector('.log-out');
+  const modal = document.getElementById('logout-modal');
+  const cancelBtn = document.getElementById('cancel-logout');
+  const confirmBtn = document.getElementById('confirm-logout');
+  
+  // If logout button exists, modify its behavior
+  if (logoutBtn) {
+    // Remove any existing onclick attribute
+    const originalOnClick = logoutBtn.getAttribute('onclick');
+    logoutBtn.removeAttribute('onclick');
+    
+    // Add event listener for click
+    logoutBtn.addEventListener('click', function(e) {
+      e.preventDefault(); // Prevent any default action
+      modal.style.display = 'flex'; // Show modal
+    });
+  }
+  
+  // When user clicks "NO"
+  cancelBtn.addEventListener('click', function() {
+    modal.style.display = 'none'; // Hide modal
+  });
+  
+  // When user clicks "YES"
+  confirmBtn.addEventListener('click', function() {
+    // Perform the actual logout
+    window.location.href = '/logout'; // Update with your actual logout URL
+  });
+  
+  // Close modal if user clicks outside of it
+  window.addEventListener('click', function(e) {
+    if (e.target === modal) {
+      modal.style.display = 'none';
+    }
+  });
+});
+</script>
+
+
+
+
+
+<%-include("../../views/Partials/user/footer")%>

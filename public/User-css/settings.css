@@ -15,7 +15,7 @@ body {
     width: 90%;
     box-sizing: border-box;
 }
-
+/* =========================== Nav-bar =========================== */
 .navigation-panel {
     height: fit-content;
     font-family: 'Poppins', sans-serif;
@@ -55,7 +55,7 @@ body {
   .active {
     color: #000;
   }
-
+/* ======================== Edit Acccount ======================== */
   .rght-container{
     padding: 25px 25px;
     border-radius: 10px;
@@ -115,7 +115,7 @@ body {
     background-color: #218838;
   }
   
-  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+ /* ======================= Address Section ======================= */
 
   .rght-container-add {
     padding: 25px;

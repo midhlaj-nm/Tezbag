@@ -31,6 +31,10 @@ router.get('/auth/google/callback/login',
     res.redirect('/');
   }
 );
-router.get('/account-settings',userController.loadSettings)
+router.get('/verify-email',userController.loadVerifyEmail)
+router.post('/verify-email',userController.loadVerifyEmailPost)
+router.get('/account-settings',userController.loadSettings);
+router.get('/account', userController.loadDashboard);
+router.get('/logout',userController.logout)
 
 module.exports = router

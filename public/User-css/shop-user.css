@@ -2,8 +2,14 @@
 @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined');
 
 a {
-    text-decoration: none;
-}
+    text-decoration: none; /* Removes the underline */
+    color: inherit; /* Uses the parent element's text color instead of blue */
+  }
+  
+  .cart-content {
+    display: flex;
+    align-items: center;
+  }
 
 
 body{
@@ -105,6 +111,19 @@ body {
     font-family: 'Poppins', sans-serif;
   }
   
+  .heart-link {
+    text-decoration: none;
+    color: inherit;
+  }
+  
+  .heart-link:visited, 
+  .heart-link:hover, 
+  .heart-link:active, 
+  .heart-link:focus {
+    text-decoration: none;
+    color: inherit;
+  }
+
   .heart-container,
   .cart-content {
     display: flex;
@@ -120,17 +139,25 @@ body {
     transition: color 0.3s;
   }
   
-  
-  .icon:hover {
-    color: #f44336; /* red on hover */
-  }
-  
   .divider {
     width: 1px;
     height: 28px;
     background-color: #ccc;
   }
   
+  .cart-link {
+    text-decoration: none; /* Removes the underline */
+    color: inherit; /* Uses the parent element's text color instead of blue */
+  }
+  
+  .cart-link:visited, 
+  .cart-link:hover, 
+  .cart-link:active, 
+  .cart-link:focus {
+    color: inherit;
+    text-decoration: none;
+  }
+
   .cart-text {
     display: flex;
     flex-direction: column;

@@ -30,10 +30,11 @@ app.use(
 app.use(flash());
 
 app.use((req, res, next) => {
-  const error = req.flash('error');
-  res.locals.message = error.length > 0 ? error[0] : null; // single message fallback
+  const message = req.flash('message');
+  res.locals.message = message.length > 0 ? message[0] : null;
   next();
 });
+
 
 
 app.set("view engine", "ejs");

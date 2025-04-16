@@ -7,8 +7,13 @@
     <div class="forget-password-box">
         <h2 class="forget-title">Reset Password</h2>
         <form>
-            <input type="email" class="form-control" placeholder="Email" required>
+
+            <% if (message && message.length > 0) { %>
+                <div class="server-error-message"><%= message %></div>
+              <% } %>
+
             <input type="password" class="form-control" placeholder="Password" required>
+            <input type="password" class="form-control" placeholder="Confirm Password" required>
             <button type="submit" class="continue-btn">Continue</button>
         </form>
     </div>
