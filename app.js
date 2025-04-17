@@ -30,8 +30,8 @@ app.use(
 app.use(flash());
 
 app.use((req, res, next) => {
-  const message = req.flash('message');
-  res.locals.message = message.length > 0 ? message[0] : null;
+  res.locals.message = req.flash('message');
+  res.locals.messageType = req.flash('messageType');
   next();
 });
 

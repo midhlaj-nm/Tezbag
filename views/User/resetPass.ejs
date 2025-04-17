@@ -6,19 +6,102 @@
 <div class="forget-password-container">
     <div class="forget-password-box">
         <h2 class="forget-title">Reset Password</h2>
-        <form>
+        <form action="/reset-password" method="POST">
 
             <% if (message && message.length > 0) { %>
                 <div class="server-error-message"><%= message %></div>
-              <% } %>
-
-            <input type="password" class="form-control" placeholder="Password" required>
-            <input type="password" class="form-control" placeholder="Confirm Password" required>
+            <% } %>
+        
+            <div class="password-wrapper">
+                <div class="input-with-eye">
+                  <input type="password" name="password" id="password" class="form-control" placeholder="Password">
+                  <span class="eye-icon" onclick="togglePassword('password', this)">👁️</span>
+                </div>
+                <div id="err1" class="err-msg"></div>
+              </div>
+              
+              <div class="password-wrapper">
+                <div class="input-with-eye">
+                  <input type="password" name="confirmPassword" id="cPassword" class="form-control" placeholder="Confirm Password">
+                  <span class="eye-icon" onclick="togglePassword('cPassword', this)">👁️</span>
+                </div>
+                <div id="err2" class="err-msg"></div>
+              </div>              
+              
+        
             <button type="submit" class="continue-btn">Continue</button>
-        </form>
+        </form>        
     </div>
 </div>
 
+<script>
+//Password Hider
+function togglePassword(inputId, iconElement) {
+  const input = document.getElementById(inputId);
+  const isVisible = input.type === "text";
+  input.type = isVisible ? "password" : "text";
+
+  // Optional: Toggle icon text
+  iconElement.textContent = isVisible ? "👁️" : "🙈";
+}
+
+
+// ======================
+// Password Verification
+// ======================
+  const passwordInput = document.getElementById('password');
+  const confirmPasswordInput = document.getElementById('cPassword');
+
+  const err1 = document.getElementById('err1');
+  const err2 = document.getElementById('err2');
+
+  const resetForm = document.querySelector('form'); // make sure it's the correct form
+
+  function validatePasswords() {
+    const passVal = passwordInput.value.trim();
+    const confirmVal = confirmPasswordInput.value.trim();
+
+    const alpha = /[a-zA-Z]/;
+    const digit = /\d/;
+
+    let valid = true;
+
+    // Validate password strength
+    if (passVal.length < 8) {
+      err1.innerText = "Should contain at least 8 characters";
+      err1.style.display = "block";
+      valid = false;
+    } else if (!alpha.test(passVal) || !digit.test(passVal)) {
+      err1.innerText = "Password must contain letters and numbers";
+      err1.style.display = "block";
+      valid = false;
+    } else {
+      err1.innerText = "";
+      err1.style.display = "none";
+    }
+
+    // Validate password match
+    if (passVal !== confirmVal) {
+      err2.innerText = "Passwords do not match";
+      err2.style.display = "block";
+      valid = false;
+    } else {
+      err2.innerText = "";
+      err2.style.display = "none";
+    }
+
+    return valid;
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    resetForm.addEventListener('submit', function (e) {
+      if (!validatePasswords()) {
+        e.preventDefault();
+      }
+    });
+  });
+
+</script>
 
 <!-- footer -->
 <%-include("../../views/Partials/user/footer")%>

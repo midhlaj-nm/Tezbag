@@ -16,6 +16,13 @@ const load404 = async (req, res) => {
 };
 
 // ===========================
+// Generate 4-digit OTP
+// ===========================
+function generateOtp() {
+    return Math.floor(1000 + Math.random() * 9000).toString();
+}
+
+// ===========================
 // Load Homepage
 // ===========================
 const loadHomepage = async (req, res, next) => {
@@ -38,7 +45,20 @@ const loadHomepage = async (req, res, next) => {
 // ===========================
 const login_user = async (req, res, next) => {
     try {
-        res.render('login_user', { message: res.locals.message || null });
+        const errorMessages = req.flash('error');
+        const successMessages = req.flash('success');
+        const customMessages = req.flash('message');
+        const customType = req.flash('messageType');
+
+        const message = errorMessages.length ? errorMessages
+                      : successMessages.length ? successMessages
+                      : customMessages;
+
+        const messageType = errorMessages.length ? ['error']
+                            : successMessages.length ? ['success']
+                            : customType;
+
+        res.render('login_user', { message, messageType });
     } catch (err) {
         console.error('❌ Error loading login page:', err);
         res.redirect('/404Error');
@@ -90,8 +110,10 @@ const logpost = async (req, res, next) => {
     }
 };
 
+
+
 // ===========================
-// Load Email Verification Page
+// Load Email Verification Page (Forget Passowrd)
 // ===========================
 const loadVerifyEmail = async (req, res) => {
     try {
@@ -103,27 +125,184 @@ const loadVerifyEmail = async (req, res) => {
 };
 
 // ===========================
-// Email Verification POST
+// Email Verification POST (Forget Passowrd)
 // ===========================
 const loadVerifyEmailPost = async (req, res, next) => {
     try {
         const { email } = req.body;
         console.log("🔍 Received email for password reset:", email);
 
+        if (!email || email.trim() === "") {
+            req.flash('message', 'Enter your Email Address');
+            return res.redirect('/forget-password');
+        }
+
         const user = await User.findOne({ email });
 
         if (!user) {
-            console.log("❌ No user found with email:", email);
             req.flash('message', 'User not found');
-            return res.redirect('/verify-email');
+            return res.redirect('/forget-password');
         }
 
+        // ✅ Save email in session
         req.session.resetEmail = email;
-        console.log("✅ Email verified and stored in session");
+        console.log("✅ Email verified and stored in session:", req.session.resetEmail);
 
-        res.render('resetPass');
+        // ✅ Generate OTP
+        const otp = generateOtp(); // Make sure this function exists
+        req.session.resetOtp = otp;
+
+        // ✅ Send OTP to user's email
+        const emailSent = await sendVeriEmail(email, otp);
+        if (!emailSent) {
+            req.flash('message', 'Failed to send OTP. Try again later.');
+            return res.redirect('/forget-password');
+        }
+
+        console.log("📧 OTP sent to user:", otp);
+
+        // ✅ Redirect to OTP input page
+        res.render("otppage", { message: req.flash('message'), otpType: "reset" });
+
     } catch (error) {
         console.error("💥 Error in loadVerifyEmailPost:", error);
+        next(error);
+    }
+};
+
+// ===========================
+// OTP verification (Forget Password)
+// ===========================
+const verifyOtpPost = async (req, res, next) => {
+    console.log("🔥 REACHED THE RIGHT verifyOtpPost (Forget Password) CONTROLLER");
+    try {
+        const { otp } = req.body;
+        const sessionOtp = req.session.resetOtp;
+
+        console.log("📥 OTP Verification Request Received");
+        console.log("🔐 Entered OTP:", otp);
+        console.log("📦 Session OTP:", sessionOtp);
+
+        // Check if OTP was sent and is 4 digits
+        if (!otp || otp.length !== 4) {
+            console.warn("⚠️ OTP is missing or not 4 digits");
+            return res.json({ success: false, message: "OTP must be 4 digits." });
+        }
+
+        // Check if session OTP exists
+        if (!sessionOtp) {
+            console.warn("⚠️ No OTP stored in session (session might have expired)");
+            return res.json({ success: false, message: "Session expired or OTP missing." });
+        }
+
+        // Validate OTP
+        if (otp !== sessionOtp) {
+            console.warn("❌ Invalid OTP entered");
+            return res.json({ success: false, message: "Invalid OTP." });
+        }
+
+        // OTP Verified
+        console.log("✅ OTP Verified Successfully");
+        delete req.session.resetOtp;
+
+        return res.json({
+            success: true,
+            redirectUrl: "/reset-password"
+        });
+
+    } catch (error) {
+        console.error("💥 Error in verifyOtpPost:", error);
+        next()
+    }
+};
+
+
+// ===========================
+// Reset Password GET
+// ===========================
+const loadResetPassPage = async (req, res) => {
+    try {
+        res.render('resetPass')
+    } catch (error) {
+        console.error("💥 Error resetting password:", error);
+        res.redirect('/404Error')
+    }
+}
+
+// ===========================
+// Reset Password POST
+// ===========================
+const resetPasswordPost = async (req, res, next) => {
+    try {
+        const { password, confirmPassword } = req.body;
+        const email = req.session.resetEmail;
+
+        console.log("🧩 Reset password for:", email);
+
+        if (!email) {
+            req.flash('message', 'Timeout. Please verify your email again.');
+            return res.redirect('/forget-password');
+        }
+
+        if (!password || !confirmPassword) {
+            req.flash('message', 'Please fill in all fields.');
+            return res.redirect('/reset-password');
+        }
+
+        if (password !== confirmPassword) {
+            req.flash('message', 'Passwords do not match.');
+            return res.redirect('/reset-password');
+        }
+
+        const user = await User.findOne({ email });
+        if (!user) {
+            req.flash('message', 'User not found.');
+            return res.redirect('/reset-password');
+        }
+
+        console.log("🔐 Old (stored hashed) password:", user.password);
+        console.log("🔑 New (plain) password:", password);
+
+        const isSameAsCurrent = await bcrypt.compare(password, user.password);
+
+        let isSameAsOld = false;
+        if (user.oldPasswords && Array.isArray(user.oldPasswords)) {
+            for (let old of user.oldPasswords) {
+                const match = await bcrypt.compare(password, old);
+                if (match) {
+                    isSameAsOld = true;
+                    break;
+                }
+            }
+        }
+
+        if (isSameAsCurrent || isSameAsOld) {
+            req.flash('message', 'This password was used before. Please use a new one.');
+            return res.redirect('/reset-password');
+        }
+
+        // Store current password in oldPasswords array
+        if (user.password) {
+            if (!user.oldPasswords) user.oldPasswords = [];
+            if (user.oldPasswords.length >= 3) user.oldPasswords.shift(); // Keep only last 3
+            user.oldPasswords.push(user.password);
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+        console.log("🔑 New (plain) hashedPassword:", hashedPassword);
+
+        user.password = hashedPassword;
+        await user.save();
+
+        delete req.session.resetEmail;
+
+        console.log("✅ Password successfully updated for", email);
+        req.flash('message', 'Password updated successfully. Please log in.');
+        req.flash('messageType', 'success');
+        return res.redirect('/login');
+
+    } catch (error) {
+        console.error("💥 Error resetting password:", error);
         next(error);
     }
 };
@@ -133,19 +312,25 @@ const loadVerifyEmailPost = async (req, res, next) => {
 // ===========================
 const register = async (req, res, next) => {
     try {
-        res.render('register', { message: res.locals.message || null });
+        const errorMessages = req.flash('error');
+        const successMessages = req.flash('success');
+        const customMessages = req.flash('message');
+        const customType = req.flash('messageType');
+
+        const message = errorMessages.length ? errorMessages
+                      : successMessages.length ? successMessages
+                      : customMessages;
+
+        const messageType = errorMessages.length ? ['error']
+                            : successMessages.length ? ['success']
+                            : customType;
+
+        res.render('register', { message, messageType });
     } catch (err) {
-        console.error("❌ Error loading register page:", err);
+        console.error('❌ Error loading login page:', err);
         res.redirect('/404Error');
     }
 };
-
-// ===========================
-// Generate 4-digit OTP
-// ===========================
-function generateOtp() {
-    return Math.floor(1000 + Math.random() * 9000).toString();
-}
 
 // ===========================
 // Send OTP Email
@@ -185,33 +370,44 @@ async function sendVeriEmail(email, otp) {
 const regpost = async (req, res, next) => {
     try {
         const { f_name, l_name, email, password, cPassword } = req.body;
-        console.log("📥 Registration attempt:", email);
+
+        console.log("📥 Registration attempt:");
+        console.log("👤 First Name:", f_name);
+        console.log("👤 Last Name:", l_name);
+        console.log("📧 Email:", email);
+        console.log("🔑 Password:", password);
+        console.log("🔐 Confirm Password:", cPassword);
 
         if (password !== cPassword) {
+            console.log("⚠️ Passwords do not match");
             req.flash('message', 'Passwords do not match. Please re-enter.');
             return res.render('register', { message: req.flash('message') });
         }
 
         const findUser = await User.findOne({ email });
         if (findUser) {
+            console.log("🚫 Email already registered:", email);
             req.flash('message', 'This email ID is already registered. Try logging in.');
-            return res.render('register', { message: req.flash('message') });
-        }
+            req.flash('messageType', 'error');
+            return res.redirect('/login');
+        }        
 
         const otp = generateOtp();
         console.log("🔐 Generated OTP:", otp);
 
         const emailSent = await sendVeriEmail(email, otp);
         if (!emailSent) {
+            console.log("📤 Email sending failed for:", email);
             req.flash('message', 'Something went wrong while sending OTP. Try again later.');
             return res.render('register', { message: req.flash('message') });
         }
 
         req.session.userOtp = otp;
         req.session.userData = { f_name, l_name, email, password };
-        console.log("📦 Stored user data in session");
+        console.log("📦 Stored user data in session:");
+        console.log("🧾", req.session.userData);
 
-        res.redirect("/otp-page");
+        res.render("otppage", { message: req.flash('message'), otpType: "registration" });
     } catch (error) {
         console.error("❌ Registration error:", error);
         next(error);
@@ -224,15 +420,18 @@ const regpost = async (req, res, next) => {
 const otpver = async (req, res, next) => {
     try {
         console.log("📲 Opening OTP Page");
-        if (!req.session.userData || !req.session.userOtp) {
-            return res.redirect('/');
-        }
-        res.render('otppage', { message: null });
+
+        const message = req.flash('message');
+        const otpType = req.session.otpType;  // 👈 grab otpType from session
+
+        res.render('otppage', { message, otpType }); // 👈 pass it to EJS
+
     } catch (err) {
         console.error("❌ Error opening OTP page:", err);
         next(err);
     }
 };
+
 
 // ===========================
 // Secure Password Hashing
@@ -249,6 +448,7 @@ const securePass = async (password) => {
 // OTP Verification
 // ===========================
 const verifyOtp = async (req, res, next) => {
+    console.log("🔥 REACHED THE RIGHT verifyOtpPost (Account Registration) CONTROLLER");
     try {
         const { otp } = req.body;
         console.log("🧪 OTP entered:", otp);
@@ -278,7 +478,11 @@ const verifyOtp = async (req, res, next) => {
         delete req.session.userOtp;
         delete req.session.userData;
 
-        res.status(200).json({ success: true, redirectUrl: "/login" });
+        res.status(200).json({ 
+            success: true, 
+            redirectUrl: "/login",
+          });
+          
     } catch (error) {
         console.error("❌ OTP verification error:", error);
         next(error);
@@ -375,6 +579,9 @@ module.exports = {
     logpost,
     loadVerifyEmail,
     loadVerifyEmailPost,
+    verifyOtpPost,
+    loadResetPassPage,
+    resetPasswordPost,
     regpost,
     otpver,
     verifyOtp,

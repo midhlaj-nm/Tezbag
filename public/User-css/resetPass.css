@@ -1,3 +1,13 @@
+/* Hide browser default password reveal icon */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-webkit-credentials-auto-fill-button,
+input[type="password"]::-webkit-inner-spin-button,
+input[type="password"]::-webkit-clear-button {
+    display: none !important;
+    appearance: none;
+}
+
+/* Server Message */
 .server-error-message {
     background-color: #ffe5e5;
     color: #d10000;
@@ -7,14 +17,15 @@
     margin-bottom: 15px;
     text-align: left;
 }
-
+  
 
 /* Center the Forget Password box */
 .forget-password-container {
+    margin: 10% 0px;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 50vh;
+    height: auto;
     background: #f8f8f8;
 }
 
@@ -45,6 +56,45 @@
     font-size: 14px;
 }
 
+/* Password Input + Eye + Error Layout */
+.password-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    margin-bottom: 10px;
+  }
+  
+  .input-with-eye {
+    position: relative;
+    width: 100%;
+  }
+  
+  .input-with-eye input.form-control {
+    width: 100%;
+    padding-right: 40px; /* Space for the eye icon */
+  }
+  
+  .eye-icon {
+    position: absolute;
+    right: 12px;
+    top: 45%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 1.2rem;
+    color: #555;
+    user-select: none;
+  }
+  
+  .err-msg {
+    color: red;
+    font-size: 0.9rem;
+    margin-top: 5px;
+    font-weight: 500;
+    display: none;
+    text-align: left;
+  }
+  
 /* Continue Button */
 .continue-btn {
     width: 100%;

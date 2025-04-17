@@ -23,6 +23,8 @@
         <input type="text" maxlength="1" class="otp-field" required>
       </div>
 
+      <input type="hidden" id="otp-type" value="<%= otpType %>">
+
       <p class="resend-text">
         <button type="button" id="resend-link" class="resend-btn" onclick="resendOtp()">Resend</button>
         (<span id="timer">30</span> s)
@@ -70,16 +72,17 @@
   function validateOTPform() {
   const otpInput = getOtpFromInputs();
   console.log("🔐 Collected OTP from inputs:", otpInput); // Log entered OTP
+  const otpType = document.getElementById("otp-type").value;
+  const postUrl = otpType === 'registration' ? '/verify-otp-reg' : '/verify-otp';
 
   $.ajax({
     type: "POST",
-    url: "/verify-otp",
+    url: postUrl,
     data: { otp: otpInput },
     success: function (response) {
       console.log("✅ Server responded with:", response); // Full server response
 
       if (response.success) {
-        console.log("🎉 OTP Verified Successfully. Redirecting to:", response.redirectUrl);
         toastr.success("OTP verified!");
         setTimeout(() => {
           window.location.href = response.redirectUrl;

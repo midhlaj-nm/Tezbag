@@ -10,7 +10,7 @@ body{
 }
 
 
-.server-error-message {
+.err-msg {
     background-color: #ffe5e5;
     color: #d10000;
     font-weight: 500;
@@ -19,6 +19,17 @@ body{
     margin-bottom: 15px;
     text-align: left;
   }
+
+  .success-msg {
+    background-color: rgb(214, 255, 214);
+    color: green;
+    font-weight: 500;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    text-align: left;
+  }
+  
 
 
 #top {

@@ -17,31 +17,31 @@
 
                     <div class="form-group">
                         <input type="text" class="form-control" name="f_name" placeholder="First Name">
-                        <div id="err1" class="err-msg"></div>
+                        <div id="err1" class="errr-msg"></div>
                     </div>
                     <div class="form-group">
                         <input type="text" class="form-control" name="l_name" placeholder="Last Name">
-                        <div id="err2" class="err-msg"></div>
+                        <div id="err2" class="errr-msg"></div>
                     </div>
                     <div class="form-group">
                         <input type="email" class="form-control" name="email" placeholder="Email">
-                        <div id="err3" class="err-msg"></div>
+                        <div id="err3" class="errr-msg"></div>
                     </div>
                     <div class="form-group password-group">
                         <input type="password" class="form-control" name="password" id="password" placeholder="Password"> 
                         <span class="eye-icon" onclick="togglePassword('password', this)">👁️</span>                  
-                        <div id="err4" class="err-msg"></div>
+                        <div id="err4" class="errr-msg"></div>
                     </div>
                     
                     <div class="form-group password-group">
                         <input type="password" class="form-control" name="cPassword" id="cPassword" placeholder="Confirm Password">
                         <span class="eye-icon" onclick="togglePassword('cPassword', this)">👁️</span>
-                        <div id="err5" class="err-msg"></div>
+                        <div id="err5" class="errr-msg"></div>
                     </div>
                     <div class="form-group remember-me">
                         <label>
                             <input type="checkbox" id="termsCheckbox">Accept our terms & conditions
-                            <div id="err6" class="err-msg"></div>
+                            <div id="err6" class="errr-msg"></div>
                         </label>
                     </div>                    
                     <button type="submit" class="login-btn">Continue</button>
@@ -63,9 +63,7 @@
 
 
 
-    <script>
-
-
+<script>
 //Password Hider
 function togglePassword(inputId, iconElement) {
   const input = document.getElementById(inputId);

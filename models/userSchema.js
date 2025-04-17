@@ -4,28 +4,33 @@ const {Schema} = mongoose;
 
 
 const userSchema = new Schema({
-    f_Name : {
+    f_Name: {
         type: String,
-        required : true,
+        required: true,
         trim: true
     },
-    l_Name : {
+    l_Name: {
         type: String,
-        required : true,
+        required: true,
         trim: true
     },
     email: {
         type: String,
         required: true,
         unique: true,
-    }, 
+    },
     googleId: {
         type: String,
-        unique: true
+        unique: true,
+        sparse: true,
     },
     password: {
         type: String,
         required: false
+    },
+    oldPasswords: {
+        type: [String], // <-- NEW FIELD
+        default: []
     },
     isBlocked: {
         type: Boolean,
@@ -43,9 +48,9 @@ const userSchema = new Schema({
         type: String
     },
     redeemed: {
-        type : Boolean,
+        type: Boolean,
     }
-})
+});
 
 
 

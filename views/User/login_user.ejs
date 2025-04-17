@@ -7,8 +7,10 @@
                 <form method="POST" action="/login">
                     
                     <% if (message && message.length > 0) { %>
-                        <div class="server-error-message"><%= message %></div>
-                      <% } %>
+                        <% const type = messageType && messageType[0] === 'success' ? 'success-msg' : 'err-msg'; %>
+                        <div class="<%= type %> flash-msg" style="display: block;"><%= message[0] %></div>
+                    <% } %>
+                    
                       
                 
                     <div class="form-group">
@@ -25,7 +27,7 @@
                             <input type="checkbox" name="rememberMe"> Remember me
                         </label>
                         <div class="forgot-password-container">
-                            <a href="/verify-email" class="forgot-password">Forget Password?</a>
+                            <a href="/forget-password" class="forgot-password">Forget Password?</a>
                         </div>
                     </div>                    
                 
