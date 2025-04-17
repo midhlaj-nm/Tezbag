@@ -1,55 +1,45 @@
-<%-include("../../views/Partials/user/header-simple")%>
+<%-include("../../views/Partials/admin/header-admin")%>
+<!-- css -->
+ <link rel="stylesheet" href="/Admin-css/login-admin.css">
         <!-- Login Form -->
         <div class="login-container">
             <div class="login-box">
                 <h2 class="login-title">Log In</h2>
-                
-                <form method="POST" action="/login" novalidate>
-                    
-                    <% if (message && message.length > 0) { %>
-                        <% const type = messageType && messageType[0] === 'success' ? 'success-msg' : 'err-msg'; %>
-                        <div class="<%= type %> flash-msg" style="display: block;"><%= message[0] %></div>
-                    <% } %>
-                    
-                      
-                
+        
+                <form action="/tezgrani/login" method="POST" novalidate>
+
+                  <% if (message && message.length > 0) { %>
+                    <div class="server-error-message"><%= message %></div>
+                  <% } %> 
+
                     <div class="form-group">
                         <input type="email" name="email" class="form-control" placeholder="Email">
-                    </div>
-                
-                    <div class="form-group password-group">
-                        <input type="password" name="password" id="password" class="form-control" placeholder="Password">
-                        <span class="eye-icon" onclick="togglePassword('password', this)">👁️</span>
-                        <div id="err2" class="errr-msg"></div>
                         <div id="err1" class="errr-msg"></div>
                     </div>
-                
+        
+                    <div class="form-group password-group">
+                        <input type="password" id="password" name="password" class="form-control" placeholder="Password">
+                        <span class="eye-icon" onclick="togglePassword('password', this)">👁️</span>
+                        <div id="err2" class="errr-msg"></div>
+                    </div>
+        
                     <div class="form-group remember-me">
-                        <label>
-                            <input type="checkbox" name="rememberMe"> Remember me
-                        </label>
-                        <div class="forgot-password-container">
-                            <a href="/forget-password" class="forgot-password">Forget Password?</a>
-                        </div>
-                    </div>                    
-                
+                        <input type="checkbox" name="remember"> Remember me
+                    </div>
+        
                     <button type="submit" class="login-btn">Login</button>
-                
-                    <!-- Google Sign-in Button -->
-                    <div class="google-signin">
-                        <a href="/auth/google/login" class="google-signin-btn">
-                          <img src="/g-logo-removebg-preview.png" alt="Google Logo">
-                          <span>Sign in with Google</span>
-                      </a>                    
-                      </div>
                 </form>
-                
-                
-                <p class="register-link">Don't have an account? <a href="/register">Register</a></p>
             </div>
         </div>
-
+        
+<!-- Password Toggle Script -->
 <script>
+    function togglePassword(inputId, iconElement) {
+        const input = document.getElementById(inputId);
+        const isVisible = input.type === "text";
+        input.type = isVisible ? "password" : "text";
+        iconElement.textContent = isVisible ? "👁️" : "🙈";
+    }
   // Get form input elements
   const emailid = document.getElementsByName('email')[0];
   const passwordid = document.getElementById('password');
@@ -128,5 +118,3 @@
     });
   });
 </script>
-
-<%-include("../../views/Partials/user/footer")%>

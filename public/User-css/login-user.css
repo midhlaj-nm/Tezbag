@@ -459,3 +459,16 @@ body {
         margin-bottom: 20px;
     }
 }
+
+
+
+
+.errr-msg {
+    color: red;
+    font-size: 0.9rem;
+    margin-top: 5px;
+    padding-left: 2px;
+    font-weight: 500;
+    display: none; /* you can toggle this with JS */
+    text-align: left;
+  }

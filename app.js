@@ -6,6 +6,7 @@ const flash = require('connect-flash');
 const env = require("dotenv").config();
 const db = require("./config/db");
 const userRouter = require("./routes/userRouter");
+const adminRouter = require('./routes/adminRouter')
 const errorHandler = require('./middlewares/errorHandler');
 const passport = require('./config/passport')
 const passport_login = require('./config/passport-login')
@@ -48,6 +49,7 @@ app.use(passport.session())
 app.use(passport_login.initialize());
 app.use(passport_login.session())
 app.use("/", userRouter);
+app.use('/tezgrani', adminRouter)
 app.use(errorHandler);
 
 

@@ -1,4 +1,5 @@
-<%- include("../../views/Partials/user/header-simple") %>
+<%- include("../../views/Partials/admin/header-admin") %>
+
 <link rel="stylesheet" href="/User-css/otpverify-user.css">
 
 <!-- jQuery and Toastr -->
@@ -9,6 +10,7 @@
 <div class="otp-container">
   <div class="otp-box">
     <h2 class="otp-title">OTP Verification</h2>
+
     <form id="otp-form" onsubmit="return validateOTPform()" novalidate>
       <% if (message) { %>
         <div class="server-error-message"><%= message %></div>
@@ -21,8 +23,8 @@
         <input type="text" maxlength="1" class="otp-field">
       </div>
 
+      <!-- Client-side error message -->
       <div id="err1" class="errr-msg"></div>
-      <input type="hidden" id="otp-type" value="<%= otpType %>">
 
       <p class="resend-text">
         <button type="button" id="resend-link" class="resend-btn" onclick="resendOtp()">Resend</button>
@@ -35,14 +37,14 @@
 </div>
 
 <script>
+  let timer = 60;
   const timerEl = document.getElementById("timer");
   const resendLink = document.getElementById("resend-link");
   const errMsg = document.getElementById("err1");
   const inputs = document.querySelectorAll(".otp-field");
 
-  let timer = 60;
-
-  function startCountdown() {
+  // Countdown timer
+  const startCountdown = () => {
     resendLink.disabled = true;
     resendLink.style.color = "grey";
     resendLink.style.cursor = "not-allowed";
@@ -50,6 +52,7 @@
     const countdown = setInterval(() => {
       timer--;
       timerEl.textContent = timer;
+
       if (timer <= 0) {
         clearInterval(countdown);
         resendLink.disabled = false;
@@ -58,39 +61,49 @@
         resendLink.textContent = "Click to resend";
       }
     }, 1000);
-  }
+  };
 
-  function getOtpFromInputs() {
+  // Get OTP from input fields
+  const getOtpFromInputs = () => {
     let otp = "";
     inputs.forEach(input => otp += input.value);
     return otp;
-  }
+  };
 
+  // Validate and submit OTP
   function validateOTPform() {
     const otpInput = getOtpFromInputs();
+    errMsg.textContent = "";
 
-    if (otpInput.length !== 4 || !/^\d{4}$/.test(otpInput)) {
+    if (otpInput.length < 4 || !/^\d{4}$/.test(otpInput)) {
       errMsg.textContent = "Please enter a valid 4-digit OTP.";
-      errMsg.style.display = "block";
       return false;
-    } else {
-      errMsg.textContent = "";
-      errMsg.style.display = "none";
     }
 
     $.ajax({
       type: "POST",
-      url: '/verify-otp',
+      url: "/tezgrani/verify-otp", // Change URL as needed
       data: { otp: otpInput },
       success: function (response) {
+        if (response.message === "Session expired") {
+          toastr.error("Timeout. Please retry again.");
+          setTimeout(() => {
+            window.location.href = "/tezgrani/login"; // Or wherever your flow restarts
+          }, 1000);
+          return;
+        }
+
         if (response.success) {
           toastr.success("OTP verified!");
-          setTimeout(() => window.location.href = response.redirectUrl, 1000);
+          setTimeout(() => {
+            window.location.href = response.redirectUrl;
+          }, 1000);
         } else {
-          toastr.error("Invalid OTP");
+          toastr.error(response.message || "Invalid OTP");
         }
       },
-      error: function () {
+      error: function (xhr, status, error) {
+        console.error("AJAX error:", error);
         toastr.error("Something went wrong");
       }
     });
@@ -98,6 +111,7 @@
     return false;
   }
 
+  // Resend OTP
   function resendOtp() {
     if (timer > 0) return;
 
@@ -109,23 +123,30 @@
     fetch("/resend-otp")
       .then(res => res.json())
       .then(data => {
-        if (data.success) {
-          toastr.success("OTP resent successfully!");
-        } else {
-          toastr.error("Failed to resend OTP.");
+        if (data.message === "Session expired") {
+          toastr.error("Timeout. Please retry again.");
+          setTimeout(() => {
+            window.location.href = "/tezgrani/login"; // Or wherever your flow restarts
+          }, 1000);
+          return;
         }
+
+        data.success
+          ? toastr.success("OTP resent successfully!")
+          : toastr.error("Failed to resend OTP.");
       })
       .catch(() => toastr.error("Something went wrong"));
   }
 
+  // Auto focus behavior
   inputs.forEach((input, index) => {
-    input.addEventListener("input", e => {
+    input.addEventListener("input", (e) => {
       if (e.target.value.length === 1 && index < inputs.length - 1) {
         inputs[index + 1].focus();
       }
     });
 
-    input.addEventListener("keydown", e => {
+    input.addEventListener("keydown", (e) => {
       if (e.key === "Backspace" && !e.target.value && index > 0) {
         inputs[index - 1].focus();
       }
@@ -135,5 +156,3 @@
   resendLink.addEventListener("click", resendOtp);
   window.onload = startCountdown;
 </script>
-
-<%- include("../../views/Partials/user/footer") %>

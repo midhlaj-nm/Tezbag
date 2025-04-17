@@ -1,10 +1,10 @@
 /* Center the OTP box */
 .otp-container {
+    margin: 5% 0px;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 65vh;
-    background: #f8f8f8;
+    height: auto;
 }
 
 /* OTP Box */
@@ -102,4 +102,13 @@
 
 .verify-btn:hover {
     background: #008C04;
+}
+
+.errr-msg {
+    color: red;
+    font-size: 0.9rem;
+    margin-top: 5px;
+    padding-left: 55px;
+    font-weight: 500;
+    text-align: left;
 }

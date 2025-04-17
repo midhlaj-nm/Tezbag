@@ -61,6 +61,7 @@ body{
     align-items: center;
     position: relative;
     padding: 0 5%;
+    border-bottom: 1px solid #ccc; /* 👈 This line adds the bottom border */
 }
 
 .logo {
@@ -71,5 +72,5 @@ body{
 }
 
 .logo img {
-    width: 150px;
+    width: 250px;
 }

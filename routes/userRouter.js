@@ -8,8 +8,9 @@ router.get('/login', userController.login_user);
 router.post('/login', userController.logpost);
 router.post('/register',userController.regpost)
 router.get('/register', userController.register);
-router.get('/otp-page',userController.otpver)
-router.post('/verify-otp-reg',userController.verifyOtp)
+router.get('/otp-page',userController.otpver);
+router.post('/verify-otp-reg',userController.verifyOtp);
+router.get('/resend-otp', userController.resendOtp);
 
 //Google Registration
 router.get('/auth/google/signup', passport.authenticate('google-registration',{scope:['profile','email']}));
@@ -52,7 +53,3 @@ router.get('/account', userController.loadDashboard);
 router.get('/logout',userController.logout)
 
 module.exports = router
-
-
-
-//.zny.3D8_4PLhhJ - old password
