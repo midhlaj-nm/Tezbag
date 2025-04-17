@@ -180,4 +180,13 @@ const resendOtp = async (req, res, next) => {
     }
 };
 
-module.exports = { loadLogin,verifyLogin,loadOtp,verifyOtp,resendOtp };
+const loadDashboard = async (req, res) => {
+    try {
+        return res.render('dashboard-adm');
+    } catch (err) {
+        console.log('Something Happened', err);
+        res.render('404-adm')
+    }
+};
+
+module.exports = { loadLogin,verifyLogin,loadOtp,verifyOtp,resendOtp,loadDashboard };

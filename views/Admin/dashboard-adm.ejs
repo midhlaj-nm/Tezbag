@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Sidebar</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Font Awesome CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: 220px;
+      background-color: #fff;
+      border-right: 1px solid #eee;
+      padding: 10px;
+      transition: all 0.3s ease;
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+    }
+
+    .sidebar.collapsed {
+      width: 60px;
+    }
+
+    .toggle-btn {
+      background: none;
+      border: none;
+      font-size: 24px;
+      margin: 10px 0 20px;
+      cursor: pointer;
+      color: #333;
+    }
+
+    .sidebar-links {
+      list-style: none;
+    }
+
+    .sidebar-links li {
+      display: flex;
+      align-items: center;
+      padding: 12px 10px;
+      cursor: pointer;
+      transition: 0.2s ease;
+      color: #333;
+      border-radius: 6px;
+    }
+
+    .sidebar-links li:hover {
+      background-color: #f2f2f2;
+    }
+
+    .sidebar-links i {
+      width: 30px;
+      font-size: 16px;
+      text-align: center;
+    }
+
+    .sidebar.collapsed .sidebar-links span {
+      display: none;
+    }
+
+    .sidebar-links span {
+      transition: opacity 0.3s;
+    }
+
+    .content {
+      margin-left: 220px;
+      padding: 20px;
+      flex: 1;
+      transition: margin-left 0.3s ease;
+    }
+
+    .sidebar.collapsed ~ .content {
+      margin-left: 60px;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        position: absolute;
+        z-index: 1000;
+      }
+
+      .sidebar.collapsed ~ .content {
+        margin-left: 60px;
+      }
+
+      .content {
+        margin-left: 220px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="sidebar" id="adminSidebar">
+    <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
+
+    <ul class="sidebar-links">
+      <li><i class="fa fa-home"></i><span>Dashboard</span></li>
+      <li><i class="fa fa-shopping-cart"></i><span>Orders</span></li>
+      <li><i class="fa fa-list"></i><span>Category</span></li>
+      <li><i class="fa fa-box"></i><span>Products</span></li>
+      <li><i class="fa fa-users"></i><span>Users</span></li>
+      <li><i class="fa fa-tags"></i><span>Offers</span></li>
+      <li><i class="fa fa-ticket"></i><span>Coupons</span></li>
+      <li><i class="fa fa-undo"></i><span>Returns</span></li>
+      <li><i class="fa fa-chart-line"></i><span>Sales report</span></li>
+      <li><i class="fa fa-image"></i><span>Banners</span></li>
+      <li><i class="fa fa-sign-out-alt"></i><span>Log-out</span></li>
+    </ul>
+  </div>
+
+  <div class="content">
+    <h1>Welcome to Admin Dashboard</h1>
+    <p>This is your main content area.</p>
+  </div>
+
+  <script>
+    function toggleSidebar() {
+      const sidebar = document.getElementById("adminSidebar");
+      sidebar.classList.toggle("collapsed");
+    }
+  </script>
+
+</body>
+</html>
