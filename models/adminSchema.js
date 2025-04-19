@@ -39,7 +39,10 @@ const adminSchema = new Schema({
   },
   lastLogin: {
     type: Date
-  }
+  },
+  lastLogout: {
+    type: Date
+  },
 });
 
 const Admin = mongoose.model('Admin', adminSchema);

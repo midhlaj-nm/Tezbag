@@ -7,6 +7,8 @@ router.post('/login', adminController.verifyLogin);
 router.get('/verifyotp',adminController.loadOtp);
 router.post('/verify-otp',adminController.verifyOtp);
 router.get('/resend-otp', adminController.resendOtp);
-router.get('/dashboard',adminController.loadDashboard)
+router.get('/dashboard',adminController.loadDashboard);
+router.patch('/punch-in',adminController.storePunchin)
+router.patch('/punch-out',adminController.storePunchout)
 
 module.exports = router;

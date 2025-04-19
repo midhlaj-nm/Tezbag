@@ -1,0 +1,388 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  font-family: 'Poppins', sans-serif;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+#middle {
+    width: 100%;
+    height: 50px;
+    background-color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding: 0 5%;
+    border-bottom: 1px solid #ccc;
+    z-index: 1000;
+}
+.logo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+.logo img {
+    width: 100%;
+    max-width: 250px;
+    height: auto;
+}
+/* Sidebar Container */
+.sidebar {
+  margin-top: 68px; /* Adjusted to account for the header height + some spacing */
+  height: calc(100vh - 80px); /* Calculate height based on viewport minus header and some padding */
+  width: 220px;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  padding: 16px 12px;
+  position: absolute;
+  left: 10px;
+  display: flex;
+  flex-direction: column;
+  transition: width 0.3s ease, padding 0.3s ease;
+  background-color: #fff;
+}
+.sidebar.collapsed {
+  width: 60px;
+  padding: 16px 6px;
+}
+/* Sidebar Links */
+.sidebar-links {
+  list-style: none;
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex-grow: 1;
+  overflow-y: auto; /* Allow scrolling if menu items exceed height */
+}
+.sidebar-links li {
+  display: flex;
+  align-items: center;
+  padding: 10px 12px;
+  cursor: pointer;
+  color: #5f5f5f;
+  font-size: 19.2px;
+  font-weight: 400;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+.sidebar-links li:hover,
+.sidebar-links li.active {
+  background-color: #f2f2f2;
+  color: #000;
+}
+.sidebar-links li .icon-svg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 10px;
+  flex-shrink: 0;
+}
+.sidebar-links li svg {
+  width: 24px;
+  height: 24px;
+  fill: #5f5f5f;
+  transition: fill 0.2s ease;
+}
+/* Keep SVGs visible when collapsed */
+.sidebar.collapsed .sidebar-links li {
+  justify-content: center;
+  padding: 10px 0;
+}
+.sidebar.collapsed .sidebar-links li .icon-svg {
+  margin-right: 0;
+}
+.sidebar-links li:hover svg,
+.sidebar-links li.active svg {
+  fill: #000;
+}
+.sidebar-links li span:not(.icon-svg) {
+  transition: opacity 0.3s ease;
+  white-space: nowrap;
+}
+/* Hide only the label (text) on collapse, but keep icon-svg */
+.sidebar.collapsed .sidebar-links li span:not(.icon-svg) {
+  display: none;
+}
+/* Content Area */
+.content {
+  margin-top: 60px; /* Match the margin-top of sidebar to align with it */
+  margin-left: 240px; /* 220px sidebar width + 20px spacing */
+  padding: 0px 37px;
+  flex: 1;
+  transition: margin-left 0.3s ease;
+}
+
+.sidebar.collapsed ~ .content {
+  margin-left: 80px; /* 60px collapsed sidebar width + 20px spacing */
+}
+
+/* Add a container for the login-reg divs */
+.login-reg-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto;
+  gap: 20px;
+  margin-top: 8px;
+}
+
+.login-reg{
+  grid-column: 1;
+  grid-row: 1;
+  width: 100%; /* Take full width within their flex container */
+  height: fit-content;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+}
+
+.punch-box {
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  color: #000000;
+}
+
+.date-time h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.date-time p {
+  margin: 4px 0;
+  font-size: 1rem;
+}
+
+#punchBtn {
+  margin-top: 15px;
+  padding: 10px 20px;
+  background-color: #00B207;
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+#punchBtn:hover {
+  background-color: #069a0b;
+}
+
+.punch-status {
+  margin-top: 20px;
+  font-size: 0.95rem;
+}
+
+
+.recently-sold-container {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  border: 1px solid #ccc;
+  width: 100%;
+  max-width: 680px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #d7eadc;
+}
+
+.heading {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 500;
+  color: #263238;
+}
+
+.view-all {
+  color: #00B207;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.table-container {
+  /* background-color: #f1f9f2; */
+  overflow-x: auto;
+}
+
+.sales-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.sales-table th {
+  text-align: left;
+  padding: 12px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: black;
+  /* background-color: #e8f5e9; */
+  border-bottom: 1px solid #d7eadc;
+}
+
+.sales-table td {
+  padding: 14px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: black;
+  border-bottom: 1px solid #e8f5e9;
+}
+
+.sales-table tbody tr:hover {
+  background-color: hwb(0 96% 4%);
+}
+
+.sales-table tbody tr:nth-child(even) {
+  background-color: #f5f5f5;
+}
+
+.sales-table tbody tr:nth-child(even):hover {
+  background-color: hwb(0 91% 9%);
+}
+
+/* Floating SVG Toggle Button */
+.floating-toggle-btn {
+  position: absolute;
+  top: 50%;
+  right: -25px;
+  transform: translateY(-50%);
+  background-color: #333;
+  color: #fff;
+  border: none;
+  padding: 8px;
+  border-radius: 25%;
+  cursor: pointer;
+  z-index: 100;
+  transition: background-color 0.3s ease;
+}
+
+.floating-toggle-btn:hover {
+  background-color: #555;
+}
+
+.floating-toggle-btn svg {
+  width: 20px;
+  height: 20px;
+  fill: #fff;
+  transition: transform 0.3s ease;
+}
+
+/* Active Link Styling */
+.active {
+  background-color: #f2f2f2;
+  color: #000;
+}
+
+.active svg {
+  fill: #000;
+}
+
+.last-logins {
+  grid-column: 1;
+  grid-row: 2;
+  width: 100%;
+  height: auto;
+  /* Remove this line: transform: translateY(-105px); */
+  border-radius: 12px;
+}
+
+.card {
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  overflow: hidden;
+  font-family: 'Poppins', sans-serif;
+  margin-top: 0; /* Change from 20px to 0 */
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f8f9fa;
+  padding: 12px 20px;
+}
+
+.card-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.view-all {
+  color: #00B207;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table thead {
+  background-color: #e9ecef;
+}
+
+.table th{
+  padding: 10px 15px;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.table td {
+  padding: 10px 15px;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.table tbody tr:hover {
+  background-color: hwb(0 96% 4%);
+}
+
+.table tbody tr:nth-child(even) {
+  background-color: #f5f5f5;
+}
+
+.table tbody tr:nth-child(even):hover {
+  background-color: hwb(0 91% 9%);
+}
+
+
+
+
+
+
+/* Responsive Support */
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    z-index: 990; /* Below header but above content */
+    margin-top: 60px;
+  }
+  .sidebar.collapsed ~ .content {
+    margin-left: 80px;
+  }
+  .content {
+    margin-left: 240px;
+  }
+}

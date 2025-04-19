@@ -78,9 +78,13 @@
       errMsg.style.display = "none";
     }
 
+    console.log("🔐 Collected OTP from inputs:", otpInput); // Log entered OTP
+    const otpType = document.getElementById("otp-type").value;
+    const postUrl = otpType === 'registration' ? '/verify-otp-reg' : '/verify-otp';
+
     $.ajax({
       type: "POST",
-      url: '/verify-otp',
+      url: postUrl,
       data: { otp: otpInput },
       success: function (response) {
         if (response.success) {

@@ -84,6 +84,9 @@
       type: "POST",
       url: "/tezgrani/verify-otp", // Change URL as needed
       data: { otp: otpInput },
+      xhrFields: {
+        withCredentials: true  // ✅ This tells the browser to include cookies
+      },
       success: function (response) {
         if (response.message === "Session expired") {
           toastr.error("Timeout. Please retry again.");
