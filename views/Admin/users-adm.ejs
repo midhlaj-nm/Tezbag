@@ -24,8 +24,7 @@
               type="text" 
               name="search" 
               value="<%= typeof search !== 'undefined' ? search : '' %>" 
-              placeholder="Search"
-            >
+              placeholder="Search">
             
             <% if (typeof search !== 'undefined' && search.trim() !== '') { %>
               <a href="/tezgrani/user-management" class="clear-icon">
@@ -233,16 +232,16 @@
       </div>
     </div>
     <div class="pagination">
-        <% const total = Math.max(totalPages, 3); %>
-        <% for (let i = 1; i <= total; i++) { %>
-          <% if (i <= totalPages) { %>
-            <a href="?page=<%= i %>">
-              <div class="dot <%= currentPage === i ? 'active' : '' %>"></div>
-            </a>
-          <% } else { %>
-            <div class="dot inactive"></div>
-          <% } %>
+      <% const total = Math.max(totalPages, 3); %>
+      <% for (let i = 1; i <= total; i++) { %>
+        <% if (i <= totalPages) { %>
+          <a href="?page=<%= i %><%= search ? '&search=' + encodeURIComponent(search) : '' %>">
+            <div class="dot <%= currentPage === i ? 'active' : '' %>"></div>
+          </a>
+        <% } else { %>
+          <div class="dot inactive"></div>
         <% } %>
+      <% } %>
     </div>
   </div>
   

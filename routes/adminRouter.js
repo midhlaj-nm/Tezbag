@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const adminController = require('../controllers/admin/adminController');
 const userManageController = require('../controllers/admin/userManageController');
+const categoryManageController = require('../controllers/admin/categoryManageController')
 const adminAuth = require('../middlewares/adminAuth');
 
 
