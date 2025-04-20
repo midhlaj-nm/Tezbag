@@ -65,13 +65,13 @@ const verifyLogin = async (req, res, next) => {
 
     if (!isAdm) {
       req.flash('message', 'Incorrect Email Address.');
-      return res.render('login-adm', { message: req.flash('message')[0] });
+      return res.render('login-adm', { message: req.flash('message') });
     }
 
     if (isAdm.isBlocked) {
       console.log("⛔ Admin is blocked:", email);
       req.flash('message', 'Your entry is Blocked by Authorities');
-      return res.render('login-adm', { message: req.flash('message')[0] });
+      return res.render('login-adm', { message: req.flash('message') });
     }
 
     const passwordMatch = await bcrypt.compare(password, isAdm.password);
@@ -104,7 +104,9 @@ const verifyLogin = async (req, res, next) => {
     // Store in session
     req.session.adminOtp = otp;
     req.session.adminData = isAdm;
+    req.session.adminEmail = email;
     req.session.lastOtpSentTime = Date.now();
+
     console.log("📝 Session updated with OTP and adminData");
 
     res.redirect('/tezgrani/verifyotp');
@@ -126,43 +128,51 @@ const loadOtp = async (req, res) => {
 };
 
 // Handle OTP verification
-const verifyOtp = async (req, res, next) => {
+const verifyOtp = async (req, res) => {
   try {
     const { otp } = req.body;
-    console.log("🧪 OTP entered by admin:", otp);
-    console.log("🔍 Current session at verification:", req.session);
 
-    if (!req.session.adminData) {
-      console.warn("⚠️ Missing adminData in session.");
-      return res.json({ success: false, message: "Session expired (adminData missing)" });
-    }
-
-    if (!req.session.adminOtp) {
-      console.warn("⚠️ Missing adminOtp in session.");
-      return res.json({ success: false, message: "Session expired (adminOtp missing)" });
+    if (!req.session.adminOtp || !req.session.adminEmail) {
+      return res.json({ message: "Session expired" });
     }
 
     if (otp !== req.session.adminOtp) {
-      console.warn(`❌ Invalid OTP. Expected: ${req.session.adminOtp}, Got: ${otp}`);
-      return next({ status: 400, message: "Invalid OTP, please try again" });
+      return res.json({ success: false, message: "Incorrect OTP" });
     }
 
-    req.session.admin = req.session.adminData._id;
-    console.log("✅ OTP verified. Admin logged in:", req.session.admin);
+    // Find admin by email (assuming OTP was emailed to this admin)
+    const admin = await Admin.findOne({ email: req.session.adminEmail });
+    if (!admin) {
+      return res.json({ success: false, message: "Admin not found" });
+    }
 
-    // Clean up
+    // OTP is valid, set admin session
+    req.session.admin = admin._id;
+
+    // Clear OTP and email from session (optional cleanup)
     delete req.session.adminOtp;
-    delete req.session.adminData;
+    delete req.session.adminEmail;
 
-    res.status(200).json({
-      success: true,
-      redirectUrl: "/tezgrani/dashboard",
+    // Save session before responding
+    req.session.save((err) => {
+      if (err) {
+        console.error("Session save error:", err);
+        return res.status(500).json({ success: false, message: "Session save failed" });
+      }
+
+      // Respond with success and dashboard redirect URL
+      res.json({
+        success: true,
+        redirectUrl: "/tezgrani/dashboard",
+      });
     });
-  } catch (error) {
-    console.error("❌ OTP verification error:", error);
-    next(error);
+
+  } catch (err) {
+    console.error("OTP verification error:", err);
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
+
 
 // Resend OTP
 const resendOtp = async (req, res, next) => {
