@@ -21,10 +21,10 @@ router.get('/user-management', adminAuth, userManageController.loadUsersPage);
 router.patch('/user/block-toggle/:id', adminAuth, userManageController.isAction);
 
 //categoryManageController
-router.get('/category-management',categoryManageController.loadCategory);
-router.post('/category/save',categoryManageController.addCategory);
-router.patch('/list-toggle/:categoryId', categoryManageController.toggleCategoryStatus);
-router.put('/category/update/:id',categoryManageController.editCategory)
+router.get('/category-management',adminAuth, categoryManageController.loadCategory);
+router.post('/category/save',adminAuth, categoryManageController.addCategory);
+router.patch('/list-toggle/:categoryId',adminAuth, categoryManageController.toggleCategoryStatus);
+router.put('/category/update/:id',adminAuth, categoryManageController.editCategory)
 
 
 module.exports = router;

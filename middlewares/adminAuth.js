@@ -27,7 +27,7 @@ const adminAuth = async (req, res, next) => {
 
   } catch (err) {
     console.log("❌ Admin auth error:", err);
-    res.redirect('/tezgrani/login');
+    res.redirect('tezgrani/login');
   }
 };
 

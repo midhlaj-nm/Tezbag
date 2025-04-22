@@ -42,6 +42,14 @@ const addCategory = async (req, res, next) => {
       console.warn("⚠️ Validation failed: Missing fields");
       return res.status(400).json({ success: false, message: "Name and description are required" });
     }
+    if (name.length > 50) {
+      console.warn("⚠️ Name too long");
+      return res.status(400).json({ success: false, message: "Category name must be 50 characters or less" });
+    }
+    if (description.length > 200) {
+      console.warn("⚠️ Description too long");
+      return res.status(400).json({ success: false, message: "Description must be 200 characters or less" });
+    }
 
     const existing = await Category.findOne({
       name: { $regex: new RegExp("^" + name + "$", "i") }
@@ -67,6 +75,8 @@ const addCategory = async (req, res, next) => {
     return res.json({ success: true, message: "Category added successfully" });
   } catch (err) {
     console.error("❌ Error in addCategory:", err.message);
+    const error = new Error("Failed to add category");
+    error.status = 500;
     next(error);
   }
 };
@@ -82,7 +92,7 @@ const toggleCategoryStatus = async (req, res, next) => {
 
     if (!categoryId) {
       console.warn("⚠️ No categoryId provided");
-      return res.status(400).json({ success: false, message: "Invalid category ID" });
+      return res.redirect("/404Error");
     }
 
     const updated = await Category.findByIdAndUpdate(
@@ -93,8 +103,7 @@ const toggleCategoryStatus = async (req, res, next) => {
 
     if (!updated) {
       console.warn("❗ Category not found in DB");
-      next({ status: 404, message: 'Category Not Found' });
-      return res.redirect('/404Error')
+      return res.redirect("/404Error");
     }
 
     console.log("✅ Category status updated successfully:", {
@@ -116,6 +125,12 @@ const editCategory = async (req, res, next) => {
     if (!name || !description) {
       return res.status(400).json({ success: false, message: "Name and description are required" });
     }
+    if (name.length > 10) {
+      return res.status(400).json({ success: false, message: "Category name must be 10 characters or less" });
+    }
+    if (description.length > 80) {
+      return res.status(400).json({ success: false, message: "Description must be 80 characters or less" });
+    }
 
     const existingCategory = await Category.findOne({ name, _id: { $ne: req.params.id } });
     if (existingCategory) {
@@ -124,9 +139,7 @@ const editCategory = async (req, res, next) => {
 
     const category = await Category.findById(req.params.id);
     if (!category) {
-      const error = new Error("Category not found");
-      next({ status: 404, message: 'Category Not Found' });
-      return res.redirect('/404Error')
+      return res.redirect("/404Error");
     }
 
     category.name = name;

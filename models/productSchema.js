@@ -43,10 +43,11 @@ const productSchema = new Schema({
         type: Number,
         required: true
     },
-    productImage: {
-        type: [String],
+    productImage: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Banner',
         required: true
-    },
+    }],
     isBlocked: {
         type: Boolean,
         default:false
