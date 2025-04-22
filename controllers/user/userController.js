@@ -1,4 +1,7 @@
 const User = require('../../models/userSchema');
+const Category = require('../../models/categorySchema');
+const Products = require('../../models/productSchema');
+const Gallery = require('../../models/bannerSchema')
 const env = require('dotenv').config();
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
@@ -27,18 +30,34 @@ function generateOtp() {
 // ===========================
 const loadHomepage = async (req, res, next) => {
     try {
-        if (req.session.user || req.user) {
-            console.log("✅ User is logged in:", req.session.user || req.user?.email);
-            res.render('homepage');
-        } else {
-            console.log("⚠️ User not logged in");
-            res.render('beforelogin');
-        }
+      const categories = await Category.find({ isListed: true }).lean();
+  
+      const categoriesWithData = await Promise.all(
+        categories.map(async (category) => {
+          const productCount = await Products.countDocuments({ category: category._id });
+          const banner = await Gallery.findOne({ categoryId: category._id }).lean();
+  
+          return {
+            ...category,
+            productCount,
+            image: banner ? banner.image : null
+          };
+        })
+      );
+  
+      if (req.session.user || req.user) {
+        res.render('homepage', { categories: categoriesWithData });
+      } else {
+        res.render('beforelogin', { categories: categoriesWithData });
+      }
+  
     } catch (err) {
-        console.error('❌ Error loading homepage:', err);
-        next(err);
+      console.error('❌ Error loading homepage:', err);
+      next(err);
     }
-};
+  };
+  
+  
 
 // ===========================
 // Load Login Page

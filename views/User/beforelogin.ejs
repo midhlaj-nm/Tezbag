@@ -122,44 +122,38 @@
     </section>
     <section class="top-categories">
         <div class="container">
-            <div class="header">
-                <h2>Top Categories</h2>
-                <a href="/login" class="view-all">View All →</a>
-            </div>
+          <div class="header">
+            <h2>Categories</h2>
+          </div>
+      
+          <% if (categories.length > 0) { %>
             <div class="categories">
+              <% categories.forEach(category => { %>
                 <div class="category">
-                    <img src="Vegetable.png" alt="Vegetables">
-                    <h3>Vegetables</h3>
-                    <p>165 Products</p>
+                  <% if (category.image) { %>
+                    <img src="<%= category.image %>" alt="<%= category.name %>">
+                  <% } else { %>
+                    <div class="no-image">No Image</div>
+                  <% } %>
+                  <h3><%= category.name %></h3>
+                  <p><%= category.productCount || 0 %> Products</p>
                 </div>
-                <div class="category">
-                    <img src="fruits.png" alt="Fresh Fruit">
-                    <h3>Fresh Fruit</h3>
-                    <p>137 Products</p>
-                </div>
-                <div class="category">
-                    <img src="fish.png" alt="Fish">
-                    <h3>Fish</h3>
-                    <p>34 Products</p>
-                </div>
-                <div class="category">
-                    <img src="meat.png" alt="Meat">
-                    <h3>Meat</h3>
-                    <p>165 Products</p>
-                </div>
-                <div class="category">
-                    <img src="soft-drink.png" alt="Water and Drinks">
-                    <h3>Water and Drinks</h3>
-                    <p>48 Products</p>
-                </div>
-                <div class="category">
-                    <img src="snacks.png" alt="Snacks">
-                    <h3>Snacks</h3>
-                    <p>165 Products</p>
-                </div>
+              <% }) %>
             </div>
+          <% } else { %>
+            <p style="width: 105%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+            font-size: 1.1rem;
+            color: #666;
+          ">No categories right now</p>
+          <% } %>
         </div>
-    </section>
+      </section>
+      
+    
     <section class="todays-items">
         <div class="container">
             <div class="header">

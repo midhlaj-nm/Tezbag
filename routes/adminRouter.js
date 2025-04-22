@@ -20,4 +20,11 @@ router.patch('/punch-out', adminAuth, adminController.storePunchout);
 router.get('/user-management', adminAuth, userManageController.loadUsersPage);
 router.patch('/user/block-toggle/:id', adminAuth, userManageController.isAction);
 
+//categoryManageController
+router.get('/category-management',categoryManageController.loadCategory);
+router.post('/category/save',categoryManageController.addCategory);
+router.patch('/list-toggle/:categoryId', categoryManageController.toggleCategoryStatus);
+router.put('/category/update/:id',categoryManageController.editCategory)
+
+
 module.exports = router;

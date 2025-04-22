@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Category Management</title>
+  <link rel="stylesheet" href="/Admin-css/category-adm.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=cancel" />
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+</head>
+<body>
+    <div id="middle" class="container-fluid">      
+        <div class="logo">
+          <img width="250" src="/Admin-css/Logo-Admins.jpg" alt="Logo">
+        </div>
+        
+        <form action="/tezgrani/category-management" method="GET" class="search-bar">
+          <div class="input-wrapper">
+            <input 
+              type="text" 
+              name="search" 
+              value="<%= typeof search !== 'undefined' ? search : '' %>" 
+              placeholder="Search">
+            
+            <% if (typeof search !== 'undefined' && search.trim() !== '') { %>
+              <a href="/tezgrani/category-management" class="clear-icon">
+                <span class="material-symbols-outlined">cancel</span>
+              </a>
+            <% } %>
+          </div>
+          <button type="submit" class="search-btn">Search</button>
+        </form>
+      </div>
+
+  <!-- Sidebar -->
+  <div class="sidebar" id="adminSidebar">
+    <ul class="sidebar-links">
+      <li>
+        <a href="/tezgrani/dashboard">
+            <span class="icon-svg">
+              <svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 -960 960 960" width="30px" fill="#5f5f5f">
+                <path d="M520-600v-240h320v240H520ZM120-440v-400h320v400H120Zm400 320v-400h320v400H520Zm-400 0v-240h320v240H120Zm80-400h160v-240H200v240Zm400 320h160v-240H600v240Zm0-480h160v-80H600v80ZM200-200h160v-80H200v80Zm160-320Zm240-160Zm0 240ZM360-280Z"/>
+              </svg>
+            </span>
+            <span>Dashboard</span>
+        </a>    
+      </li>
+      <li>
+        <a href="#">
+            <span class="icon-svg">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f">
+                    <path d="M280-80q-33 0-56.5-23.5T200-160q0-33 23.5-56.5T280-240q33 0 56.5 23.5T360-160q0 33-23.5 56.5T280-80Zm400 0q-33 0-56.5-23.5T600-160q0-33 23.5-56.5T680-240q33 0 56.5 23.5T760-160q0 33-23.5 56.5T680-80ZM246-720l96 200h280l110-200H246Zm-38-80h590q23 0 35 20.5t1 41.5L692-482q-11 20-29.5 31T622-440H324l-44 80h480v80H280q-45 0-68-39.5t-2-78.5l54-98-144-304H40v-80h130l38 80Zm134 280h280-280Z"/>
+                </svg>
+            </span>
+            <span>Orders</span>
+        </a>
+      </li>
+      <li class="active">
+        <a href="/tezgrani/category-management">
+            <span class="icon-svg">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f">
+                  <path d="m260-520 220-360 220 360H260ZM700-80q-75 0-127.5-52.5T520-260q0-75 52.5-127.5T700-440q75 0 127.5 52.5T880-260q0 75-52.5 127.5T700-80Zm-580-20v-320h320v320H120Zm580-60q42 0 71-29t29-71q0-42-29-71t-71-29q-42 0-71 29t-29 71q0 42 29 71t71 29Zm-500-20h160v-160H200v160Zm202-420h156l-78-126-78 126Zm78 0ZM360-340Zm340 80Z"/>
+                </svg>
+            </span>
+            <span>Category</span>
+        </a>
+      </li>
+      <li>
+        <a href="#">
+            <span class="icon-svg">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f">
+                  <path d="M200-80q-33 0-56.5-23.5T120-160v-451q-18-11-29-28.5T80-680v-120q0-33 23.5-56.5T160-880h640q33 0 56.5 23.5T880-800v120q0 23-11 40.5T840-611v451q0 33-23.5 56.5T760-80H200Zm0-520v440h560v-440H200Zm-40-80h640v-120H160v120Zm200 280h240v-80H360v80Zm120 20Z"/>
+                </svg>
+              </span>
+              <span>Products</span>
+        </a>
+      </li>
+      <li>
+        <a href="/tezgrani/user-management">
+            <span class="icon-svg">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f">
+                  <path d="M0-240v-63q0-43 44-70t116-27q13 0 25 .5t23 2.5q-14 21-21 44t-7 48v65H0Zm240 0v-65q0-32 17.5-58.5T307-410q32-20 76.5-30t96.5-10q53 0 97.5 10t76.5 30q32 20 49 46.5t17 58.5v65H240Zm540 0v-65q0-26-6.5-49T754-397q11-2 22.5-2.5t23.5-.5q72 0 116 26.5t44 70.5v63H780Zm-455-80h311q-10-20-55.5-35T480-370q-55 0-100.5 15T325-320ZM160-440q-33 0-56.5-23.5T80-520q0-34 23.5-57t56.5-23q34 0 57 23t23 57q0 33-23 56.5T160-440Zm640 0q-33 0-56.5-23.5T720-520q0-34 23.5-57t56.5-23q34 0 57 23t23 57q0 33-23 56.5T800-440Zm-320-40q-50 0-85-35t-35-85q0-51 35-85.5t85-34.5q51 0 85.5 34.5T600-600q0 50-34.5 85T480-480Zm0-80q17 0 28.5-11.5T520-600q0-17-11.5-28.5T480-640q-17 0-28.5 11.5T440-600q0 17 11.5 28.5T480-560Zm1 240Zm-1-280Z"/>
+                </svg>
+              </span>
+              <span>Users</span>
+        </a>
+      </li>
+      <li>
+        <a href="#">
+            <span class="icon-svg">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f">
+                  <path d="M160-280v80h640v-80H160Zm0-440h88q-5-9-6.5-19t-1.5-21q0-50 35-85t85-35q30 0 55.5 15.5T460-826l20 26 20-26q18-24 44-39t56-15q50 0 85 35t35 85q0 11-1.5 21t-6.5 19h88q33 0 56.5 23.5T880-640v440q0 33-23.5 56.5T800-120H160q-33 0-56.5-23.5T80-200v-440q0-33 23.5-56.5T160-720Zm0 320h640v-240H596l84 114-64 46-136-184-136 184-64-46 82-114H160v240Zm200-320q17 0 28.5-11.5T400-760q0-17-11.5-28.5T360-800q-17 0-28.5 11.5T320-760q0 17 11.5 28.5T360-720Zm240 0q17 0 28.5-11.5T640-760q0-17-11.5-28.5T600-800q-17 0-28.5 11.5T560-760q0 17 11.5 28.5T600-720Z"/>
+                </svg>
+              </span>
+              <span>Deals</span>
+        </a>
+      </li>
+      <li>
+        <a href="#">
+            <span class="icon-svg">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f">
+                  <path d="M360-240 120-480l240-240 56 56-144 144h488v-160h80v240H272l144 144-56 56Z"/>
+                </svg>
+              </span>
+              <span>Returns</span>
+        </a>
+      </li>
+      <li>
+        <a href="#">
+            <span class="icon-svg">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f">
+                  <path d="M640-160v-280h160v280H640Zm-240 0v-640h160v640H400Zm-240 0v-440h160v440H160Z"/>
+                </svg>
+              </span>
+              <span>Sales Report</span>
+        </a>
+      </li>
+      <li>
+        <a href="#">
+            <span class="icon-svg">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f">
+                  <path d="M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h640q33 0 56.5 23.5T880-720v480q0 33-23.5 56.5T800-160H160Zm0-80h640v-480H160v480Zm80-80h480L570-520 450-360l-90-120-120 160Zm-80 80v-480 480Z"/>
+                </svg>
+              </span>
+              <span>Gallery</span>
+        </a>
+      </li>
+      <li>
+        <a href="#">
+            <span class="icon-svg">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f">
+                  <path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h280v80H200v560h280v80H200Zm440-160-55-58 102-102H360v-80h327L585-622l55-58 200 200-200 200Z"/>
+                </svg>
+              </span>
+              <span>Log-out</span>
+        </a>
+      </li>
+    </ul>
+    <button class="floating-toggle-btn" onclick="toggleSidebar()">
+      <svg id="drawer-icon" xmlns="http://www.w3.org/2000/svg" height="28px" viewBox="0 -960 960 960" width="28px" fill="#000000">
+        <path d="M360-120v-720h80v720h-80Zm160-160v-400l200 200-200 200Z"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Content Area -->
+  <div class="content">
+    <% if (message && message.length > 0) { %>
+      <% const type = messageType && messageType[0] === 'success' ? 'success-msg' : 'err-msg'; %>
+      <div class="<%= type %> flash-msg" style="display: block;"><%= message[0] %></div>
+    <% } %>
+    <div class="table-container">
+      <div class="table-wrapper">
+        <div class="table-header">
+          <h2 class="table-title">Categories</h2>
+          <a href="#" class="add-category-btn" id="openPopup">Add Category</a>
+        </div>
+        <table class="category-table">
+          <thead>
+            <tr>
+                <th>NAME</th>
+                <th>DESCRIPTION</th>
+                <th>STATUS</th>
+                <th>CREATED ON</th>
+                <th style="padding-left: 0px !important;">ACTIONS</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (!categories || categories.length === 0) { %>
+              <tr>
+                <td colspan="5" style="padding: 1rem;">
+                  <div style="
+                    width: 105%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-weight: 500;
+                    font-size: 1.1rem;
+                    color: #666;
+                  ">
+                    No categories to show right now!
+                  </div>
+                </td>
+              </tr>
+            <% } %>
+            <% categories.forEach(category => { %>
+              <tr>
+                <td><%= category.name %></td>
+                <td class="description-cell">
+                  <%= category.description.length > 50 ? category.description.substring(0, 50) + '...' : category.description %>
+                </td>
+                <td class="status <%= category.isListed ? 'active' : 'inactive' %>">
+                  <%= category.isListed ? 'Listed ✅' : 'Unlisted ❌' %>
+                </td>
+                <td class="date"><%= category.createdAt.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) %></td>
+                <td class="actions">
+                  <a href="#" class="btn edit-btn" 
+                     data-categoryid="<%= category._id %>"
+                     data-name="<%= category.name %>"
+                     data-description="<%= category.description %>"
+                     data-islisted="<%= category.isListed %>">EDIT</a>
+                  <a href="#" class="btn list-toggle" data-categoryid="<%= category._id %>" data-status="<%= category.isListed %>">
+                    <%= category.isListed ? 'UNLIST' : 'LIST' %>
+                  </a>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>          
+        </table>
+      </div>
+    </div>
+    <div class="pagination">
+      <% const total = Math.max(totalPages, 3); %>
+      <% for (let i = 1; i <= total; i++) { %>
+        <% if (i <= totalPages) { %>
+          <a href="?page=<%= i %><%= search ? '&search=' + encodeURIComponent(search) : '' %>">
+            <div class="dot <%= currentPage === i ? 'active' : '' %>"></div>
+          </a>
+        <% } else { %>
+          <div class="dot inactive"></div>
+        <% } %>
+      <% } %>
+    </div>
+  </div>
+
+  <!-- Popup with overlay -->
+  <div class="overlay hidden" id="popupOverlay">
+    <div class="popup">
+        <div class="popup-header">
+            <h2 class="popup-title">Add Category</h2>
+            <button class="close-btn" id="closePopup">×</button>
+        </div>
+        <div class="popup-content">
+            <form id="accountForm">
+                <input type="hidden" id="categoryId" name="categoryId">
+                <div class="form-group">
+                    <label for="CategoryName">Category Name</label>
+                    <input type="text" id="CategoryName" name="CategoryName" placeholder="Enter Category Name">
+                    <div id="err1" class="errr-msg"></div>
+                </div>
+                <div class="form-group">
+                    <label for="Description">Description</label>
+                    <input type="text" id="Description" name="Description" placeholder="Enter Category Description">
+                    <div id="err2" class="errr-msg"></div>
+                </div>
+            </form>
+        </div>
+        <div class="popup-footer">
+            <button class="btn btn-primary" id="saveBtn">Save Changes</button>
+        </div>
+    </div>
+  </div>
+
+  <!-- Confirmation modal -->
+  <div id="confirm-modal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <h3>Are you sure?</h3>
+      <div class="modal-buttons">
+        <button id="cancel-action" class="btn-no">NO</button>
+        <button id="confirm-action" class="btn-yes">YES</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      // ==================== Sidebar Toggle ====================
+      const sidebar = document.getElementById("adminSidebar");
+      const icon = document.getElementById("drawer-icon");
+      window.toggleSidebar = function () {
+        sidebar.classList.toggle("collapsed");
+        icon.style.transform = sidebar.classList.contains("collapsed") ? "rotate(0deg)" : "rotate(180deg)";
+      };
+
+      // ================== Modal Toggle for List/Unlist ==================
+      const toggleButtons = document.querySelectorAll(".list-toggle");
+      const modal = document.getElementById("confirm-modal");
+      const cancelBtn = document.getElementById("cancel-action");
+      const confirmBtn = document.getElementById("confirm-action");
+
+      let selectedCategoryId = null;
+      let selectedButton = null;
+      let selectedCurrentStatus = null;
+
+      toggleButtons.forEach((button) => {
+        button.addEventListener("click", (e) => {
+          e.preventDefault();
+          selectedCategoryId = button.dataset.categoryid;
+          selectedCurrentStatus = button.dataset.status === "true";
+          selectedButton = button;
+          modal.style.display = "flex";
+        });
+      });
+
+      const closeModal = () => {
+        modal.style.display = "none";
+        selectedCategoryId = null;
+        selectedButton = null;
+      };
+
+      cancelBtn.addEventListener("click", closeModal);
+      window.addEventListener("click", (e) => {
+        if (e.target === modal) closeModal();
+      });
+
+      confirmBtn.addEventListener("click", async () => {
+        try {
+          const response = await fetch(`/tezgrani/list-toggle/${selectedCategoryId}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ isListed: !selectedCurrentStatus }),
+          });
+
+          const result = await response.json();
+          if (result.success) {
+            selectedButton.textContent = selectedCurrentStatus ? "LIST" : "UNLIST";
+            selectedButton.dataset.status = (!selectedCurrentStatus).toString();
+            const row = selectedButton.closest("tr");
+            const statusCell = row.querySelector(".status");
+            statusCell.textContent = !selectedCurrentStatus ? "Listed ✅" : "Unlisted ❌";
+            statusCell.className = "status " + (!selectedCurrentStatus ? "active" : "inactive");
+            toastr.success("Category status updated successfully");
+          } else {
+            toastr.error(result.message || "Failed to update category status");
+          }
+        } catch (error) {
+          console.error("Toggle error:", error);
+          toastr.error("Something went wrong");
+        }
+        closeModal();
+      });
+
+      // ================ Popup Open/Close ================
+      const openPopupBtn = document.getElementById("openPopup");
+      const closePopupBtn = document.getElementById("closePopup");
+      const popupOverlay = document.getElementById("popupOverlay");
+      const popupTitle = document.querySelector(".popup-title");
+      const saveBtn = document.getElementById("saveBtn");
+      const categoryForm = document.getElementById("accountForm");
+      const categoryIdInput = document.getElementById("categoryId");
+      const categoryNameInput = document.getElementById("CategoryName");
+      const descriptionInput = document.getElementById("Description");
+
+      const closePopup = () => {
+        popupOverlay.classList.add("hidden");
+        resetForm();
+      };
+
+      const resetForm = () => {
+        categoryIdInput.value = "";
+        categoryNameInput.value = "";
+        descriptionInput.value = "";
+        popupTitle.textContent = "Add Category";
+        saveBtn.textContent = "Save Changes";
+        // Clear error messages
+        [errCategory, errDescription].forEach(err => {
+          err.textContent = "";
+          err.style.display = "none";
+        });
+      };
+
+      const openPopup = (mode = "add", data = {}) => {
+        popupOverlay.classList.remove("hidden");
+        if (mode === "edit") {
+          categoryIdInput.value = data.categoryId || "";
+          categoryNameInput.value = data.name || "";
+          descriptionInput.value = data.description || "";
+          popupTitle.textContent = "Edit Category";
+          saveBtn.textContent = "Update Category";
+        } else {
+          resetForm();
+        }
+      };
+
+      openPopupBtn?.addEventListener("click", () => openPopup("add"));
+      closePopupBtn?.addEventListener("click", closePopup);
+      popupOverlay?.addEventListener("click", (e) => {
+        if (e.target === popupOverlay) closePopup();
+      });
+      cancelBtn?.addEventListener("click", closePopup);
+
+      // ================ Edit Button Handler ================
+      const editButtons = document.querySelectorAll(".edit-btn");
+      editButtons.forEach(button => {
+        button.addEventListener("click", (e) => {
+          e.preventDefault();
+          const data = {
+            categoryId: button.dataset.categoryid,
+            name: button.dataset.name,
+            description: button.dataset.description,
+            isListed: button.dataset.islisted === "true"
+          };
+          openPopup("edit", data);
+        });
+      });
+
+      // ================ Form Validation and API Calls ================
+      const errCategory = document.getElementById("err1");
+      const errDescription = document.getElementById("err2");
+
+      const validateInput = (input, errorElement, msg) => {
+        const val = input.value.trim();
+        if (!val) {
+          errorElement.textContent = msg;
+          errorElement.style.display = "block";
+          return false;
+        }
+        errorElement.textContent = "";
+        errorElement.style.display = "none";
+        return true;
+      };
+
+      const addCategory = async (data) => {
+        try {
+          const response = await fetch('/tezgrani/category/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
+          const result = await response.json();
+          if (result.success) {
+            toastr.success('Category added successfully');
+            closePopup();
+            window.location.reload();
+          } else {
+            toastr.error(result.message || 'Failed to add category');
+          }
+        } catch (error) {
+          console.error('Add category error:', error);
+          toastr.error('Something went wrong');
+        }
+      };
+
+      const editCategory = async (categoryId, data) => {
+        try {
+          const response = await fetch(`/tezgrani/category/update/${categoryId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
+          const result = await response.json();
+          if (result.success) {
+            toastr.success('Category updated successfully');
+            closePopup();
+            window.location.reload();
+          } else {
+            toastr.error(result.message || 'Failed to update category');
+          }
+        } catch (error) {
+          console.error('Update category error:', error);
+          toastr.error('Something went wrong');
+        }
+      };
+
+      saveBtn?.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const isCategoryValid = validateInput(categoryNameInput, errCategory, 'Category name is required');
+        const isDescriptionValid = validateInput(descriptionInput, errDescription, 'Description is required');
+
+        if (!isCategoryValid || !isDescriptionValid) return;
+
+        const categoryId = categoryIdInput.value;
+        const isEditMode = !!categoryId;
+
+        const data = {
+          name: categoryNameInput.value.trim(),
+          description: descriptionInput.value.trim(),
+          isListed: isEditMode ? (document.querySelector(`a[data-categoryid="${categoryId}"]`).dataset.islisted === 'true') : true
+        };
+
+        if (isEditMode) {
+          await editCategory(categoryId, data);
+        } else {
+          await addCategory(data);
+        }
+      });
+    });
+  </script>
+</body>
+</html>

@@ -11,6 +11,7 @@ const errorHandler = require('./middlewares/errorHandler');
 const passport = require('./config/passport')
 const passport_login = require('./config/passport-login')
 const stateRouter = require('./routes/countryStateApi');
+const methodOverride = require('method-override');
 db();
 
 app.use(express.json());
@@ -35,7 +36,7 @@ app.use((req, res, next) => {
   res.locals.messageType = req.flash('messageType');
   next();
 });
-
+app.use(methodOverride('_method'));
 
 
 app.set("view engine", "ejs");

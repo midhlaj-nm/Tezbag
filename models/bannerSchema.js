@@ -23,8 +23,13 @@ const bannerSchema = new Schema({
     },
     endDate: {
         type: Date,
-        required: true
-    }
+        required: false
+    },
+    categoryId: {
+        type: Schema.Types.ObjectId,
+        ref: 'Category',
+        required: false
+      }
 })
 
 
