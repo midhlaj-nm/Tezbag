@@ -16,9 +16,9 @@ const loadProduct = async(req,res) => {
 
 const addProduct = async (req, res, next) => {
   try {
-
+    res.render('product-adm')
   } catch (err) {
-
+    console.log(err)
   }
 
 };

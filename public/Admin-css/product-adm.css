@@ -53,7 +53,7 @@ body {
   border: 1px solid #ccc;
   border-radius: 12px;
   padding: 16px 12px;
-  position: absolute;
+  position: fixed;
   left: 10px;
   display: flex;
   flex-direction: column;

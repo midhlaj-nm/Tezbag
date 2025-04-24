@@ -133,7 +133,7 @@
         <div class="table-header">
             <h2 class="table-title">Product Management</h2>
             <div class="buttons">
-              <a href="#" class="add-product-btn" id="openPopup">Add Product</a>
+              <a href="#" class="add-product-btn" id="openPopupBtn">Add Product</a>
             </div>
           </div>
       </div>
@@ -148,16 +148,16 @@
         <button class="close-btn" id="closePopup">×</button>
       </div>
       <div class="popup-content">
-        <form id="productForm" action="" enctype="multipart/form-data">
+        <form id="productForm" action="/product/save" method="post" enctype="multipart/form-data" novalidate>
           <div class="form-group">
             <label for="productName">Product Name</label>
-            <input type="text" id="productName" name="productName" placeholder="Enter Product Name">
+            <input type="text" id="productName" name="productName" placeholder="Enter Product Name" required>
             <div id="errProductName" class="errr-msg"></div>
           </div>
           <div class="form-row">
             <div class="form-group">
               <label for="category">Category</label>
-              <select id="category" name="category">
+              <select id="category" name="category" required>
                 <option value="">Select Category</option>
                 <% if (typeof categories !== 'undefined') { %>
                   <% categories.forEach(category => { %>
@@ -169,171 +169,246 @@
             </div>
             <div class="form-group">
               <label for="price">Price</label>
-              <input type="number" id="price" name="price" placeholder="Enter Price" step="0.01" min="0">
+              <input type="number" id="price" name="price" placeholder="Enter Price" step="1.00" min="0" required>
               <div id="errPrice" class="errr-msg"></div>
             </div>
             <div class="form-group">
               <label for="mrp">MRP</label>
-              <input type="number" id="mrp" name="mrp" placeholder="Enter MRP" step="0.01" min="0">
+              <input type="number" id="mrp" name="mrp" placeholder="Enter MRP" step="1.00" min="0" required>
               <div id="errMrp" class="errr-msg"></div>
             </div>
           </div>
           <div class="form-group">
             <label for="qty">Qty</label>
-            <input type="number" id="qty" name="qty" placeholder="Enter Quantity" min="0">
+            <input type="number" id="qty" name="qty" placeholder="Enter Quantity" min="0" required>
             <div id="errQty" class="errr-msg"></div>
           </div>
           <div class="form-group">
             <label for="description">Description</label>
-            <textarea id="description" name="description" placeholder="Enter Product Description"></textarea>
+            <textarea id="description" name="description" placeholder="Enter Product Description" required></textarea>
             <div id="errDescription" class="errr-msg"></div>
           </div>
           <div class="form-group">
             <label>Images</label>
             <div class="image-upload-container">
-              <input type="file" id="image1" name="images" accept="image/*" class="image-input" style="display: none;">
-              <div class="image-placeholder" onclick="document.getElementById('image1').click()">
-                <span class="material-icons"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f"><path d="M480-480ZM200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h320v80H200v560h560v-320h80v320q0 33-23.5 56.5T760-120H200Zm40-160h480L570-480 450-320l-90-120-120 160Zm440-320v-80h-80v-80h80v-80h80v80h80v80h-80v80h-80Z"/></svg>
-                </span>
-              </div>
-              <input type="file" id="image2" name="images" accept="image/*" class="image-input" style="display: none;">
-              <div class="image-placeholder" onclick="document.getElementById('image2').click()">
-                <span class="material-icons"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f"><path d="M480-480ZM200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h320v80H200v560h560v-320h80v320q0 33-23.5 56.5T760-120H200Zm40-160h480L570-480 450-320l-90-120-120 160Zm440-320v-80h-80v-80h80v-80h80v80h80v80h-80v80h-80Z"/></svg>
-                </span>
-              </div>
-              <input type="file" id="image3" name="images" accept="image/*" class="image-input" style="display: none;">
-              <div class="image-placeholder" onclick="document.getElementById('image3').click()">
-                <span class="material-icons"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f"><path d="M480-480ZM200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h320v80H200v560h560v-320h80v320q0 33-23.5 56.5T760-120H200Zm40-160h480L570-480 450-320l-90-120-120 160Zm440-320v-80h-80v-80h80v-80h80v80h80v80h-80v80h-80Z"/></svg>
-                </span>
-              </div>
+              <% for (let i = 1; i <= 3; i++) { %>
+                <input type="file" id="image<%= i %>" name="images" accept="image/*" class="image-input" style="display: none;">
+                <div class="image-placeholder" onclick="document.getElementById('image<%= i %>').click()" id="placeholder<%= i %>">
+                  <span class="material-icons">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f">
+                      <path d="M480-480ZM200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h320v80H200v560h560v-320h80v320q0 33-23.5 56.5T760-120H200Zm40-160h480L570-480 450-320l-90-120-120 160Zm440-320v-80h-80v-80h80v-80h80v80h80v80h-80v80h-80Z"/>
+                    </svg>
+                  </span>
+                </div>
+              <% } %>
             </div>
             <div id="errImage" class="errr-msg"></div>
           </div>
         </form>
       </div>
       <div class="popup-footer">
-        <button type="button" class="btn btn-primary" id="saveProductBtn">ADD</button>
+        <button type="submit" class="btn btn-primary" id="saveProductBtn" form="productForm">ADD</button>
       </div>
     </div>
   </div>
-</body>
 
-
-<script>
+  <script>
 document.addEventListener("DOMContentLoaded", function () {
-  // ==================== Sidebar Toggle ====================
-  const sidebar = document.getElementById("adminSidebar");
-  const icon = document.getElementById("drawer-icon");
-  window.toggleSidebar = function () {
-    sidebar.classList.toggle("collapsed");
-    icon.style.transform = sidebar.classList.contains("collapsed") ? "rotate(0deg)" : "rotate(180deg)";
-  };
+    // ==================== Sidebar Toggle ====================
+    const sidebar = document.getElementById("adminSidebar");
+    const icon = document.getElementById("drawer-icon");
+    window.toggleSidebar = function () {
+      sidebar.classList.toggle("collapsed");
+      icon.style.transform = sidebar.classList.contains("collapsed") ? "rotate(0deg)" : "rotate(180deg)";
+    };
 
-  // ================ Popup Open/Close ================
-  const openPopupBtn = document.getElementById("openPopup");
-  const closePopupBtn = document.getElementById("closePopup");
-  const popupOverlay = document.getElementById("popupOverlay");
-  const saveProductBtn = document.getElementById("saveProductBtn");
-  const productForm = document.getElementById("productForm");
-  const productNameInput = document.getElementById("productName");
-  const categoryInput = document.getElementById("category");
-  const priceInput = document.getElementById("price");
-  const mrpInput = document.getElementById("mrp");
-  const qtyInput = document.getElementById("qty");
-  const descriptionInput = document.getElementById("description");
-  const imageInputs = [document.getElementById("image1"), document.getElementById("image2"), document.getElementById("image3")];
-  const errProductName = document.getElementById("errProductName");
-  const errCategory = document.getElementById("errCategory");
-  const errPrice = document.getElementById("errPrice");
-  const errMrp = document.getElementById("errMrp");
-  const errQty = document.getElementById("errQty");
-  const errDescription = document.getElementById("errDescription");
-  const errImage = document.getElementById("errImage");
+    // ==================== Add Product Popup Logic ====================
+    const popup = document.getElementById("popupOverlay");
+    const openPopupBtn = document.getElementById("openPopupBtn");
+    const closePopupBtn = document.getElementById("closePopup");
+    const productForm = document.getElementById("productForm");
+    const saveProductBtn = document.getElementById("saveProductBtn");
 
-  toastr.options = {
-    closeButton: true,
-    progressBar: true,
-    positionClass: "toast-top-right",
-    timeOut: "3000",
-  };
-
-  const closePopup = () => {
-    popupOverlay.classList.add("hidden");
-    resetForm();
-  };
-
-  const resetForm = () => {
-    productForm.reset();
-    [errProductName, errCategory, errPrice, errMrp, errQty, errDescription, errImage].forEach(err => {
-      err.textContent = "";
-      err.style.display = "none";
+    openPopupBtn.addEventListener("click", () => {
+      popup.classList.remove("hidden");
     });
-  };
 
-  openPopupBtn.addEventListener("click", () => {
-    popupOverlay.classList.remove("hidden");
-    resetForm();
-  });
+    closePopupBtn.addEventListener("click", () => {
+      popup.classList.add("hidden");
+      productForm.reset();
+      clearErrors();
+      resetPlaceholders();
+    });
 
-  closePopupBtn.addEventListener("click", closePopup);
-  popupOverlay.addEventListener("click", (e) => {
-    if (e.target === popupOverlay) closePopup();
-  });
+    // Handle button click directly
+    saveProductBtn.addEventListener("click", function(event) {
+      event.preventDefault();
+      
+      // Force clear any previous error messages
+      clearErrors();
+      
+      // Run validation
+      if (validateForm()) {
+        console.log("Validation passed. Submitting the form via AJAX...");
+        saveProductBtn.disabled = true; // Disable button to prevent multiple submissions
 
-  const validateInput = (input, errorElement, msg, maxLength = null, minValue = null) => {
-    const val = input.value.trim();
-    if (!val && input.type !== "file") {
-      errorElement.textContent = msg;
-      errorElement.style.display = "block";
-      return false;
-    }
-    if (maxLength && val.length > maxLength) {
-      errorElement.textContent = `Must be ${maxLength} characters or less`;
-      errorElement.style.display = "block";
-      return false;
-    }
-    if (minValue !== null && !isNaN(minValue) && (parseFloat(val) <= minValue || isNaN(val))) {
-      errorElement.textContent = msg;
-      errorElement.style.display = "block";
-      return false;
-    }
-    if (input.type === "file" && !input.files.length) {
-      errorElement.textContent = msg;
-      errorElement.style.display = "block";
-      return false;
-    }
-    errorElement.textContent = "";
-    errorElement.style.display = "none";
-    return true;
-  };
+        // Create FormData object to handle file uploads
+        const formData = new FormData(productForm);
 
-  saveProductBtn.addEventListener("click", async (e) => {
-    e.preventDefault();
-    const isProductNameValid = validateInput(productNameInput, errProductName, "Product Name is required", 50);
-    const isCategoryValid = validateInput(categoryInput, errCategory, "Category is required");
-    const isPriceValid = validateInput(priceInput, errPrice, "Valid Price is required (greater than 0)", null, 0);
-    const isMrpValid = validateInput(mrpInput, errMrp, "Valid MRP is required (greater than 0)", null, 0);
-    const isQtyValid = validateInput(qtyInput, errQty, "Valid Quantity is required (greater than 0)", null, 0);
-    const isDescriptionValid = validateInput(descriptionInput, errDescription, "Description is required", 200);
-    const isImageValid = imageInputs.every(input => validateInput(input, errImage, "All three images are required"));
-
-    if (!isProductNameValid || !isCategoryValid || !isPriceValid || !isMrpValid || !isQtyValid || !isDescriptionValid || !isImageValid) return;
-
-    const formData = new FormData();
-    formData.append("productName", productNameInput.value.trim());
-    formData.append("category", categoryInput.value);
-    formData.append("price", priceInput.value);
-    formData.append("mrp", mrpInput.value);
-    formData.append("qty", qtyInput.value);
-    formData.append("description", descriptionInput.value.trim());
-    imageInputs.forEach((input, index) => {
-      if (input.files.length > 0) {
-        formData.append(`images`, input.files[0]);
+        // Submit form via AJAX
+        $.ajax({
+          url: "/product/save",
+          type: "POST",
+          data: formData,
+          processData: false, 
+          contentType: false, 
+          success: function (response) {
+            toastr.success("Product added successfully!");
+            productForm.reset();
+            clearErrors();
+            resetPlaceholders();
+            popup.classList.add("hidden");
+            saveProductBtn.disabled = false;
+          },
+          error: function (xhr, status, error) {
+            toastr.error("Failed to add product: " + (xhr.responseJSON?.message || "Unknown error"));
+            saveProductBtn.disabled = false;
+          },
+        });
+      } else {
+        console.log("Validation failed - errors should be displayed");
       }
     });
+
+    function clearErrors() {
+      document.querySelectorAll(".errr-msg").forEach(el => {
+        el.textContent = "";
+        el.style.display = "block"; // Make sure they're visible
+      });
+    }
+
+    function resetPlaceholders() {
+      for (let i = 1; i <= 3; i++) {
+        document.getElementById(`placeholder${i}`).innerHTML = `
+          <span class="material-icons">
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f">
+              <path d="M480-480ZM200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h320v80H200v560h560v-320h80v320q0 33-23.5 56.5T760-120H200Zm40-160h480L570-480 450-320l-90-120-120 160Zm440-320v-80h-80v-80h80v-80h80v80h80v80h-80v80h-80Z"/>
+            </svg>
+          </span>`;
+      }
+    }
+
+    function displayError(elementId, message) {
+      const errorElement = document.getElementById(elementId);
+      if (errorElement) {
+        errorElement.textContent = message;
+        errorElement.style.display = "block";
+        console.log(`Setting error for ${elementId}: ${message}`);
+      } else {
+        console.error(`Error element not found: ${elementId}`);
+      }
+    }
+
+    function validateForm() {
+  let isValid = true;
+  
+  // Get form elements
+  const productName = document.getElementById("productName");
+  const category = document.getElementById("category");
+  const price = document.getElementById("price");
+  const mrp = document.getElementById("mrp");
+  const qty = document.getElementById("qty");
+  const description = document.getElementById("description");
+
+  // Product Name validation
+  if (!productName.value.trim()) {
+    isValid = false;
+    displayError("errProductName", "Product name is required.");
+  }
+
+  // Category validation
+  if (!category.value) {
+    isValid = false;
+    displayError("errCategory", "Please select a category.");
+  }
+
+  // Price validation
+  if (!price.value.trim()) {
+    isValid = false;
+    displayError("errPrice", "Price is required.");
+  } else if (isNaN(parseFloat(price.value)) || parseFloat(price.value) < 0) {
+    isValid = false;
+    displayError("errPrice", "Price must be a valid positive number.");
+  }
+
+  // MRP validation
+  if (!mrp.value.trim()) {
+    isValid = false;
+    displayError("errMrp", "MRP is required.");
+  } else if (isNaN(parseFloat(mrp.value)) || parseFloat(mrp.value) < 0) {
+    isValid = false;
+    displayError("errMrp", "MRP must be a valid positive number.");
+  } else if (parseFloat(mrp.value) < parseFloat(price.value)) {
+    isValid = false;
+    displayError("errMrp", "MRP must be greater than or equal to the price.");
+  }
+
+  // Quantity validation
+  if (!qty.value.trim()) {
+    isValid = false;
+    displayError("errQty", "Quantity is required.");
+  } else if (isNaN(parseInt(qty.value)) || parseInt(qty.value) < 0) {
+    isValid = false;
+    displayError("errQty", "Quantity must be a valid positive number.");
+  }
+
+  // Description validation
+  if (!description.value.trim()) {
+    isValid = false;
+    displayError("errDescription", "Description is required.");
+  }
+
+  // Image validation - require all three images
+  let missingImages = false;
+  for (let i = 1; i <= 3; i++) {
+    if (document.getElementById(`image${i}`).files.length === 0) {
+      missingImages = true;
+      break;
+    }
+  }
+  
+  if (missingImages) {
+    isValid = false;
+    displayError("errImage", "All three product images are required.");
+  }
+
+  return isValid;
+}
+
+
+    // ==================== Image Preview on Change ====================
+    for (let i = 1; i <= 3; i++) {
+      const imageInput = document.getElementById(`image${i}`);
+      const placeholder = document.getElementById(`placeholder${i}`);
+      
+      imageInput.addEventListener("change", function () {
+        if (imageInput.files && imageInput.files[0]) {
+          const file = imageInput.files[0];
+          
+          // Validate file type
+          if (!file.type.match('image.*')) {
+            displayError("errImage", "Please select valid image files only.");
+            imageInput.value = '';
+            return;
+          }
+          
+          placeholder.innerHTML = `<img src="${URL.createObjectURL(file)}" alt="Preview" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">`;
+          document.getElementById("errImage").textContent = "";
+        }
+      });
+    }
   });
-}); 
-</script>
-
-
+    </script>
+  
+</body>
 </html>
