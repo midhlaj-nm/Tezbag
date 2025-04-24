@@ -35,7 +35,8 @@ const loadHomepage = async (req, res, next) => {
       const categoriesWithData = await Promise.all(
         categories.map(async (category) => {
           const productCount = await Products.countDocuments({ category: category._id });
-          const banner = await Gallery.findOne({ categoryId: category._id }).lean();
+          const banner = await Gallery
+          .findOne({ categoryId: category._id }).lean();
   
           return {
             ...category,

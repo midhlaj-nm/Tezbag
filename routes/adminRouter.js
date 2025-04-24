@@ -2,7 +2,8 @@ const express = require('express');
 const router = express.Router();
 const adminController = require('../controllers/admin/adminController');
 const userManageController = require('../controllers/admin/userManageController');
-const categoryManageController = require('../controllers/admin/categoryManageController')
+const categoryManageController = require('../controllers/admin/categoryManageController');
+const productManagementController = require('../controllers/admin/productManagementController')
 const adminAuth = require('../middlewares/adminAuth');
 
 
@@ -24,7 +25,10 @@ router.patch('/user/block-toggle/:id', adminAuth, userManageController.isAction)
 router.get('/category-management',adminAuth, categoryManageController.loadCategory);
 router.post('/category/save',adminAuth, categoryManageController.addCategory);
 router.patch('/list-toggle/:categoryId',adminAuth, categoryManageController.toggleCategoryStatus);
-router.put('/category/update/:id',adminAuth, categoryManageController.editCategory)
+router.put('/category/update/:id',adminAuth, categoryManageController.editCategory);
+
+//productManageController
+router.get('/product-management', productManagementController.loadProduct);
 
 
 module.exports = router;

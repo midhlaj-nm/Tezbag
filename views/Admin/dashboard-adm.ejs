@@ -58,7 +58,7 @@
       </li>
 
       <li>
-        <a href="#">
+        <a href="/tezgrani/product-management">
             <span class="icon-svg">
                 <!-- Products -->
                 <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f">
@@ -348,7 +348,7 @@
           })
           .then(data => {
             console.log("🎉 Punch-in success:", data);
-            toastr.success('You have successfully punched in!');
+            toastr.success('You have successfully punched in!', 'Punch-in');
           })
           .catch(err => {
             console.error("❌ Error during punch-in:", err);

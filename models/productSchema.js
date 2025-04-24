@@ -58,6 +58,11 @@ const productSchema = new Schema({
         required: true,
         default: 'Available'
     },
+    SKU:{
+        type: String,
+        required: true,
+        default: null
+    }
 },{timestamps: true});
 
 const Product = mongoose.model('Product',productSchema)

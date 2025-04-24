@@ -6,13 +6,13 @@ const userAuth = async (req, res, next) => {
     console.log("Session data:", req.session);
 
     // Step 1: Check if session contains userId
-    if (!req.session.userId) {
+    if (!req.session.user) {
       console.log("❌ No userId found in session. Redirecting to login.");
       return res.redirect('/login'); // adjust route if needed
     }
 
     // Step 2: Fetch the user from the DB
-    const user = await User.findById(req.session.userId);
+    const user = await User.findById(req.session.user);
     console.log("🔍 Fetched user from DB:", user);
 
     // Step 3: Validate user existence and block status

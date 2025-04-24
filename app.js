@@ -11,7 +11,6 @@ const errorHandler = require('./middlewares/errorHandler');
 const passport = require('./config/passport')
 const passport_login = require('./config/passport-login')
 const stateRouter = require('./routes/countryStateApi');
-const methodOverride = require('method-override');
 db();
 
 app.use(express.json());
@@ -36,7 +35,6 @@ app.use((req, res, next) => {
   res.locals.messageType = req.flash('messageType');
   next();
 });
-app.use(methodOverride('_method'));
 
 
 app.set("view engine", "ejs");
@@ -50,11 +48,11 @@ app.use(passport.session())
 app.use(passport_login.initialize());
 app.use(passport_login.session())
 app.use("/", userRouter);
-app.use('/tezgrani', adminRouter)
+app.use('/tezgrani', adminRouter);
+app.use('/api', stateRouter);
 app.use(errorHandler);
 
 
-app.use('/api', stateRouter);
 
 app.listen(process.env.PORT, () => {
   console.log("Server running");

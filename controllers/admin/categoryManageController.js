@@ -42,13 +42,13 @@ const addCategory = async (req, res, next) => {
       console.warn("⚠️ Validation failed: Missing fields");
       return res.status(400).json({ success: false, message: "Name and description are required" });
     }
-    if (name.length > 50) {
+    if (name.length > 20) {
       console.warn("⚠️ Name too long");
-      return res.status(400).json({ success: false, message: "Category name must be 50 characters or less" });
+      return res.status(400).json({ success: false, message: "Category name must be 20 characters or less" });
     }
-    if (description.length > 200) {
+    if (description.length > 80) {
       console.warn("⚠️ Description too long");
-      return res.status(400).json({ success: false, message: "Description must be 200 characters or less" });
+      return res.status(400).json({ success: false, message: "Description must be 80 characters or less" });
     }
 
     const existing = await Category.findOne({
@@ -125,8 +125,8 @@ const editCategory = async (req, res, next) => {
     if (!name || !description) {
       return res.status(400).json({ success: false, message: "Name and description are required" });
     }
-    if (name.length > 10) {
-      return res.status(400).json({ success: false, message: "Category name must be 10 characters or less" });
+    if (name.length > 20) {
+      return res.status(400).json({ success: false, message: "Category name must be 20 characters or less" });
     }
     if (description.length > 80) {
       return res.status(400).json({ success: false, message: "Description must be 80 characters or less" });
