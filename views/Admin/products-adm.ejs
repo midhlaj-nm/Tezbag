@@ -5,16 +5,36 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Product Management</title>
   <link rel="stylesheet" href="/Admin-css/product-adm.css" />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" />
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
 </head>
 <body>
-  <div id="middle" class="container-fluid">
+  <div id="middle" class="container-fluid">      
     <div class="logo">
       <img width="250" src="/Admin-css/Logo-Admins.jpg" alt="Logo">
     </div>
+    
+    <form action="/tezgrani/product-management" method="GET" class="search-bar">
+      <div class="input-wrapper">
+        <input 
+          type="text" 
+          name="search" 
+          value="<%= typeof search !== 'undefined' ? search : '' %>" 
+          placeholder="Search by product name..."
+          class="search-input">
+        
+          <% if (typeof search !== 'undefined' && search.trim() !== '') { %>
+            <a href="/tezgrani/product-management" class="clear-icon">
+              <span class="material-symbols-outlined">cancel</span>
+            </a>
+          <% } %>
+      </div>
+      <button type="submit" class="search-btn">Search</button>
+    </form>
   </div>
 
   <div class="sidebar" id="adminSidebar">
@@ -22,9 +42,7 @@
       <li>
         <a href="/tezgrani/dashboard">
           <span class="icon-svg">
-            <svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 -960 960 960" width="30px" fill="#5f5f5f">
-              <path d="M520-600v-240h320v240H520ZM120-440v-400h320v400H120Zm400 320v-400h320v400H520Zm-400 0v-240h320v240H120Zm80-400h160v-240H200v240Zm400 320h160v-240H600v240Zm0-480h160v-80H600v80ZM200-200h160v-80H200v80Zm160-320Zm240-160Zm0 240ZM360-280Z"/>
-            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f"><path d="M520-600v-240h320v240H520ZM120-440v-400h320v400H120Zm400 320v-400h320v400H520Zm-400 0v-240h320v240H120Zm80-400h160v-240H200v240Zm400 320h160v-240H600v240Zm0-480h160v-80H600v80ZM200-200h160v-80H200v80Zm160-320Zm240-160Zm0 240ZM360-280Z"/></svg>
           </span>
           <span>Dashboard</span>
         </a>
@@ -101,19 +119,18 @@
       </li>
       <li>
         <a href="#">
-          <span class="icon-svg">
-            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f">
-              <path d="M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h640q33 0 56.5 23.5T880-720v480q0 33-23.5 56.5T800-160H160Zm0-80h640v-480H160v480Zm80-80h480L570-520 450-360l-90-120-120 160Zm-80 80v-480 480Z"/>
-            </svg>
-          </span>
-          <span>Gallery</span>
+            <span class="icon-svg">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f">
+                  <path d="M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h640q33 0 56.5 23.5T880-720v480q0 33-23.5 56.5T800-160H160Zm0-80h640v-480H160v480Zm80-80h480L570-520 450-360l-90-120-120 160Zm-80 80v-480 480Z"/>
+                </svg>
+              </span>
+              <span>Gallery</span>
         </a>
       </li>
       <li>
         <a href="#">
           <span class="icon-svg">
-            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f">
-              <path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h280v80H200v560h280v80H200Zm440-160-55-58 102-102H360v-80h327L585-622l55-58 200 200-200 200Z"/>
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h280v80H200v560h280v80H200Zm440-160-55-58 102-102H360v-80h327L585-622l55-58 200 200-200 200Z"/></svg>
             </svg>
           </span>
           <span>Log-out</span>
@@ -130,25 +147,118 @@
   <div class="content">
     <div class="table-container">
       <div class="table-wrapper">
+        
         <div class="table-header">
-            <h2 class="table-title">Product Management</h2>
-            <div class="buttons">
-              <a href="#" class="add-product-btn" id="openPopupBtn">Add Product</a>
-            </div>
+          <h2 class="table-title">Product Management</h2>
+          <div class="buttons">
+            <a href="#" class="add-product-btn" id="openPopupBtn">Add Product</a>
           </div>
+        </div>
+  
+        <!-- Product Table -->
+        <div class="table-body">
+          <table class="product-table">
+            <thead>
+              <tr>
+                <th>SI. NO.</th>
+                <th>IMAGES</th>
+                <th>NAME</th>
+                <th>CATEGORY</th>
+                <th>PRICE</th>
+                <th>MRP</th>
+                <th>STOCK</th>
+                <th>STATUS</th>
+                <th>ACTION</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (!products || products.length === 0) { %>
+                <tr>
+                  <td colspan="9" style="padding: 1rem;">
+                    <div style="
+                      width: 105%;
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      font-weight: 500;
+                      font-size: 1.1rem;
+                      color: #666;
+                    ">
+                      No Products to show right now!
+                    </div>
+                  </td>
+                </tr>
+              <% } else { %>
+                <% products.forEach((product, index) => { %>
+                  <tr>
+                    <td><%= (currentPage - 1) * 6 + index + 1 %></td>
+                    <td class="product-info">
+                      <img src="<%= product.productImage[0] %>" alt="Product Image" class="product-thumbnail">
+                    </td>
+                    <td><%= product.productName %></td>
+                    <td><%= product.category?.name %></td>
+                    <td>₹<%= product.regularPrice %></td>
+                    <td>₹<%= product.salePrice %></td>
+                    <td><%= product.quantity %> pcs</td>
+                    <td class="status <%= product.isBlocked ? 'inactive' : 'active' %>">
+                      <%= product.isBlocked ? 'Blocked' : 'Active' %>
+                    </td>
+                    <td class="actions">
+                      <a href="#" class="btn edit-btn" 
+                         data-productid="<%= product._id %>"
+                         data-name="<%= product.productName %>"
+                         data-description="<%= product.description %>"
+                         data-isblocked="<%= product.isBlocked %>"
+                         data-categoryid="<%= product.category._id %>"
+                         data-price="<%= product.regularPrice %>"
+                         data-mrp="<%= product.salePrice %>"
+                         data-stock="<%= product.quantity %>"
+                         data-images='<%= JSON.stringify(product.productImage) %>'>
+                        EDIT
+                      </a>
+                      <a href="#" class="btn list-toggle" 
+                         data-productid="<%= product._id %>" 
+                         data-status="<%= product.isBlocked %>">
+                        <%= product.isBlocked ? 'UNBLOCK' : 'BLOCK' %>
+                      </a>
+                    </td>
+                  </tr>
+                <% }) %>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+        <!-- End Product Table -->
+  
       </div>
+    </div>
+    <div class="pagination">
+      <% const total = Math.max(totalPages, 3); %>
+      <% for (let i = 1; i <= total; i++) { %>
+        <% if (i <= totalPages) { %>
+          <a href="/tezgrani/products-management?page=<%= i %><%= search ? '&search=' + encodeURIComponent(search) : '' %>">
+            <div class="dot <%= currentPage === i ? 'active' : '' %>"></div>
+          </a>
+        <% } else { %>
+          <div class="dot inactive"></div>
+        <% } %>
+      <% } %>
     </div>
   </div>
 
-  <!-- Popup with overlay -->
+  <!-- Existing Popup with overlay -->
   <div class="overlay hidden" id="popupOverlay">
     <div class="popup">
       <div class="popup-header">
-        <h2 class="popup-title">Add Product</h2>
+        <h2 class="popup-title" id="popupTitle">Add Product</h2>
         <button class="close-btn" id="closePopup">×</button>
       </div>
       <div class="popup-content">
-        <form id="productForm" action="/product/save" method="post" enctype="multipart/form-data" novalidate>
+        <form id="productForm" enctype="multipart/form-data" novalidate>
+          <input type="hidden" id="productId" name="productId">
+          <!-- Hidden fields to track existing and deleted images -->
+          <div id="existingImagesContainer" style="display: none;"></div>
+          <div id="deletedImagesContainer" style="display: none;"></div>
           <div class="form-group">
             <label for="productName">Product Name</label>
             <input type="text" id="productName" name="productName" placeholder="Enter Product Name" required>
@@ -157,8 +267,8 @@
           <div class="form-row">
             <div class="form-group">
               <label for="category">Category</label>
-              <select id="category" name="category" required>
-                <option value="">Select Category</option>
+              <select id="category" name="category">
+                <option value="" disabled selected hidden>Select Category</option>
                 <% if (typeof categories !== 'undefined') { %>
                   <% categories.forEach(category => { %>
                     <option value="<%= category._id %>"><%= category.name %></option>
@@ -189,25 +299,43 @@
             <div id="errDescription" class="errr-msg"></div>
           </div>
           <div class="form-group">
-            <label>Images</label>
-            <div class="image-upload-container">
-              <% for (let i = 1; i <= 3; i++) { %>
-                <input type="file" id="image<%= i %>" name="images" accept="image/*" class="image-input" style="display: none;">
-                <div class="image-placeholder" onclick="document.getElementById('image<%= i %>').click()" id="placeholder<%= i %>">
-                  <span class="material-icons">
-                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f">
-                      <path d="M480-480ZM200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h320v80H200v560h560v-320h80v320q0 33-23.5 56.5T760-120H200Zm40-160h480L570-480 450-320l-90-120-120 160Zm440-320v-80h-80v-80h80v-80h80v80h80v80h-80v80h-80Z"/>
-                    </svg>
-                  </span>
-                </div>
-              <% } %>
-            </div>
+            <label>Images <span id="imageCounter">0/5</span></label>
+            <div id="image-upload-container" class="image-upload-container"></div>
             <div id="errImage" class="errr-msg"></div>
           </div>
         </form>
       </div>
       <div class="popup-footer">
         <button type="submit" class="btn btn-primary" id="saveProductBtn" form="productForm">ADD</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cropping Modal -->
+  <div class="overlay hidden" id="cropModal">
+    <div class="popup">
+      <div class="popup-header">
+        <h2 class="popup-title">Crop Image</h2>
+        <button class="close-btn" id="closeCropModal">×</button>
+      </div>
+      <div class="popup-content">
+        <div>
+          <img id="cropImage" src="" alt="Image to crop" style="max-width: 100%; max-height: 400px;">
+        </div>
+      </div>
+      <div class="popup-footer">
+        <button type="button" class="btn btn-primary" id="cropDoneBtn">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirmation modal -->
+  <div id="confirm-modal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <h3>Are you sure?</h3>
+      <div class="modal-buttons">
+        <button id="cancel-action" class="btn-no">NO</button>
+        <button id="confirm-action" class="btn-yes">YES</button>
       </div>
     </div>
   </div>
@@ -222,15 +350,85 @@ document.addEventListener("DOMContentLoaded", function () {
       icon.style.transform = sidebar.classList.contains("collapsed") ? "rotate(0deg)" : "rotate(180deg)";
     };
 
-    // ==================== Add Product Popup Logic ====================
+    // ==================== Add/Edit Product Popup Logic ====================
     const popup = document.getElementById("popupOverlay");
     const openPopupBtn = document.getElementById("openPopupBtn");
     const closePopupBtn = document.getElementById("closePopup");
     const productForm = document.getElementById("productForm");
     const saveProductBtn = document.getElementById("saveProductBtn");
+    const popupTitle = document.getElementById("popupTitle");
+    const imageUploadContainer = document.getElementById("image-upload-container");
+    const imageCounter = document.getElementById("imageCounter");
+    const existingImagesContainer = document.getElementById("existingImagesContainer");
+    const deletedImagesContainer = document.getElementById("deletedImagesContainer");
 
+    let deletedImages = new Set(); // Track deleted images to avoid duplicates
+
+    // Open modal for adding a new product
     openPopupBtn.addEventListener("click", () => {
+      popupTitle.textContent = "Add Product";
+      saveProductBtn.textContent = "ADD";
+      productForm.reset();
+      document.getElementById("productId").value = "";
+      existingImagesContainer.innerHTML = "";
+      deletedImagesContainer.innerHTML = "";
+      deletedImages.clear();
+      clearErrors();
+      initializePlaceholders();
+      updateImageCounter();
       popup.classList.remove("hidden");
+    });
+
+    // Open modal for editing a product
+    document.querySelectorAll('.edit-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        popupTitle.textContent = "Edit Product";
+        saveProductBtn.textContent = "UPDATE";
+
+        // Populate form fields with product data
+        const productId = btn.getAttribute('data-productid');
+        const name = btn.getAttribute('data-name');
+        const description = btn.getAttribute('data-description');
+        const categoryId = btn.getAttribute('data-categoryid');
+        const price = btn.getAttribute('data-price');
+        const mrp = btn.getAttribute('data-mrp');
+        const stock = btn.getAttribute('data-stock');
+        const images = JSON.parse(btn.getAttribute('data-images') || '[]');
+
+        document.getElementById('productId').value = productId;
+        document.getElementById('productName').value = name;
+        document.getElementById('description').value = description;
+        document.getElementById('category').value = categoryId;
+        document.getElementById('price').value = price;
+        document.getElementById('mrp').value = mrp;
+        document.getElementById('qty').value = stock;
+
+        // Populate existing images as hidden inputs
+        existingImagesContainer.innerHTML = "";
+        deletedImagesContainer.innerHTML = "";
+        deletedImages.clear();
+        images.forEach((url, index) => {
+          const input = document.createElement("input");
+          input.type = "hidden";
+          input.name = `existingImages[${index}]`;
+          input.value = url;
+          existingImagesContainer.appendChild(input);
+        });
+
+        // Populate images in placeholders
+        imageUploadContainer.innerHTML = "";
+        images.forEach((imageUrl, index) => {
+          createPlaceholder(index + 1, imageUrl);
+        });
+        if (images.length < 5) {
+          createPlaceholder(images.length + 1);
+        }
+        addImageChangeListeners();
+        updateImageCounter();
+
+        popup.classList.remove("hidden");
+      });
     });
 
     closePopupBtn.addEventListener("click", () => {
@@ -238,41 +436,57 @@ document.addEventListener("DOMContentLoaded", function () {
       productForm.reset();
       clearErrors();
       resetPlaceholders();
+      existingImagesContainer.innerHTML = "";
+      deletedImagesContainer.innerHTML = "";
+      deletedImages.clear();
+      updateImageCounter();
     });
 
-    // Handle button click directly
+    // Handle form submission
     saveProductBtn.addEventListener("click", function(event) {
       event.preventDefault();
       
-      // Force clear any previous error messages
       clearErrors();
       
-      // Run validation
       if (validateForm()) {
         console.log("Validation passed. Submitting the form via AJAX...");
-        saveProductBtn.disabled = true; // Disable button to prevent multiple submissions
+        saveProductBtn.disabled = true;
+        saveProductBtn.textContent = productForm.productId.value ? "Updating..." : "Adding...";
 
-        // Create FormData object to handle file uploads
+        // Append deleted images to FormData
         const formData = new FormData(productForm);
+        Array.from(deletedImages).forEach((url, index) => {
+          formData.append(`deletedImages[${index}]`, url);
+        });
 
-        // Submit form via AJAX
+        const productId = document.getElementById("productId").value;
+        const url = productId ? `/tezgrani/product/edit/${productId}` : "/tezgrani/product/save";
+        const method = productId ? "PATCH" : "POST";
+
         $.ajax({
-          url: "/product/save",
-          type: "POST",
+          url: url,
+          type: method,
           data: formData,
           processData: false, 
           contentType: false, 
           success: function (response) {
-            toastr.success("Product added successfully!");
+            toastr.success(productId ? "Product updated successfully!" : "Product added successfully!");
             productForm.reset();
             clearErrors();
             resetPlaceholders();
+            existingImagesContainer.innerHTML = "";
+            deletedImagesContainer.innerHTML = "";
+            deletedImages.clear();
             popup.classList.add("hidden");
             saveProductBtn.disabled = false;
+            saveProductBtn.textContent = productId ? "UPDATE" : "ADD";
+            window.location.reload();
           },
           error: function (xhr, status, error) {
-            toastr.error("Failed to add product: " + (xhr.responseJSON?.message || "Unknown error"));
+            const errorMsg = xhr.responseJSON?.message || "Unknown error";
+            toastr.error(`Failed to ${productId ? 'update' : 'add'} product: ${errorMsg}`);
             saveProductBtn.disabled = false;
+            saveProductBtn.textContent = productId ? "UPDATE" : "ADD";
           },
         });
       } else {
@@ -280,21 +494,192 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     });
 
+    // ==================== Cropping Modal Logic ====================
+    const cropModal = document.getElementById("cropModal");
+    const closeCropModalBtn = document.getElementById("closeCropModal");
+    const cropDoneBtn = document.getElementById("cropDoneBtn");
+    let cropper;
+    let currentImageInput;
+    let currentPlaceholder;
+
+    closeCropModalBtn.addEventListener("click", () => {
+      cropModal.classList.add("hidden");
+      if (cropper) {
+        cropper.destroy();
+        cropper = null;
+      }
+    });
+
+    cropDoneBtn.addEventListener("click", () => {
+      if (cropper) {
+        const canvas = cropper.getCroppedCanvas();
+        if (canvas) {
+          canvas.toBlob((blob) => {
+            const file = new File([blob], currentImageInput.files[0]?.name || `cropped-image-${currentImageInput.id.replace('image', '')}.jpg`, { type: "image/jpeg" });
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+            currentImageInput.files = dataTransfer.files;
+
+            currentPlaceholder.innerHTML = `
+              <img src="${canvas.toDataURL()}" alt="Preview" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
+              <div class="image-hover-controls">
+                <button type="button" class="control-btn edit-btn" onclick="event.stopPropagation(); editImage(${currentImageInput.id.replace('image', '')})">
+                  <span class="material-symbols-outlined">edit</span>
+                </button>
+                <button type="button" class="control-btn delete-btn" onclick="event.stopPropagation(); deleteImage(${currentImageInput.id.replace('image', '')})">
+                  <span class="material-symbols-outlined">delete</span>
+                </button>
+              </div>`;
+            document.getElementById("errImage").textContent = "";
+            updateImageCounter();
+          }, "image/jpeg");
+        }
+        cropper.destroy();
+        cropper = null;
+        cropModal.classList.add("hidden");
+
+        addNewPlaceholderIfNeeded();
+      }
+    });
+
+    // ==================== Real-Time Price vs MRP Validation ====================
+    const priceInput = document.getElementById("price");
+    const mrpInput = document.getElementById("mrp");
+
+    function validatePriceVsMrp() {
+      const price = parseFloat(priceInput.value);
+      const mrp = parseFloat(mrpInput.value);
+
+      if (!isNaN(price) && !isNaN(mrp) && price > mrp) {
+        displayError("errPrice", "Price cannot be greater than MRP.");
+        displayError("errMrp", "Price cannot be greater than MRP.");
+      } else {
+        document.getElementById("errPrice").textContent = "";
+        document.getElementById("errMrp").textContent = "";
+      }
+    }
+
+    priceInput.addEventListener("input", validatePriceVsMrp);
+    mrpInput.addEventListener("input", validatePriceVsMrp);
+
     function clearErrors() {
       document.querySelectorAll(".errr-msg").forEach(el => {
         el.textContent = "";
-        el.style.display = "block"; // Make sure they're visible
+        el.style.display = "block";
       });
     }
 
+    function initializePlaceholders() {
+      imageUploadContainer.innerHTML = "";
+      createPlaceholder(1);
+      addImageChangeListeners();
+      updateImageCounter();
+    }
+
     function resetPlaceholders() {
-      for (let i = 1; i <= 3; i++) {
-        document.getElementById(`placeholder${i}`).innerHTML = `
+      initializePlaceholders();
+    }
+
+    function createPlaceholder(index, imageUrl = null) {
+      const inputId = `image${index}`;
+      const placeholderId = `placeholder${index}`;
+      const placeholderDiv = document.createElement("div");
+      placeholderDiv.className = "image-placeholder-wrapper";
+      let placeholderContent = `
+        <input type="file" id="${inputId}" name="images" accept="image/*" class="image-input" style="display: none;">
+        <div class="image-placeholder" onclick="document.getElementById('${inputId}').click()" id="${placeholderId}">
           <span class="material-icons">
             <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f">
               <path d="M480-480ZM200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h320v80H200v560h560v-320h80v320q0 33-23.5 56.5T760-120H200Zm40-160h480L570-480 450-320l-90-120-120 160Zm440-320v-80h-80v-80h80v-80h80v80h80v80h-80v80h-80Z"/>
             </svg>
-          </span>`;
+          </span>
+        </div>`;
+
+      if (imageUrl) {
+        placeholderContent = `
+          <input type="file" id="${inputId}" name="images" accept="image/*" class="image-input" style="display: none;">
+          <div class="image-placeholder" id="${placeholderId}">
+            <img src="${imageUrl}" alt="Preview" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
+            <div class="image-hover-controls">
+              <button type="button" class="control-btn edit-btn" onclick="event.stopPropagation(); editImage(${index})">
+                <span class="material-symbols-outlined">edit</span>
+              </button>
+              <button type="button" class="control-btn delete-btn" onclick="event.stopPropagation(); deleteImage(${index}, '${imageUrl}')">
+                <span class="material-symbols-outlined">delete</span>
+              </button>
+            </div>
+          </div>`;
+      }
+
+      placeholderDiv.innerHTML = placeholderContent;
+      imageUploadContainer.appendChild(placeholderDiv);
+    }
+
+    function addNewPlaceholderIfNeeded() {
+      const placeholders = document.querySelectorAll(".image-placeholder-wrapper");
+      if (placeholders.length < 5) {
+        createPlaceholder(placeholders.length + 1);
+        addImageChangeListeners();
+      }
+    }
+
+    function getImageCount() {
+      const placeholders = document.querySelectorAll(".image-placeholder");
+      let count = 0;
+      placeholders.forEach(placeholder => {
+        if (placeholder.querySelector("img")) {
+          count++;
+        }
+      });
+      return count;
+    }
+
+    function updateImageCounter() {
+      const count = getImageCount();
+      imageCounter.textContent = `${count}/5`;
+      imageCounter.style.color = count < 3 ? "red" : "green";
+    }
+
+    function addImageChangeListeners() {
+      const inputs = document.querySelectorAll(".image-input");
+      inputs.forEach(input => {
+        // Remove existing listeners to prevent duplicates
+        input.removeEventListener("change", handleImageChange);
+        input.addEventListener("change", handleImageChange);
+      });
+    }
+
+    function handleImageChange(event) {
+      const imageInput = event.target;
+      const placeholder = document.getElementById(`placeholder${imageInput.id.replace('image', '')}`);
+      
+      if (imageInput.files && imageInput.files[0]) {
+        const file = imageInput.files[0];
+        
+        if (!file.type.match('image.*')) {
+          displayError("errImage", "Please select a valid image file (e.g., JPEG, PNG).");
+          imageInput.value = '';
+          return;
+        }
+
+        currentImageInput = imageInput;
+        currentPlaceholder = placeholder;
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          const cropImage = document.getElementById("cropImage");
+          cropImage.src = e.target.result;
+          cropModal.classList.remove("hidden");
+
+          if (cropper) {
+            cropper.destroy();
+          }
+          cropper = new Cropper(cropImage, {
+            aspectRatio: 1,
+            viewMode: 1,
+            autoCropArea: 1,
+          });
+        };
+        reader.readAsDataURL(file);
       }
     }
 
@@ -310,105 +695,191 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function validateForm() {
-  let isValid = true;
-  
-  // Get form elements
-  const productName = document.getElementById("productName");
-  const category = document.getElementById("category");
-  const price = document.getElementById("price");
-  const mrp = document.getElementById("mrp");
-  const qty = document.getElementById("qty");
-  const description = document.getElementById("description");
-
-  // Product Name validation
-  if (!productName.value.trim()) {
-    isValid = false;
-    displayError("errProductName", "Product name is required.");
-  }
-
-  // Category validation
-  if (!category.value) {
-    isValid = false;
-    displayError("errCategory", "Please select a category.");
-  }
-
-  // Price validation
-  if (!price.value.trim()) {
-    isValid = false;
-    displayError("errPrice", "Price is required.");
-  } else if (isNaN(parseFloat(price.value)) || parseFloat(price.value) < 0) {
-    isValid = false;
-    displayError("errPrice", "Price must be a valid positive number.");
-  }
-
-  // MRP validation
-  if (!mrp.value.trim()) {
-    isValid = false;
-    displayError("errMrp", "MRP is required.");
-  } else if (isNaN(parseFloat(mrp.value)) || parseFloat(mrp.value) < 0) {
-    isValid = false;
-    displayError("errMrp", "MRP must be a valid positive number.");
-  } else if (parseFloat(mrp.value) < parseFloat(price.value)) {
-    isValid = false;
-    displayError("errMrp", "MRP must be greater than or equal to the price.");
-  }
-
-  // Quantity validation
-  if (!qty.value.trim()) {
-    isValid = false;
-    displayError("errQty", "Quantity is required.");
-  } else if (isNaN(parseInt(qty.value)) || parseInt(qty.value) < 0) {
-    isValid = false;
-    displayError("errQty", "Quantity must be a valid positive number.");
-  }
-
-  // Description validation
-  if (!description.value.trim()) {
-    isValid = false;
-    displayError("errDescription", "Description is required.");
-  }
-
-  // Image validation - require all three images
-  let missingImages = false;
-  for (let i = 1; i <= 3; i++) {
-    if (document.getElementById(`image${i}`).files.length === 0) {
-      missingImages = true;
-      break;
-    }
-  }
-  
-  if (missingImages) {
-    isValid = false;
-    displayError("errImage", "All three product images are required.");
-  }
-
-  return isValid;
-}
-
-
-    // ==================== Image Preview on Change ====================
-    for (let i = 1; i <= 3; i++) {
-      const imageInput = document.getElementById(`image${i}`);
-      const placeholder = document.getElementById(`placeholder${i}`);
+      let isValid = true;
       
-      imageInput.addEventListener("change", function () {
-        if (imageInput.files && imageInput.files[0]) {
-          const file = imageInput.files[0];
-          
-          // Validate file type
-          if (!file.type.match('image.*')) {
-            displayError("errImage", "Please select valid image files only.");
-            imageInput.value = '';
-            return;
-          }
-          
-          placeholder.innerHTML = `<img src="${URL.createObjectURL(file)}" alt="Preview" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">`;
-          document.getElementById("errImage").textContent = "";
+      const productName = document.getElementById("productName");
+      const category = document.getElementById("category");
+      const price = document.getElementById("price");
+      const mrp = document.getElementById("mrp");
+      const qty = document.getElementById("qty");
+      const description = document.getElementById("description");
+
+      if (!productName.value.trim()) {
+        isValid = false;
+        displayError("errProductName", "Product name is required.");
+      }
+
+      if (!category.value) {
+        isValid = false;
+        displayError("errCategory", "Please select a category.");
+      }
+
+      if (!price.value.trim()) {
+        isValid = false;
+        displayError("errPrice", "Price is required.");
+      } else if (isNaN(parseFloat(price.value)) || parseFloat(price.value) < 0) {
+        isValid = false;
+        displayError("errPrice", "Price must be a positive number.");
+      }
+
+      if (!mrp.value.trim()) {
+        isValid = false;
+        displayError("errMrp", "MRP is required.");
+      } else if (isNaN(parseFloat(mrp.value)) || parseFloat(mrp.value) < 0) {
+        isValid = false;
+        displayError("errMrp", "MRP must be a positive number.");
+      } else if (parseFloat(mrp.value) < parseFloat(price.value)) {
+        isValid = false;
+        displayError("errPrice", "Price cannot be greater than MRP.");
+        displayError("errMrp", "Price cannot be greater than MRP.");
+      }
+
+      if (!qty.value.trim()) {
+        isValid = false;
+        displayError("errQty", "Quantity is required.");
+      } else if (isNaN(parseInt(qty.value)) || parseInt(qty.value) < 0) {
+        isValid = false;
+        displayError("errQty", "Quantity must be a positive number.");
+      }
+
+      if (!description.value.trim()) {
+        isValid = false;
+        displayError("errDescription", "Description is required.");
+      }
+
+      const imageCount = getImageCount();
+      if (imageCount < 3) {
+        isValid = false;
+        displayError("errImage", `Please upload at least 3 images. Currently, you have ${imageCount}.`);
+      } else if (imageCount > 5) {
+        isValid = false;
+        displayError("errImage", `You can upload a maximum of 5 images. Currently, you have ${imageCount}.`);
+      }
+
+      return isValid;
+    }
+
+    // ==================== Image Edit and Delete Functions ====================
+    window.editImage = function(imageIndex) {
+      console.log(`Editing image ${imageIndex}`);
+      const placeholder = document.getElementById(`placeholder${imageIndex}`);
+      const imageInput = document.getElementById(`image${imageIndex}`);
+      
+      const imgElement = placeholder.querySelector("img");
+      if (imgElement) {
+        currentImageInput = imageInput;
+        currentPlaceholder = placeholder;
+        
+        const cropImage = document.getElementById("cropImage");
+        cropImage.src = imgElement.src;
+        cropModal.classList.remove("hidden");
+
+        if (cropper) {
+          cropper.destroy();
+        }
+        cropper = new Cropper(cropImage, {
+          aspectRatio: 1,
+          viewMode: 1,
+          autoCropArea: 1,
+        });
+      }
+    };
+
+    window.deleteImage = function(imageIndex, imageUrl = null) {
+      console.log(`Deleting image ${imageIndex}`);
+      const placeholderWrapper = document.getElementById(`placeholder${imageIndex}`).parentElement;
+      placeholderWrapper.remove();
+
+      // If this is an existing image, mark it for deletion
+      if (imageUrl) {
+        deletedImages.add(imageUrl);
+      }
+
+      // Re-index remaining placeholders
+      const remainingWrappers = document.querySelectorAll(".image-placeholder-wrapper");
+      remainingWrappers.forEach((wrapper, idx) => {
+        const newIndex = idx + 1;
+        const input = wrapper.querySelector(".image-input");
+        const placeholder = wrapper.querySelector(".image-placeholder");
+        input.id = `image${newIndex}`;
+        placeholder.id = `placeholder${newIndex}`;
+        placeholder.setAttribute("onclick", `document.getElementById('image${newIndex}').click()`);
+
+        const img = placeholder.querySelector("img");
+        if (img) {
+          const editBtn = placeholder.querySelector(".edit-btn");
+          const deleteBtn = placeholder.querySelector(".delete-btn");
+          editBtn.setAttribute("onclick", `event.stopPropagation(); editImage(${newIndex})`);
+          deleteBtn.setAttribute("onclick", `event.stopPropagation(); deleteImage(${newIndex}, '${img.src}')`);
         }
       });
-    }
-  });
-    </script>
-  
+
+      // Add a new placeholder if none exist
+      if (remainingWrappers.length === 0) {
+        createPlaceholder(1);
+        addImageChangeListeners();
+      }
+
+      updateImageCounter();
+    };
+
+    // Initialize with 1 placeholder
+    initializePlaceholders();
+
+    // List/Unlist (Block/Unblock) button with confirmation modal
+    const confirmModal = document.getElementById('confirm-modal');
+    const cancelAction = document.getElementById('cancel-action');
+    const confirmAction = document.getElementById('confirm-action');
+
+    // Single event listeners for modal buttons
+    cancelAction.addEventListener('click', () => {
+      confirmModal.style.display = 'none';
+    });
+
+    confirmAction.addEventListener('click', async () => {
+      if (confirmModal.dataset.productId) {
+        const productId = confirmModal.dataset.productId;
+        const newStatus = confirmModal.dataset.newStatus === 'true';
+
+        confirmModal.style.display = 'none';
+        confirmModal.removeAttribute('data-productId');
+        confirmModal.removeAttribute('data-newStatus');
+
+        try {
+          console.log('Toggling productId:', productId, 'with status:', newStatus);
+          const response = await fetch(`/tezgrani/product/toggle-block/${productId}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ isBlocked: newStatus })
+          });
+          const data = await response.json();
+          console.log('Server response:', data);
+          if (data.success) {
+            window.location.reload();
+          } else {
+            toastr.error(`Failed to update product status: ${data.message || 'No message provided'}`);
+          }
+        } catch (err) {
+          console.error('Error toggling product status:', err);
+          toastr.error(`Error occurred: ${err.message || 'Unknown error'}`);
+        }
+      }
+    });
+
+    document.querySelectorAll('.list-toggle').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const productId = btn.getAttribute('data-productid');
+        const currentStatus = btn.getAttribute('data-status') === 'true';
+        const newStatus = !currentStatus;
+
+        // Store data in modal dataset
+        confirmModal.dataset.productId = productId;
+        confirmModal.dataset.newStatus = newStatus;
+        confirmModal.style.display = 'block';
+      });
+    });
+});
+  </script>
 </body>
 </html>

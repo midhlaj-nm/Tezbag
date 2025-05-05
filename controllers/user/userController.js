@@ -14,7 +14,7 @@ const load404 = async (req, res) => {
         res.render('404');
     } catch (err) {
         console.error('⚠️ Error loading 404 page:', err);
-        res.redirect('/404Error');
+        res.render('404');
     }
 };
 

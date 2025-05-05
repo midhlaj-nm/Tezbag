@@ -52,10 +52,12 @@ app.use('/tezgrani', adminRouter);
 app.use('/api', stateRouter);
 app.use(errorHandler);
 
+app.use((req, res) => {
+  const isAdmin = req.originalUrl.startsWith('/tezgrani');
+  res.status(404).render('404', { isAdmin });
+});
 
 
 app.listen(process.env.PORT, () => {
   console.log("Server running");
 });
-
-

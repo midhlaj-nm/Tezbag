@@ -10,10 +10,6 @@ const productSchema = new Schema({
         type: String,
         required: true
     },
-    additionalInformation: {
-        type: String,
-        required: true
-    },
     customerReview: {
         type: Schema.Types.ObjectId,
         ref: 'Review'
@@ -39,15 +35,7 @@ const productSchema = new Schema({
         type: Number,
         default: true
     },
-    size: {
-        type: Number,
-        required: true
-    },
-    productImage: [{
-        type: Schema.Types.ObjectId,
-        ref: 'Banner',
-        required: true
-    }],
+    productImage: [{type: String}],
     isBlocked: {
         type: Boolean,
         default:false

@@ -5,6 +5,7 @@ const passport = require('passport');
 const userAuth = require('../middlewares/userAuth');
 
 router.get('/', userController.loadHomepage);
+router.get('/404Error', userController.load404)
 
 router.get('/login', userController.login_user);
 router.post('/login', userController.logpost);
@@ -47,17 +48,9 @@ router.post('/verify-otp', userController.verifyOtpPost);
 router.get('/reset-password', userController.loadResetPassPage);
 router.post('/reset-password', userController.resetPasswordPost);
 
-// ✅ PROTECTED ROUTES (Need Login)
+// ✅ PROTECTED ROUTES (Need Login) profileController.js
 router.get('/account-settings', userAuth, userController.loadSettings);
 router.get('/account', userAuth, userController.loadDashboard);
 router.get('/logout', userAuth, userController.logout);
-
-
-
-
-//profileController.js
-router.get('/account-settings',userController.loadSettings);
-router.get('/account', userController.loadDashboard);
-router.get('/logout',userController.logout)
 
 module.exports = router

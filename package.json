@@ -28,7 +28,9 @@
     "nodemon": "^3.1.10",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
+    "path": "^0.12.7",
     "Router": "^2.1.0",
+    "sharp": "^0.34.1",
     "slugify": "^1.6.6",
     "uuid": "^11.1.0"
   }

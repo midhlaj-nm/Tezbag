@@ -5,6 +5,7 @@ const userManageController = require('../controllers/admin/userManageController'
 const categoryManageController = require('../controllers/admin/categoryManageController');
 const productManagementController = require('../controllers/admin/productManagementController')
 const adminAuth = require('../middlewares/adminAuth');
+const upload = require('../middlewares/multer')
 
 
 //adminController
@@ -29,6 +30,8 @@ router.put('/category/update/:id',adminAuth, categoryManageController.editCatego
 
 //productManageController
 router.get('/product-management', productManagementController.loadProduct);
+router.post('/product/save', upload.array('images', 5), productManagementController.addProduct)
+router.patch('/product/toggle-block/:productId', productManagementController.toggleProductStatus)
 
 
 module.exports = router;

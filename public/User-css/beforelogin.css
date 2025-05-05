@@ -355,6 +355,7 @@ h2 {
 
 /* Category Container */
 .categories {
+    /* color: white; */
     display: flex;
     gap: 15px;
     justify-content: center;
