@@ -409,7 +409,7 @@ const regpost = async (req, res, next) => {
             console.log("🚫 Email already registered:", email);
             req.flash('message', 'This email ID is already registered. Try logging in.');
             req.flash('messageType', 'error');
-            return res.redirect('/login');
+            return res.render('register', { message: req.flash('message') });
         }        
 
         const findAdmin = await Admin.findOne({ email });
