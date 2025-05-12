@@ -9,8 +9,10 @@
 
 
                   <% if (message && message.length > 0) { %>
-                    <div class="server-error-message"><%= message %></div>
-                  <% } %>                 
+                    <div class="server-error-message <%= messageType %>">
+                      <%= message %>
+                    </div>
+                  <% } %>
                   
                   
 

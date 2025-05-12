@@ -30,12 +30,6 @@ app.use(
 
 app.use(flash());
 
-app.use((req, res, next) => {
-  res.locals.message = req.flash('message');
-  res.locals.messageType = req.flash('messageType');
-  next();
-});
-
 
 app.set("view engine", "ejs");
 app.set("views", [

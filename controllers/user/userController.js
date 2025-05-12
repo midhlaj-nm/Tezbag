@@ -1,7 +1,8 @@
 const User = require('../../models/userSchema');
 const Category = require('../../models/categorySchema');
 const Products = require('../../models/productSchema');
-const Gallery = require('../../models/bannerSchema')
+const Gallery = require('../../models/bannerSchema');
+const Admin = require('../../models/adminSchema')
 const env = require('dotenv').config();
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
@@ -182,7 +183,7 @@ const loadVerifyEmailPost = async (req, res, next) => {
         console.log("📧 OTP sent to user:", otp);
 
         // ✅ Redirect to OTP input page
-        res.render("otppage", { message: req.flash('message'), otpType: "reset" });
+        return res.redirect('/otppage?otpType=reset');
 
     } catch (error) {
         console.error("💥 Error in loadVerifyEmailPost:", error);
@@ -330,27 +331,17 @@ const resetPasswordPost = async (req, res, next) => {
 // ===========================
 // Load Register Page
 // ===========================
-const register = async (req, res, next) => {
+const register = async (req, res) => {
     try {
-        const errorMessages = req.flash('error');
-        const successMessages = req.flash('success');
-        const customMessages = req.flash('message');
-        const customType = req.flash('messageType');
-
-        const message = errorMessages.length ? errorMessages
-                      : successMessages.length ? successMessages
-                      : customMessages;
-
-        const messageType = errorMessages.length ? ['error']
-                            : successMessages.length ? ['success']
-                            : customType;
-
-        res.render('register', { message, messageType });
+      const message = req.flash('message')[0] || null;
+      const messageType = req.flash('messageType')[0] || null;
+  
+      res.render('register', { message, messageType });
     } catch (err) {
-        console.error('❌ Error loading login page:', err);
-        res.redirect('/404Error');
+      console.error('❌ Error loading register page:', err);
+      res.redirect('/404Error');
     }
-};
+  };
 
 // ===========================
 // Send OTP Email
@@ -401,7 +392,7 @@ const regpost = async (req, res, next) => {
         if (password !== cPassword) {
             console.log("⚠️ Passwords do not match");
             req.flash('message', 'Passwords do not match. Please re-enter.');
-            return res.render('register', { message: req.flash('message') });
+            return res.redirect('/register');
         }
 
         const findUser = await User.findOne({ email });
@@ -409,16 +400,15 @@ const regpost = async (req, res, next) => {
             console.log("🚫 Email already registered:", email);
             req.flash('message', 'This email ID is already registered. Try logging in.');
             req.flash('messageType', 'error');
-            return res.render('register', { message: req.flash('message') });
+            return res.redirect('/login');
         }        
 
         const findAdmin = await Admin.findOne({ email });
         if (findAdmin) {
-            console.log("🚫 [regpost] Email found in Admin collection:", email);
+            console.log("🚫 Entry deneied Because of Admin's email:", email);
             req.flash('message', 'Cannot register using an admin\'s email. Please use a different email.');
             req.flash('messageType', 'error');
-            console.log("📩 [regpost] Flash message set:", req.flash('message'));
-            return res.render('register', { message: req.flash('message') });
+            return res.redirect('/register');
         }
 
         const otp = generateOtp();
@@ -428,7 +418,7 @@ const regpost = async (req, res, next) => {
         if (!emailSent) {
             console.log("📤 Email sending failed for:", email);
             req.flash('message', 'Something went wrong while sending OTP. Try again later.');
-            return res.render('register', { message: req.flash('message') });
+            return res.redirect('/register');
         }
 
         req.session.userOtp = otp;
@@ -436,7 +426,7 @@ const regpost = async (req, res, next) => {
         console.log("📦 Stored user data in session:");
         console.log("🧾", req.session.userData);
 
-        res.render("otppage", { message: req.flash('message'), otpType: "registration" });
+        return res.redirect('/otppage?otpType=registration');
     } catch (error) {
         console.error("❌ Registration error:", error);
         next(error);

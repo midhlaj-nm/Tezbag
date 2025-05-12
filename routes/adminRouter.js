@@ -32,6 +32,7 @@ router.put('/category/update/:id',adminAuth, categoryManageController.editCatego
 router.get('/product-management', productManagementController.loadProduct);
 router.post('/product/save', upload.array('images', 5), productManagementController.addProduct)
 router.patch('/product/toggle-block/:productId', productManagementController.toggleProductStatus)
+router.patch('/product/edit/:productId', upload.array('images'), productManagementController.editProduct)
 
 
 module.exports = router;
