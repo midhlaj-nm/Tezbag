@@ -6,10 +6,11 @@
                 
                 <form method="POST" action="/login" novalidate>
                     
-                    <% if (message && message.length > 0) { %>
-                        <% const type = messageType && messageType[0] === 'success' ? 'success-msg' : 'err-msg'; %>
-                        <div class="<%= type %> flash-msg" style="display: block;"><%= message[0] %></div>
-                    <% } %>
+                  <% if (message && message.length > 0) { %>
+                    <div class="server-error-message <%= messageType %>">
+                      <%= message %>
+                    </div>
+                  <% } %>
                     
                       
                 
