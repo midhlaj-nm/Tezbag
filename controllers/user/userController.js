@@ -64,27 +64,17 @@ const loadHomepage = async (req, res, next) => {
 // ===========================
 // Load Login Page
 // ===========================
-const login_user = async (req, res, next) => {
+const login_user = async (req, res) => {
     try {
-        const errorMessages = req.flash('error');
-        const successMessages = req.flash('success');
-        const customMessages = req.flash('message');
-        const customType = req.flash('messageType');
-
-        const message = errorMessages.length ? errorMessages
-                      : successMessages.length ? successMessages
-                      : customMessages;
-
-        const messageType = errorMessages.length ? ['error']
-                            : successMessages.length ? ['success']
-                            : customType;
-
-        res.render('login_user', { message, messageType });
+      const message = req.flash('message')[0] || null;
+      const messageType = req.flash('messageType')[0] || null;
+  
+      res.render('login_user', { message, messageType });
     } catch (err) {
-        console.error('❌ Error loading login page:', err);
-        res.redirect('/404Error');
+      console.error('❌ Error loading login page:', err);
+      res.redirect('/404Error');
     }
-};
+  }; 
 
 // ===========================
 // Login POST

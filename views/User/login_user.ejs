@@ -6,11 +6,13 @@
                 
                 <form method="POST" action="/login" novalidate>
                     
+                  <% const type = typeof messageType !== 'undefined' ? messageType : 'error'; %>
                   <% if (message && message.length > 0) { %>
-                    <div class="server-error-message <%= messageType %>">
+                    <div class="server-error-message <%= type %>">
                       <%= message %>
                     </div>
                   <% } %>
+                  
                     
                       
                 

@@ -10,7 +10,7 @@ body{
 }
 
 
-.err-msg {
+.server-error-message {
     background-color: #ffe5e5;
     color: #d10000;
     font-weight: 500;
