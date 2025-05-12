@@ -412,6 +412,15 @@ const regpost = async (req, res, next) => {
             return res.redirect('/login');
         }        
 
+        const findAdmin = await Admin.findOne({ email });
+        if (findAdmin) {
+            console.log("🚫 [regpost] Email found in Admin collection:", email);
+            req.flash('message', 'Cannot register using an admin\'s email. Please use a different email.');
+            req.flash('messageType', 'error');
+            console.log("📩 [regpost] Flash message set:", req.flash('message'));
+            return res.render('register', { message: req.flash('message') });
+        }
+
         const otp = generateOtp();
         console.log("🔐 Generated OTP:", otp);
 
