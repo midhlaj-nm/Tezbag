@@ -6,6 +6,7 @@ const Admin = require('../../models/adminSchema')
 const env = require('dotenv').config();
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
+const { LEGAL_TCP_SOCKET_OPTIONS } = require('mongodb');
 
 // ===========================
 // Load 404 Page
@@ -66,8 +67,13 @@ const loadHomepage = async (req, res, next) => {
 // ===========================
 const login_user = async (req, res) => {
     try {
-      const message = req.flash('message')[0] || null;
-      const messageType = req.flash('messageType')[0] || null;
+      let message = req.flash('message')[0] || null;
+      let messageType = req.flash('messageType')[0] || null;
+  
+      if (!message) {
+        message = req.flash('error')[0]; // for Passport
+        messageType = 'error';
+      }
   
       res.render('login_user', { message, messageType });
     } catch (err) {
@@ -81,45 +87,55 @@ const login_user = async (req, res) => {
 // ===========================
 const logpost = async (req, res, next) => {
     try {
-        const { email, password, rememberMe } = req.body;
-        console.log("🛂 Login Attempt:", email, "| Remember Me:", rememberMe);
-
-        const findUser = await User.findOne({ isAdmin: 0, email });
-
-        if (!findUser) {
-            req.flash('message', 'Incorrect Email Address');
-            return res.render('login_user', { message: req.flash('message') });
-        }
-
-        if (findUser.isBlocked) {
-            req.flash('message', 'Your entry is Blocked by Authorities');
-            return res.render('login_user', { message: req.flash('message') });
-        }
-
-        const passwordMatch = await bcrypt.compare(password, findUser.password);
-
-        if (!passwordMatch) {
-            req.flash('message', 'Incorrect Password');
-            return res.render('login_user', { message: req.flash('message') });
-        }
-
-        req.session.user = findUser._id;
-
-        if (rememberMe) {
-            req.session.cookie.maxAge = 7 * 24 * 60 * 60 * 1000; // 7 days
-            console.log("🕒 Remember Me enabled");
-        } else {
-            req.session.cookie.expires = false;
-            console.log("⏱️ Session expires on browser close");
-        }
-
-        res.redirect('/');
+      const { email, password, rememberMe } = req.body;
+      console.log("🛂 Login Attempt:", email, "| Remember Me:", rememberMe);
+  
+      const findUser = await User.findOne({ isAdmin: 0, email });
+  
+      if (!findUser) {
+        req.flash('message', 'Incorrect Email Address');
+        req.flash('messageType', 'error');
+        return res.redirect('/login')
+      }
+  
+      if (findUser.isBlocked) {
+        req.flash('message', 'Your entry is Blocked by Authorities');
+        req.flash('messageType', 'error');
+        return res.redirect('/login')
+      }
+  
+      if (!password || !findUser.password) {
+        req.flash('message', 'Invalid credentials.');
+        req.flash('messageType', 'error');
+        return res.redirect('/login')
+      }
+  
+      const passwordMatch = await bcrypt.compare(password, findUser.password);
+  
+      if (!passwordMatch) {
+        req.flash('message', 'Incorrect Password');
+        req.flash('messageType', 'error');
+        return res.redirect('/login')
+      }
+  
+      // Successful login
+      req.session.user = findUser._id;
+  
+      if (rememberMe === "on") {
+        req.session.cookie.maxAge = 7 * 24 * 60 * 60 * 1000; // 7 days
+        console.log("🕒 Remember Me enabled");
+      } else {
+        req.session.cookie.expires = false;
+        console.log("⏱️ Session expires on browser close");
+      }
+  
+      res.redirect('/');
     } catch (error) {
-        console.error("❌ Login failed:", error);
-        req.flash('message', 'Login failed. Please try again');
-        res.render('login_user', { message: req.flash('message') });
+      console.error("❌ Login failed:", error);
+      next(error)
     }
-};
+  };
+  
 
 
 
@@ -128,12 +144,14 @@ const logpost = async (req, res, next) => {
 // ===========================
 const loadVerifyEmail = async (req, res) => {
     try {
-        res.render('forgetpass');
-    } catch (error) {
-        console.error("❌ Error loading forget password page:", error);
-        res.redirect('/404Error');
+      const message = req.flash("message")[0] || null;
+      res.render("forgetpass", { message });
+    } catch (err) {
+      console.error(err);
+      res.redirect("/404Error");
     }
-};
+  };
+  
 
 // ===========================
 // Email Verification POST (Forget Passowrd)
@@ -173,7 +191,7 @@ const loadVerifyEmailPost = async (req, res, next) => {
         console.log("📧 OTP sent to user:", otp);
 
         // ✅ Redirect to OTP input page
-        return res.redirect('/otppage?otpType=reset');
+        res.render("otppage", { message: req.flash('message'), otpType: "reset" });
 
     } catch (error) {
         console.error("💥 Error in loadVerifyEmailPost:", error);
@@ -203,7 +221,7 @@ const verifyOtpPost = async (req, res, next) => {
         // Check if session OTP exists
         if (!sessionOtp) {
             console.warn("⚠️ No OTP stored in session (session might have expired)");
-            return res.json({ success: false, message: "Session expired or OTP missing." });
+            return res.json({ success: false, message: "Timeout. Try again" });
         }
 
         // Validate OTP
@@ -233,12 +251,15 @@ const verifyOtpPost = async (req, res, next) => {
 // ===========================
 const loadResetPassPage = async (req, res) => {
     try {
-        res.render('resetPass')
-    } catch (error) {
-        console.error("💥 Error resetting password:", error);
-        res.redirect('/404Error')
+      const message = req.flash('message')[0] || null;
+      const messageType = req.flash('messageType')[0] || null;
+  
+      res.render('resetPass', { message, messageType });
+    } catch (err) {
+      console.error('❌ Error loading resetPassword page:', err);
+      res.redirect('/404Error');
     }
-}
+  }; 
 
 // ===========================
 // Reset Password POST
@@ -323,8 +344,13 @@ const resetPasswordPost = async (req, res, next) => {
 // ===========================
 const register = async (req, res) => {
     try {
-      const message = req.flash('message')[0] || null;
-      const messageType = req.flash('messageType')[0] || null;
+      let message = req.flash('message')[0] || null;
+      let messageType = req.flash('messageType')[0] || null;
+
+      if (!message) {
+        message = req.flash('error')[0]; // for Passport
+        messageType = 'error';
+      }
   
       res.render('register', { message, messageType });
     } catch (err) {
@@ -416,7 +442,7 @@ const regpost = async (req, res, next) => {
         console.log("📦 Stored user data in session:");
         console.log("🧾", req.session.userData);
 
-        return res.redirect('/otppage?otpType=registration');
+        res.render("otppage", { message: req.flash('message'), otpType: "registration" });
     } catch (error) {
         console.error("❌ Registration error:", error);
         next(error);
@@ -460,15 +486,29 @@ const verifyOtp = async (req, res, next) => {
     console.log("🔥 REACHED THE RIGHT verifyOtpPost (Account Registration) CONTROLLER");
     try {
         const { otp } = req.body;
-        console.log("🧪 OTP entered:", otp);
+        const newSessionOtp = req.session.userOtp
 
-        if (otp !== req.session.userOtp) {
-            return next({ status: 400, message: 'Invalid OTP, please try again' });
+        console.log("📥 OTP Verification Request Received");
+        console.log("🔐 Entered OTP:", otp);
+        console.log("📦 Session OTP:", newSessionOtp);
+
+        // Check if OTP was sent and is 4 digits
+        if (!otp || otp.length !== 4) {
+            console.warn("⚠️ OTP is missing or not 4 digits");
+            return res.json({ success: false, message: "OTP must be 4 digits." });
         }
 
+        // Validate OTP
+        if (otp !== newSessionOtp) {
+            console.warn("⚠️ OTP is missing or not 4 digits");
+            return res.json({ success: false, message: "Invalid Otp" });
+        }
+
+        // Check if session OTP exists
         const user = req.session.userData;
         if (!user) {
-            return next({ status: 400, message: 'Session expired. Please register again.' });
+            console.warn("⚠️ No OTP stored in session (session might have expired)");
+            return res.json({ success: false, message: "Timeout. Try again" });
         }
 
         const passwordHash = await securePass(user.password);
@@ -487,9 +527,11 @@ const verifyOtp = async (req, res, next) => {
         delete req.session.userOtp;
         delete req.session.userData;
 
-        res.status(200).json({ 
-            success: true, 
-            redirectUrl: "/login",
+        return res.status(200).json({ 
+            success: true,
+            redirectUrl: '/login',
+            message: 'OTP Verified Successfully. Please log in.', // Add flash message
+            messageType: 'success' // Add message type
           });
           
     } catch (error) {

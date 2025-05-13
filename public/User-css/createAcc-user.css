@@ -1,3 +1,12 @@
+/* Hide browser default password reveal icon */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-webkit-credentials-auto-fill-button,
+input[type="password"]::-webkit-inner-spin-button,
+input[type="password"]::-webkit-clear-button {
+    display: none !important;
+    appearance: none;
+}
+
 body, html {
     margin: 0;
     padding: 0;

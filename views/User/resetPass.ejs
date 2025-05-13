@@ -8,9 +8,9 @@
         <h2 class="forget-title">Reset Password</h2>
         <form action="/reset-password" method="POST">
 
-            <% if (message && message.length > 0) { %>
-                <div class="server-error-message"><%= message %></div>
-            <% } %>
+          <% if (message) { %>
+            <div class="server-error-message"><%= message %></div>
+          <% } %>
         
             <div class="password-wrapper">
                 <div class="input-with-eye">

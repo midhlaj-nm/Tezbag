@@ -27,7 +27,7 @@ passport.use('google-login', new GoogleStrategy({
       if (!user.googleId) {
         console.log("⚠️ User has not registered via Google. Block login.");
         return done(null, false, {
-          message: "Account exists. Please log in using email and password."
+        message: 'This email already exists. Please log-in with <strong>Email</strong> and <strong>Password</strong>'
         });
       }
   

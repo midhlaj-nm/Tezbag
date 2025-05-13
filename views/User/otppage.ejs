@@ -6,6 +6,23 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
+<style>
+  /* Hide the server-error-message div when it’s empty */
+  .server-error-message:empty {
+      display: none !important;
+  }
+  /* Style the server-error-message when it has content */
+  .server-error-message {
+    background-color: #ffe5e5;
+    color: #d10000;
+    font-weight: 500;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    text-align: left;
+  }
+</style>
+
 <div class="otp-container">
   <div class="otp-box">
     <h2 class="otp-title">OTP Verification</h2>
@@ -78,9 +95,11 @@
       errMsg.style.display = "none";
     }
 
-    console.log("🔐 Collected OTP from inputs:", otpInput); // Log entered OTP
+    console.log("🔐 Collected OTP from inputs:", otpInput);
     const otpType = document.getElementById("otp-type").value;
+    console.log("🔍 OTP Type:", otpType); // Debug: Log the otpType
     const postUrl = otpType === 'registration' ? '/verify-otp-reg' : '/verify-otp';
+    console.log("🔍 POST URL:", postUrl); // Debug: Log the postUrl
 
     $.ajax({
       type: "POST",
@@ -88,6 +107,8 @@
       data: { otp: otpInput },
       success: function (response) {
         if (response.success) {
+          sessionStorage.setItem('message', response.message && response.message.trim() ? response.message : 'none');
+          sessionStorage.setItem('messageType', response.messageType && response.messageType.trim() ? response.messageType : 'none');
           toastr.success("OTP verified!");
           setTimeout(() => window.location.href = response.redirectUrl, 1000);
         } else {

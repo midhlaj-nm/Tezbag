@@ -47,9 +47,15 @@ app.use('/api', stateRouter);
 app.use(errorHandler);
 
 app.use((req, res) => {
-  const isAdmin = req.originalUrl.startsWith('/tezgrani');
-  res.status(404).render('404', { isAdmin });
+  const isAdminRoute = req.originalUrl.startsWith('/tezgrani');
+
+  if (isAdminRoute) {
+    res.status(404).render('404-adm'); // no isAdmin needed
+  } else {
+    res.status(404).render('404');  // no isAdmin needed
+  }
 });
+
 
 
 app.listen(process.env.PORT, () => {

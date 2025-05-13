@@ -1,6 +1,7 @@
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const User = require('../models/userSchema');
+const Admin = require('../models/adminSchema')
 require('dotenv').config();
 
 passport.use('google-registration',new GoogleStrategy({
@@ -19,11 +20,19 @@ passport.use('google-registration',new GoogleStrategy({
       const googleId = profile.id;
 
       const existingUser = await User.findOne({ email });
+      const isAdmin = await Admin.findOne({ email });
+
+      if (isAdmin) {
+        console.log("⛔ Admin email tried to register via Google:", email);
+        return done(null, false, {
+          message: 'Can\'t register with admin\'s email.'
+        });
+      }
 
       if (existingUser) {
         console.log("✅ Existing user found:", existingUser.email);
         return done(null, false, {
-          message: "This email already exists. Please log in."
+          message: 'This email already exists. Please log-in with <strong>Email</strong> and <strong>Password</strong>'
         });
       }
 

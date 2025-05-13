@@ -1,4 +1,6 @@
 <%-include("../../views/Partials/user/header-simple")%>
+<link rel="stylesheet" href="/User-css/login-user.css">
+
         <!-- Login Form -->
         <div class="login-container">
             <div class="login-box">
@@ -7,13 +9,13 @@
                 <form method="POST" action="/login" novalidate>
                     
                   <% const type = typeof messageType !== 'undefined' ? messageType : 'error'; %>
-                  <% if (message && message.length > 0) { %>
-                    <div class="server-error-message <%= type %>">
-                      <%= message %>
+                  <% if (message) { %>
+                    <div class="<%= type === 'success' ? 'success-msg' : 'server-error-message' %>">
+                      <%- message %>
                     </div>
                   <% } %>
                   
-                    
+                  <div id="client-message" style="display: none;"></div>
                       
                 
                     <div class="form-group">
@@ -53,6 +55,25 @@
         </div>
 
 <script>
+
+  // Check for message in sessionStorage and display it
+  document.addEventListener("DOMContentLoaded", () => {
+    const message = sessionStorage.getItem('message');
+    const messageType = sessionStorage.getItem('messageType');
+    const clientMessageDiv = document.getElementById('client-message');
+
+    if (message && messageType && message !== 'none' && messageType !== 'none') {
+      // Display the message in the DOM
+      clientMessageDiv.style.display = 'block';
+      clientMessageDiv.textContent = message;
+      clientMessageDiv.className = messageType === 'success' ? 'success-msg' : 'server-error-message';
+
+      // Clear the message from sessionStorage so it doesn't show again
+      sessionStorage.removeItem('message');
+      sessionStorage.removeItem('messageType');
+    }
+  });
+
   // Get form input elements
   const emailid = document.getElementsByName('email')[0];
   const passwordid = document.getElementById('password');
