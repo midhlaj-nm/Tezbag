@@ -1,113 +1,294 @@
-<%-include("../../views/Partials/user/header-srch")%>
-    <div class="ccontainer">
-        <div id="offer-banner">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tez Bag</title>
 
-        </div>
+  <!-- jQuery (required for Toastr) -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <!-- Toastr CSS & JS -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  <link rel="stylesheet" href="/User-css/shop-user.css">
+
+  <!-- Font & icon -->
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Header Section -->
+  <header class="header">
+    <div class="container d-flex justify-content-between align-items-center">
+      <!-- Logo -->
+      <div class="logo">
+        <img src="logo.png" alt="TezBag">
+      </div>
+
+      <!-- Search Bar -->
+      <div class="search-bar">
+        <form action="/shop" method="GET" class="search-bar">
+          <div class="input-wrapper">
+            <input 
+              type="text" 
+              name="search" 
+              value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>" 
+              placeholder="Search by product name..."
+              class="search-input">
+            <% if (typeof searchQuery !== 'undefined' && searchQuery.trim() !== '') { %>
+              <a href="/shop?category=<%= selectedCategory %>&priceRange=<%= selectedPriceRange %>&sort=<%= selectedSort %>" class="clear-icon">
+                <span class="material-symbols-outlined">cancel</span>
+              </a>
+            <% } %>
+          </div>
+          <button type="submit" class="search-btn">Search</button>
+          <input type="hidden" name="category" value="<%= selectedCategory %>">
+          <input type="hidden" name="priceRange" value="<%= selectedPriceRange %>">
+          <input type="hidden" name="sort" value="<%= selectedSort %>">
+        </form>
+      </div>
+
+      <!-- Google Fonts Icons Version -->
+      <div class="cart-container">
+        <a href="" class="heart-link">
+          <div class="heart-container">
+            <span class="material-symbols-outlined icon">favorite</span>
+          </div>
+        </a>
+        <div class="divider"></div>
+        <a href="" class="cart-link">
+          <div class="cart-content">
+            <span class="material-symbols-outlined icon">shopping_bag</span>
+            <div class="cart-text">
+              <p class="cart-label">Shopping cart:</p>
+              <p class="cart-total">00.00</p>
+            </div>
+          </div>
+        </a>
+      </div>
     </div>
-    <div class="shop-wrapper">
-        <div class="filters">
-            <div class="filters-left">
-                <select>
-                    <option disabled selected>Filter by Category</option>
-                    <option>Fruits & Vegetables</option>
-                    <option>Meat & Fish</option>
-                    <option>Bread & Bakery</option>
-                    <option>Beauty & Health</option>
-                </select>
-    
-                <select>
-                    <option disabled selected>Filter by Price Range</option>
-                    <option>$0 - $10</option>
-                    <option>$10 - $50</option>
-                    <option>$50 - $100</option>
-                    <option>$100+</option>
-                </select>
-            </div>
-    
-            <div class="filters-right">
-                <select>
-                    <option disabled selected>Sort by Price</option>
-                    <option>Low to High</option>
-                    <option>High to Low</option>
-                </select>
-    
-                <select>
-                    <option disabled selected>Sort by Name</option>
-                    <option>A - Z</option>
-                    <option>Z - A</option>
-                </select>
-            </div>
+  </header>
+
+  <div id="middle" class="container-fluid">
+    <ul id="list">
+      <li><a href="/">Home</a></li>
+      <li><a href="/shop">Shop</a></li>
+      <li><a href="#">Pages</a></li>
+      <li><a href="#">Blog</a></li>
+      <li><a href="/account">Account</a></li>
+    </ul>        
+    <div id="right-section">
+      <div id="call">
+        <img src="/PhoneCall 1.svg">
+      </div>
+      <span id="num">
+        <p>7907700456</p>
+      </span>
+    </div>    
+  </div>
+  <div id="breadcrumb">
+    <img src="/Breadcrumbs.jpg">
+  </div>
+
+  <div class="shop-wrapper">
+    <!-- Original dropdown filters -->
+    <div class="filters">
+      <div class="filters-left">
+        <form action="/shop" method="GET">
+          <select name="category" onchange="this.form.submit()">
+            <option value="" disabled <%= !selectedCategory ? 'selected' : '' %>>Filter by Category</option>
+            <option value="" <%= selectedCategory === '' ? 'selected' : '' %>>All Category</option>
+            <% categories.forEach(category => { %>
+              <option value="<%= category._id %>" <%= selectedCategory === category._id.toString() ? 'selected' : '' %>>
+                <%= category.name %>
+              </option>
+            <% }) %>
+          </select>
+          <input type="hidden" name="search" value="<%= searchQuery %>">
+          <input type="hidden" name="priceRange" value="<%= selectedPriceRange %>">
+          <input type="hidden" name="sort" value="<%= selectedSort %>">
+        </form>
+
+        <form action="/shop" method="GET">
+          <select name="priceRange" onchange="this.form.submit()">
+            <option value="" disabled <%= !selectedPriceRange ? 'selected' : '' %>>Filter by Price Range</option>
+            <option value="" <%= selectedPriceRange === '' ? 'selected' : '' %>>All Price Range</option>
+            <option value="0-10" <%= selectedPriceRange === '0-10' ? 'selected' : '' %>>₹0 - ₹10</option>
+            <option value="10-50" <%= selectedPriceRange === '10-50' ? 'selected' : '' %>>₹10 - ₹50</option>
+            <option value="50-100" <%= selectedPriceRange === '50-100' ? 'selected' : '' %>>₹50 - ₹100</option>
+            <option value="100+" <%= selectedPriceRange === '100+' ? 'selected' : '' %>>₹100+</option>
+          </select>
+          <input type="hidden" name="search" value="<%= searchQuery %>">
+          <input type="hidden" name="category" value="<%= selectedCategory %>">
+          <input type="hidden" name="sort" value="<%= selectedSort %>">
+        </form>
+      </div>
+
+      <div class="filters-right">
+        <form action="/shop" method="GET">
+          <select name="sort" onchange="this.form.submit()">
+            <option value="" <%= !selectedSort ? 'selected' : '' %>>Sort by Price</option>
+            <option value="price-low-to-high" <%= selectedSort === 'price-low-to-high' ? 'selected' : '' %>>Low to High</option>
+            <option value="price-high-to-low" <%= selectedSort === 'price-high-to-low' ? 'selected' : '' %>>High to Low</option>
+          </select>
+          <input type="hidden" name="search" value="<%= searchQuery %>">
+          <input type="hidden" name="category" value="<%= selectedCategory %>">
+          <input type="hidden" name="priceRange" value="<%= selectedPriceRange %>">
+        </form>
+
+        <form action="/shop" method="GET">
+          <select name="sort" onchange="this.form.submit()">
+            <option value="" <%= !selectedSort ? 'selected' : '' %>>Sort by Name</option>
+            <option value="name-a-to-z" <%= selectedSort === 'name-a-to-z' ? 'selected' : '' %>>A - Z</option>
+            <option value="name-z-to-a" <%= selectedSort === 'name-z-to-a' ? 'selected' : '' %>>Z - A</option>
+          </select>
+          <input type="hidden" name="search" value="<%= searchQuery %>">
+          <input type="hidden" name="category" value="<%= selectedCategory %>">
+          <input type="hidden" name="priceRange" value="<%= selectedPriceRange %>">
+        </form>
+      </div>
+    </div>
+
+    <!-- Shop Container with Sidebar and Main Content -->
+    <div class="shop-container">
+      <!-- Sidebar Filters -->
+      <div class="sidebar-filters">
+        <!-- Category Filter -->
+        <div class="filter-section">
+          <div class="d-flex align-items-center justify-content-between" style="border-bottom: 1px solid #eee;">
+            <h3>Category</h3>
+            <% if (selectedCategory) { %>
+              <a href="/shop?search=<%= searchQuery %>&priceRange=<%= selectedPriceRange %>&sort=<%= selectedSort %>" class="material-symbols-outlined cancel-icon" style="cursor: pointer;">cancel</a>
+            <% } else { %>
+              <span class="material-symbols-outlined cancel-icon" style="display: none; cursor: pointer;">cancel</span>
+            <% } %>
+          </div>
+          <div class="category-list">
+            <% categories.forEach(category => { %>
+              <a href="/shop?category=<%= category._id %>&search=<%= searchQuery %>&priceRange=<%= selectedPriceRange %>&sort=<%= selectedSort %>">
+                <div class="category-item <%= selectedCategory === category._id.toString() ? 'active' : '' %>">
+                  <%= category.name %>
+                </div>
+              </a>
+            <% }) %>
+          </div>
         </div>
 
-        <p id="prdct-count">4 items found</p>
-    
+        <!-- Price Range Filter -->
+        <div class="filter-section">
+          <div class="d-flex align-items-center justify-content-between">
+            <h3>Price Range</h3>
+            <% if (selectedPriceRange) { %>
+              <a href="/shop?search=<%= searchQuery %>&category=<%= selectedCategory %>&sort=<%= selectedSort %>" class="material-symbols-outlined cancel-icon" style="cursor: pointer;">cancel</a>
+            <% } %>
+          </div>
+          <div class="price-options">
+            <div class="price-option">
+              <input type="checkbox" id="price-0-10" <%= selectedPriceRange === '50-100' ? 'checked' : '' %>
+                onchange="window.location.href='/shop?priceRange=50-100&search=<%= searchQuery %>&category=<%= selectedCategory %>&sort=<%= selectedSort %>'">
+              <label for="price-0-10">₹50 - ₹100</label>
+            </div>
+            <div class="price-option">
+              <input type="checkbox" id="price-10-50" <%= selectedPriceRange === '100-200' ? 'checked' : '' %>
+                onchange="window.location.href='/shop?priceRange=100-200&search=<%= searchQuery %>&category=<%= selectedCategory %>&sort=<%= selectedSort %>'">
+              <label for="price-10-50">₹100 - ₹200</label>
+            </div>
+            <div class="price-option">
+              <input type="checkbox" id="price-50-100" <%= selectedPriceRange === '200-300' ? 'checked' : '' %>
+                onchange="window.location.href='/shop?priceRange=200-300arch=<%= searchQuery %>&category=<%= selectedCategory %>&sort=<%= selectedSort %>'">
+              <label for="price-50-100">₹200 - ₹300</label>
+            </div>
+            <div class="price-option">
+              <input type="checkbox" id="price-100-plus" <%= selectedPriceRange === '300+' ? 'checked' : '' %>
+                onchange="window.location.href='/shop?priceRange=300+&search=<%= searchQuery %>&category=<%= selectedCategory %>&sort=<%= selectedSort %>'">
+              <label for="price-100-plus">₹300+</label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="main-content">
+        <p id="prdct-count"><%= products.length %> items found</p>
         <div class="products-grid">
-            <!-- Product cards go here -->
-            <div class="product-grid">
-                <!-- Product Card 1 -->
-                <div class="product-card">
-                    <img src="chili.jpg" alt="Red Chili">
-                    <p class="product-name">Red Chili</p>
-                    <p class="price">14.99₹</p>
-                    <a href="#">
-                        <button class="cart-btn">
-                            <img src="cart-icon.png" alt="Add to cart">
-                        </button>
-                    </a>
-                    <div class="rating">⭐⭐⭐⭐</div>
-                    <i class="bi bi-lock-fill lock-icon"></i>
+          <div class="product-grid">
+            <div class="product-list">
+              <% if (products.length > 0) { %>
+                <div class="row">
+                  <% products.forEach(product => { %>
+                    <div class="col-md">
+                      <div class="product-card">
+                        <img src="<%= product.image || '/default-product.png' %>" alt="<%= product.name %>">
+                        <p class="product-name"><%= product.name %></p>
+                        <p class="price">₹<%= product.regularPrice.toFixed(2) %></p>
+                        <del class="old-price">₹<%= product.price.toFixed(2) %></del>
+                        <a href="/cart/add/<%= product._id %>">
+                          <button class="cart-btn">
+                            <span class="material-symbols-outlined">shopping_bag</span>
+                          </button>
+                        </a>
+                        <span class="material-symbols-outlined fav-icon">favorite</span>
+                      </div>
+                    </div>
+                  <% }) %>
                 </div>
-            
-                <!-- Product Card 2 -->
-                <div class="product-card">
-                    <img src="potato.jpg" alt="Big Potatoes">
-                    <p class="product-name">Big Potatoes</p>
-                    <p class="price">14.99₹</p>
-                    <a href="#">
-                        <button class="cart-btn">
-                            <img src="cart-icon.png" alt="Add to cart">
-                        </button>
-                    </a>
-                    <div class="rating">⭐⭐⭐⭐</div>
-                    <i class="bi bi-lock-fill lock-icon"></i>
+              <% } else { %>
+                <div style="
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  font-weight: 500;
+                  font-size: 2.1rem;
+                  color: #666;
+                ">
+                  No products available for display!.
                 </div>
-            
-                <!-- Product Card 3 -->
-                <div class="product-card">
-                    <img src="/cabbage.png" alt="Chinese Cabbage">
-                    <p class="product-name">Chinese Cabbage</p>
-                    <p class="price">14.99₹</p>
-                    <a href="#">
-                        <button class="cart-btn">
-                            <img src="cart-icon.png" alt="Add to cart">
-                        </button>
-                    </a>
-                    <div class="rating">⭐⭐⭐⭐</div>
-                    <i class="bi bi-lock-fill lock-icon"></i>
-                    <i class="bi bi-heart fav-icon"></i>
-                </div>
-            
-                <!-- Product Card 4 (Out of Stock) -->
-                <div class="product-card out-of-stock">
-                    <span class="out-of-stock-label">Out of Stock</span>
-                    <img src="/ladies-finger.png" alt="Ladies Finger">
-                    <p class="product-name">Ladies Finger</p>
-                    <p class="price"><span class="old-price">20.99₹ </span> 14.99₹</p>
-                    <a href="#">
-                        <button class="cart-btn">
-                            <img src="cart-icon.png" alt="Add to cart">
-                        </button>
-                    </a>
-                    <div class="rating">⭐⭐⭐⭐</div>
-                    <i class="bi bi-lock-fill lock-icon"></i>
-                </div>
+              <% } %>
             </div>
-            
+            <!-- <div class="product-card out-of-stock">
+              <span class="out-of-stock-label">Out of Stock</span>
+              <img src="/ladies-finger.png" alt="Ladies Finger">
+              <p class="product-name">Ladies Finger</p>
+              <p class="price"><span class="old-price">20.99₹ </span> 14.99₹</p>
+              <a href="#">
+                <button class="cart-btn">
+                  <span class="material-symbols-outlined">shopping_bag</span>
+                </button>
+              </a>
+              <div class="rating">⭐⭐⭐⭐</div>
+              <span class="material-symbols-outlined fav-icon">favorite</span>
+            </div> -->
+          </div>
         </div>
+
+        <!-- Pagination -->
+        <% if (totalPages => 1) { %>
+            <nav aria-label="Page navigation">
+              <ul class="pagination justify-content-center mt-4">
+                <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
+                  <a class="page-link" href="/shop?page=<%= currentPage - 1 %>&search=<%= searchQuery %>&category=<%= selectedCategory %>&priceRange=<%= selectedPriceRange %>&sort=<%= selectedSort %>">Previous</a>
+                </li>
+                <% for (let i = 1; i <= totalPages; i++) { %>
+                  <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                    <a class="page-link" href="/shop?page=<%= i %>&search=<%= searchQuery %>&category=<%= selectedCategory %>&priceRange=<%= selectedPriceRange %>&sort=<%= selectedSort %>"><%= i %></a>
+                  </li>
+                <% } %>
+                <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
+                  <a class="page-link" href="/shop?page=<%= currentPage + 1 %>&search=<%= searchQuery %>&category=<%= selectedCategory %>&priceRange=<%= selectedPriceRange %>&sort=<%= selectedSort %>">Next</a>
+                </li>
+              </ul>
+            </nav>
+          <% } %>
+      </div>
     </div>
-    
-        
-        <div class="footer-wrapper">
-            <%- include("../../views/Partials/user/footer") %>
-        </div>
-        
+  </div>
+
+  <div class="footer-wrapper">
+    <%- include("../../views/Partials/user/footer") %>
+  </div>
+</body>
+</html>

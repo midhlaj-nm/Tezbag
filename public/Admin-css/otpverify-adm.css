@@ -4,13 +4,6 @@ a {
     text-decoration: none;
 }
 
-#toast-container > .toast {
-  transition: opacity 0.3s ease-in-out;
-}
-
-#toast-container > .toast.fade.show {
-    opacity: 1 !important;
-  }
 
 body{
     font-family: 'Poppins', sans-serif;    
@@ -57,18 +50,10 @@ body{
     width: 100%; 
 }
 
-.logo img {
-    width: 150px;
-    transform: translate3d(10px, 10px, 10px)
-}
-
 /* Navbar */
 .navbar {
     text-align: center;
     padding: 20px 0;
-}
-.logo img {
-    width: 120px;
 }
 
 /* Center the OTP box */

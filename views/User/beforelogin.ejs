@@ -1,225 +1,144 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tez Bag | Home</title>
-
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    <link rel="stylesheet" href="/User-css/beforelogin.css">
-    <!-- Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tez Bag | Home</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  <link rel="stylesheet" href="/User-css/beforelogin.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined" rel="stylesheet">
 </head>
 <body>
+  <div id="top" class="container-fluid">
+    <div class="left-content">
+      <img width="16" height="13" src="/Map Pin.svg">
+      <span class="location">Store Location: Mijus Store, Pavaratty-680507, Kerala, India</span>
+    </div>
+    <div class="right-content">
+      <span id="lang" class="location">ENG</span>
+      <span id="country" class="location">IND</span>
+    </div>
+  </div>
 
-    <div id="top" class="container-fluid">
-            <div class="left-content">
-                <img width="16" height="13" src="/Map Pin.svg">
-                <span class="location">Store Location: Mijus Store, Pavaratty-680507, Kerala, India</span>
-            </div>
-            <div class="right-content">
-                <span id="lang" class="location">ENG</span>
-                <span id="country" class="location">IND</span>
-            </div>
+  <div id="middle" class="container-fluid">
+    <div class="navbar">
+      <ul id="list">
+        <a href="/login"><li>Home</li></a>
+        <a href="/login"><li>Shop</li></a>
+        <a href="/login"><li>Pages</li></a>
+        <a href="/login"><li>Blog</li></a>
+        <a href="/login"><li>Account</li></a>
+      </ul>
     </div>
-    <div id="middle" class="container-fluid">
-        <div class="navbar">
-            <ul id="list">
-                <a href="/login">
-                    <li>Home
-                    </li>
-                </a>
-                <a href="/login">
-                    <li>Shop
-                    </li>
-                </a>
-                <a href="/login">
-                    <li>Pages
-                    </li>
-                </a>
-                <a href="/login">
-                    <li>Blog
-                    </li>  
-                </a>
-                <a href="/login">
-                    <li>Account
-                    </li>
-                </a>
-            </ul>
-        </div>
-        <div class="logo">
-            <img width="150" src="/Logo.png" alt="Logo">
-        </div>
-        <div id="right-section">
-            <a href="/login" id="login-button">Login</a>
-        </div>    
+    <div class="logo">
+      <img width="150" src="/Logo.png" alt="Logo">
     </div>
-    <div class="container-fluid p-0 position-relative">
-        <img src="/BG.png" class="w-100">
-        <div class="text-content">
-            <p id="p1" class="text-success fw-semibold">WELCOME TO TEZBAG</p>
-            <h1 class="fw-bold">Fresh & Healthy <br> Organic Food</h1>
-            <p class="fs-5">Sale up to <span class="text-warning fw-bold">30% OFF</span></p>
-            <p id="p2" class="text-muted">Free shipping on all your orders. We deliver, you enjoy.</p>
-            <a href="/shop" class="btn btn-success">Shop Now</a>
-        </div>
-        <div id="feature">
-            <img src="/Feature.png" class="w-100">
-        </div>
+    <div id="right-section">
+      <a href="/login" id="login-button">Login</a>
     </div>
+  </div>
+
+  <div class="container-fluid p-0 position-relative">
+    <img src="/BG.png" class="w-100">
+    <div class="text-content">
+      <p id="p1" class="text-success fw-semibold">WELCOME TO TEZBAG</p>
+      <h1 class="fw-bold">Fresh & Healthy <br> Organic Food</h1>
+      <p class="fs-5">Sale up to <span class="text-warning fw-bold">30% OFF</span></p>
+      <p id="p2" class="text-muted">Free shipping on all your orders. We deliver, you enjoy.</p>
+      <a href="/login" class="btn btn-success">Shop Now</a>
+    </div>
+  </div>
+
+  <% if (showFeaturedProducts) { %>
     <section class="featured-products">
-        <div class="container">
-            <div class="header">
-                <h2>Featured Products</h2>
-                <a href="/login" class="view-all">View All →</a>
-            </div>
-            <div class="product-list">
-                <div class="product-card">
-                    <img src="/apple.png" alt="Green Apple">
-                    <span class="discount">Sale 50%</span>
-                    <h3>Green Apple</h3>
-                    <p class="price">$14.99 <del>$29.99</del></p>
-                    <a href="/login">
-                        <button class="cart-btn">
-                            <img src="cart-icon.png" alt="Add to cart">
-                        </button>
-                    </a>
-                </div>
-                <div class="product-card">
-                    <img src="/cabbage.png" alt="Chinese Cabbage">
-                    <h3>Chinese Cabbage</h3>
-                    <p class="price">$14.99</p>
-                    <a href="/login">
-                        <button class="cart-btn">
-                            <img src="cart-icon.png" alt="Add to cart">
-                        </button>
-                    </a>
-                </div>
-                <div class="product-card">
-                    <img src="/capsicum.png" alt="Green Capsicum">
-                    <h3>Green Capsicum</h3>
-                    <p class="price">$14.99</p>
-                    <a href="/login">
-                        <button class="cart-btn">
-                            <img src="cart-icon.png" alt="Add to cart">
-                        </button>
-                    </a>
-                </div>
-                <div class="product-card">
-                    <img src="/ladies-finger.png" alt="Ladies Finger">
-                    <h3>Ladies Finger</h3>
-                    <p class="price">$14.99</p>
-                    <a href="/login">
-                        <button class="cart-btn">
-                            <img src="cart-icon.png" alt="Add to cart">
-                        </button>
-                    </a>
-                </div>
-            </div>
+      <div class="container">
+        <div class="header">
+          <h2>Featured Products</h2>
+          <a href="/login" class="view-all">View All →</a>
         </div>
+        <div class="product-list">
+          <% products.slice(0, 4).forEach(product => { %>
+            <div class="product-card">
+              <img src="<%= product.image || '/default-product.png' %>" alt="<%= product.name %>">
+              <h3><%= product.name %></h3>
+              <p class="price">
+                <span class="sale-price">₹<%= product.regularPrice.toFixed(2) %></span>
+                <del class="regular-price">₹<%= product.price.toFixed(2) %></del>
+              </p>
+              <a href="/login">
+                <button class="cart-btn">
+                  <span class="material-symbols-outlined">shopping_bag</span>
+                </button>
+              </a>
+            </div>
+          <% }) %>
+        </div>
+      </div>
     </section>
+  <% } %>
+
+  <% if (showTopCategories) { %>
     <section class="top-categories">
-        <div class="container">
-          <div class="header">
-            <h2>Categories</h2>
-          </div>
-      
-          <% if (categories.length > 0) { %>
-            <div class="categories">
-              <% categories.forEach(category => { %>
-                <div class="category">
-                  <% if (category.image) { %>
-                    <img src="<%= category.image %>" alt="<%= category.name %>">
-                  <% } else { %>
-                    <div class="no-image">No Image</div>
-                  <% } %>
-                  <h3><%= category.name %></h3>
-                  <p><%= category.productCount || 0 %> Products</p>
-                </div>
-              <% }) %>
-            </div>
-          <% } else { %>
-            <p style="width: 105%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 500;
-            font-size: 1.1rem;
-            color: #666;
-          ">No categories right now</p>
-          <% } %>
+      <div class="container">
+        <div class="header">
+          <h2>Categories</h2>
         </div>
-      </section>
-      
-    
+        <div class="categories">
+          <% categories.forEach(category => { %>
+            <div class="category">
+              <% if (category.image) { %>
+                <img src="<%= category.image %>" alt="<%= category.name %>">
+              <% } else { %>
+                <div class="no-image">No Image</div>
+              <% } %>
+              <h3><%= category.name %></h3>
+              <p><%= category.productCount || 0 %> Products</p>
+            </div>
+          <% }) %>
+        </div>
+      </div>
+    </section>
+  <% } %>
+
+  <% if (showTodaysItems) { %>
     <section class="todays-items">
-        <div class="container">
-            <div class="header">
-                <h2>Today's fresh items</h2>
-            </div>
-            <section id="todays-fresh-items">
-                <div class="product-row">
-                    <div class="product-card">
-                        <img src="/ladies-finger.png" alt="Ladies Finger">
-                        <h3>Ladies Finger</h3>
-                        <p class="price">$14.99</p>
-                        <a href="/login">
-                            <button class="cart-btn">
-                                <img src="cart-icon.png" alt="Add to cart">
-                            </button>
-                        </a>
-                    </div>
-                    <div class="product-card">
-                        <img src="/cabbage.png" alt="Chinese Cabbage">
-                        <h3>Chinese Cabbage</h3>
-                        <p class="price">$14.99</p>
-                        <a href="/login">
-                            <button class="cart-btn">
-                                <img src="cart-icon.png" alt="Add to cart">
-                            </button>
-                        </a>
-                    </div>
-                    <div class="product-card">
-                        <img src="/capsicum.png" alt="Green Capsicum">
-                        <h3>Green Capsicum</h3>
-                        <p class="price">$14.99</p>
-                        <a href="/login">
-                            <button class="cart-btn">
-                                <img src="cart-icon.png" alt="Add to cart">
-                            </button>
-                        </a>
-                    </div>
-                </div>
-                <div id="pagination">
-                    <img width="50" height="12" src="/pagination.png">
-                </div>
+      <div class="container">
+        <div class="header">
+          <h2>Today's Fresh Items</h2>
+        </div>
+        <section id="todays-fresh-items">
+          <div class="product-row">
+            <% latestProducts.forEach(product => { %>
+              <div class="product-card">
+                <img src="<%= product.image || '/default-product.png' %>" alt="<%= product.name %>">
+                <h3><%= product.name %></h3>
+                <p class="price">
+                  <span class="sale-price">₹<%= product.regularPrice.toFixed(2) %></span>
+                  <del class="regular-price">₹<%= product.price.toFixed(2) %></del>  
+                </p>
+                <a href="/login">
+                  <button class="cart-btn">
+                    <span class="material-symbols-outlined">shopping_bag</span>
+                  </button>
+                </a>
+              </div>
+            <% }) %>
+          </div>
         </section>
+      </div>
     </section>
-    <section class="offer-banner">
-        <div id="offerdiv" class="container">
-            <div class="promo-div left-div"></div>
-            <div class="promo-div right-div"></div>
-        </div>
-    </section>
-    <section class="working">
-        <div id="workings">
-            <h2 id="specials-heading">How It Works</h2>
-            <img src="/BG1.png">
-            <div id="specials" class="container">
-                <img src="/working.png">
-            </div>
-        </div>
-    </section> 
-    <%-include("../../views/Partials/user/footer")%>
-    
-    
+  <% } %>
 
-    <!-- Bootstrap JS Bundle -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
-    <!-- Caret transparent -->
-    <script src="/app.js"></script>
+  <section class="offer-banner">
+    <div id="offerdiv" class="container">
+      <div class="promo-div left-div"></div>
+      <div class="promo-div right-div"></div>
+    </div>
+  </section>
 
+  <%- include("../../views/Partials/user/footer") %>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 </body>
-</html>  
+</html>

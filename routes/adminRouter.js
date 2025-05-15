@@ -29,10 +29,10 @@ router.patch('/list-toggle/:categoryId',adminAuth, categoryManageController.togg
 router.put('/category/update/:id',adminAuth, categoryManageController.editCategory);
 
 //productManageController
-router.get('/product-management', productManagementController.loadProduct);
-router.post('/product/save', upload.array('images', 5), productManagementController.addProduct)
-router.patch('/product/toggle-block/:productId', productManagementController.toggleProductStatus)
-router.patch('/product/edit/:productId', upload.array('images'), productManagementController.editProduct)
+router.get('/product-management', adminAuth, productManagementController.loadProduct);
+router.post('/product/save', adminAuth, upload.array('images', 5), productManagementController.addProduct)
+router.patch('/product/toggle-block/:productId', adminAuth, productManagementController.toggleProductStatus)
+router.patch('/product/edit/:productId', adminAuth, upload.array('images'), productManagementController.editProduct)
 
 
 module.exports = router;

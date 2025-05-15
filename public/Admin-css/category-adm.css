@@ -620,6 +620,58 @@ input:focus {
   cursor: pointer;
 }
 
+/* Custom Pagination Styling */
+.custom-pagination {
+  margin-top: 1.5rem; /* Equivalent to Bootstrap's mt-4 */
+  text-align: center; /* Center the pagination */
+}
+
+.pagination-list {
+  display: inline-flex; /* Display items in a row */
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  gap: 5px; /* Space between items */
+}
+
+.pagination-item {
+  display: inline-block;
+}
+
+.pagination-link {
+  display: inline-block;
+  padding: 8px 12px; /* Padding for clickable area */
+  text-decoration: none;
+  color: #333; /* Default text color */
+  background-color: #f8f9fa; /* Light gray background */
+  border: 1px solid #ddd; /* Light border */
+  border-radius: 5px; /* Rounded corners */
+  font-size: 14px;
+  transition: background-color 0.2s, color 0.2s; /* Smooth transition */
+}
+
+/* Active Page */
+.pagination-item.active .pagination-link {
+  background-color: #00B207; /* Green background for active page */
+  border-color: #00B207;
+  color: white; /* White text for contrast */
+}
+
+/* Disabled State */
+.pagination-item.disabled .pagination-link {
+  color: #aaa; /* Grayed-out text */
+  background-color: #f1f1f1; /* Slightly different background */
+  border-color: #ddd;
+  cursor: not-allowed; /* Indicate it's not clickable */
+}
+
+/* Hover Effect for Non-Active, Non-Disabled Links */
+.pagination-item:not(.active):not(.disabled) .pagination-link:hover {
+  background-color: #e6f7e8; /* Light green background on hover */
+  color: #00B207; /* Green text on hover */
+  border-color: #00B207;
+}
+
 /* Responsive adjustments for smaller screens */
 @media screen and (max-width: 1024px) {
   .content {

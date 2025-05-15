@@ -8,8 +8,9 @@ const bcrypt = require('bcrypt');
 // Render login page
 const loadLogin = async (req, res) => {
   try {
+    const message = req.flash('message')[0] || null;
     console.log("📥 Rendering Admin Login Page");
-    return res.render('login-adm');
+    return res.render('login-adm',{message});
   } catch (err) {
     console.log('❌ Error loading login page:', err);
     res.render('404-adm');
@@ -119,8 +120,9 @@ const verifyLogin = async (req, res, next) => {
 // Render OTP page
 const loadOtp = async (req, res) => {
   try {
+    const message = req.flash('message')[0] || null;
     console.log("📥 Rendering OTP Page");
-    return res.render('otp-adm');
+    return res.render('otp-adm',{message});
   } catch (err) {
     console.log('❌ Error loading OTP page:', err);
     res.render('404-adm');

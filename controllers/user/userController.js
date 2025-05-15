@@ -1,12 +1,11 @@
 const User = require('../../models/userSchema');
 const Category = require('../../models/categorySchema');
-const Products = require('../../models/productSchema');
+const Product = require('../../models/productSchema');
 const Gallery = require('../../models/bannerSchema');
 const Admin = require('../../models/adminSchema')
 const env = require('dotenv').config();
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
-const { LEGAL_TCP_SOCKET_OPTIONS } = require('mongodb');
 
 // ===========================
 // Load 404 Page
@@ -32,27 +31,82 @@ function generateOtp() {
 // ===========================
 const loadHomepage = async (req, res, next) => {
     try {
-      const categories = await Category.find({ isListed: true }).lean();
+      // Fetch categories and unblocked products
+      const [categories, products] = await Promise.all([
+        Category.find({ isListed: true }).lean(),
+        Product.find({ isBlocked: false }).lean()
+      ]);
   
+      // Get Vegetables and Fruits categories
+      const [vegetableCategory, fruitCategory] = await Promise.all([
+        Category.findOne({ name: 'Vegetables', isListed: true }),
+        Category.findOne({ name: 'Fruits', isListed: true })
+      ]);
+  
+      // Fetch latest products for today's items
+      const categoryIds = [vegetableCategory, fruitCategory]
+        .filter(Boolean)
+        .map(cat => cat._id);
+  
+      let latestProducts = [];
+      if (categoryIds.length) {
+        latestProducts = await Product.find({
+          category: { $in: categoryIds },
+          isBlocked: false
+        })
+          .sort({ createdAt: -1 })
+          .limit(3)
+          .lean();
+      }
+  
+      // Helper to transform product for frontend
+      const transformProduct = (product) => ({
+        ...product,
+        name: product.productName,
+        image: Array.isArray(product.productImage) ? product.productImage[0] : product.productImage,
+        price: product.salePrice,
+        regularPrice: product.regularPrice,
+        discount: product.regularPrice > 0
+          ? (((product.regularPrice - product.salePrice) / product.regularPrice) * 100).toFixed(0)
+          : 0
+      });
+  
+      const transformedProducts = products.map(transformProduct);
+      const transformedLatestProducts = latestProducts.map(transformProduct);
+  
+      // Shuffle featured products
+      for (let i = transformedProducts.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [transformedProducts[i], transformedProducts[j]] = [transformedProducts[j], transformedProducts[i]];
+      }
+  
+      // Enrich categories with product count and image
       const categoriesWithData = await Promise.all(
         categories.map(async (category) => {
-          const productCount = await Products.countDocuments({ category: category._id });
-          const banner = await Gallery
-          .findOne({ categoryId: category._id }).lean();
+          const [productCount, banner] = await Promise.all([
+            Product.countDocuments({ category: category._id }),
+            Gallery.findOne({ categoryId: category._id }).lean()
+          ]);
   
           return {
             ...category,
             productCount,
-            image: banner ? banner.image : null
+            image: banner?.image || null
           };
         })
       );
   
-      if (req.session.user || req.user) {
-        res.render('homepage', { categories: categoriesWithData });
-      } else {
-        res.render('beforelogin', { categories: categoriesWithData });
-      }
+      const renderData = {
+        categories: categoriesWithData,
+        products: transformedProducts,
+        latestProducts: transformedLatestProducts,
+        showTodaysItems: transformedLatestProducts.length > 0,
+        showFeaturedProducts: transformedProducts.length > 0,
+        showTopCategories: categoriesWithData.length > 0,
+      };
+  
+      const viewName = req.session.user || req.user ? 'homepage' : 'beforelogin';
+      res.render(viewName, renderData);
   
     } catch (err) {
       console.error('❌ Error loading homepage:', err);
@@ -191,7 +245,8 @@ const loadVerifyEmailPost = async (req, res, next) => {
         console.log("📧 OTP sent to user:", otp);
 
         // ✅ Redirect to OTP input page
-        res.render("otppage", { message: req.flash('message'), otpType: "reset" });
+        req.session.otpType = "reset";
+        res.redirect('/otp-page');
 
     } catch (error) {
         console.error("💥 Error in loadVerifyEmailPost:", error);
@@ -442,7 +497,8 @@ const regpost = async (req, res, next) => {
         console.log("📦 Stored user data in session:");
         console.log("🧾", req.session.userData);
 
-        res.render("otppage", { message: req.flash('message'), otpType: "registration" });
+        req.session.otpType = "registration";
+        res.redirect('/otp-page');
     } catch (error) {
         console.error("❌ Registration error:", error);
         next(error);
@@ -457,9 +513,12 @@ const otpver = async (req, res, next) => {
         console.log("📲 Opening OTP Page");
 
         const message = req.flash('message');
-        const otpType = req.session.otpType;  // 👈 grab otpType from session
+        const otpType = req.session.otpType;
 
-        res.render('otppage', { message, otpType }); // 👈 pass it to EJS
+        // Optional: clear otpType after using it
+        delete req.session.otpType;
+
+        res.render('otppage', { message, otpType });
 
     } catch (err) {
         console.error("❌ Error opening OTP page:", err);

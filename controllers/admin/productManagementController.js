@@ -131,7 +131,7 @@ const addProduct = async (req, res, next) => {
       salePrice: parseFloat(mrp) || parseFloat(price),
       productImage: resizedImages,
       SKU: SKU,
-      stock: quantity,
+      quantity: quantity,
       status: quantity > 0 ? 'Available' : 'OutOfStock'
     });
 
@@ -140,7 +140,7 @@ const addProduct = async (req, res, next) => {
     if (req.xhr || req.headers.accept.indexOf('json') > -1) {
       return res.json({ success: true });
     } else {
-      return res.redirect('/product-management');
+      return res.redirect('tezgrani/product-management');
     }
 
   } catch (err) {

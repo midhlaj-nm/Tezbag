@@ -8,9 +8,9 @@
         
                 <form action="/tezgrani/login" method="POST" novalidate>
 
-                  <% if (message && message.length > 0) { %>
+                  <% if (message) { %>
                     <div class="server-error-message"><%= message %></div>
-                  <% } %> 
+                  <% } %>
 
                     <div class="form-group">
                         <input type="email" name="email" class="form-control" placeholder="Email">

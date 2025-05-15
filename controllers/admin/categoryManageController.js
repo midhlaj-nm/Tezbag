@@ -3,6 +3,10 @@ const slugify = require('slugify');
 
 const loadCategory = async (req, res, next) => {
   try {
+
+    let message = req.flash('message')[0] || null;
+    let messageType = req.flash('messageType')[0] || null;
+
     const limit = 6;
     const currentPage = parseInt(req.query.page) || 1;
     const search = req.query.search || "";
@@ -24,6 +28,8 @@ const loadCategory = async (req, res, next) => {
       totalPages,
       currentPage,
       search,
+      message,
+      messageType
     });
   } catch (err) {
     console.error("❌ Error in loadCategories:", err.message);

@@ -231,18 +231,28 @@
         </table>
       </div>
     </div>
-    <div class="pagination">
-      <% const total = Math.max(totalPages, 3); %>
-      <% for (let i = 1; i <= total; i++) { %>
-        <% if (i <= totalPages) { %>
-          <a href="?page=<%= i %><%= search ? '&search=' + encodeURIComponent(search) : '' %>">
-            <div class="dot <%= currentPage === i ? 'active' : '' %>"></div>
-          </a>
-        <% } else { %>
-          <div class="dot inactive"></div>
-        <% } %>
-      <% } %>
-    </div>
+    <% if (totalPages => 1) { %>
+      <nav aria-label="Admin page navigation" class="custom-pagination">
+        <ul class="pagination-list">
+          <!-- Previous Button -->
+          <li class="pagination-item <%= currentPage === 1 ? 'disabled' : '' %>">
+            <a class="pagination-link" href="?page=<%= currentPage - 1 %><%= search ? '&search=' + encodeURIComponent(search) : '' %>">Previous</a>
+          </li>
+    
+          <!-- Page Numbers -->
+          <% for (let i = 1; i <= totalPages; i++) { %>
+            <li class="pagination-item <%= currentPage === i ? 'active' : '' %>">
+              <a class="pagination-link" href="?page=<%= i %><%= search ? '&search=' + encodeURIComponent(search) : '' %>"><%= i %></a>
+            </li>
+          <% } %>
+    
+          <!-- Next Button -->
+          <li class="pagination-item <%= currentPage === totalPages ? 'disabled' : '' %>">
+            <a class="pagination-link" href="?page=<%= currentPage + 1 %><%= search ? '&search=' + encodeURIComponent(search) : '' %>">Next</a>
+          </li>
+        </ul>
+      </nav>
+    <% } %>
   </div>
   
 

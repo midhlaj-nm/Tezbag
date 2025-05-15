@@ -239,8 +239,7 @@ body{
 }
 
 .featured-products {
-    padding: 50px 0;
-    background-color: #f9f9f9;
+    padding: 10px 0;
 }
 
 .container {
@@ -348,16 +347,18 @@ h3 {
 .cart-btn {
     position: absolute;
     bottom: 30px;
-    right: 10px;
+    right: 20px;
     background: none;
     border: none;
     cursor: pointer;
-}
-
-.cart-btn img {
-    width: 40px;
-    height: 40px;
-}
+  }
+  
+  .cart-btn .material-symbols-outlined {
+    font-size: 30px; /* Matches the previous 40px width/height */
+    /* width: 40px; */
+    /* height: 40px; */
+    line-height: 40px; /* Centers the icon vertically */
+  }
 
 
 /* Top Categories Section */
@@ -491,7 +492,7 @@ h2 {
 .cart-btn {
     position: absolute;
     bottom: 30px;
-    right: 10px;
+    right: 20px;
     background: none;
     border: none;
     cursor: pointer;
@@ -544,42 +545,7 @@ h2 {
     background-color: #3498db;
 }
 
-#workings {
-    width: 100%;
-    height: 100vh; /* Ensure it takes full viewport height */
-    display: flex;
-    justify-content: center;
-    align-items: center; /* Ensures vertical centering */
-    position: relative; /* Allows children to be positioned relative to this */
-    flex-direction: column; /* Stacks items vertically */
-}
 
-#workings img {
-    width: 100%;
-    height: auto;
-}
-
-#specials {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: absolute; /* Positions relative to #workings */
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%); /* Ensures true centering */
-}
-
-#specials-heading {
-    font-size: 36px;
-    font-weight: 800;
-    font-family: 'Poppins', sans-serif; /* Apply Poppins */
-    position: absolute;
-    top: 15%;
-    left: 50%;
-    transform: translateX(-50%);
-    text-align: center;
-    color: #333;
-}
 
 /* Footer Styling */
 .footer {

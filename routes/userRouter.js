@@ -1,6 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const userController = require('../controllers/user/userController');
+const productPage = require('../controllers/user/productPage')
 const passport = require('passport');
 const userAuth = require('../middlewares/userAuth');
 
@@ -48,9 +49,12 @@ router.post('/verify-otp', userController.verifyOtpPost);
 router.get('/reset-password', userController.loadResetPassPage);
 router.post('/reset-password', userController.resetPasswordPost);
 
-// ✅ PROTECTED ROUTES (Need Login) profileController.js
+// profileController.js
 router.get('/account-settings', userAuth, userController.loadSettings);
 router.get('/account', userAuth, userController.loadDashboard);
 router.get('/logout', userAuth, userController.logout);
+
+//productPage
+router.get('/shop', productPage.loadProduct)
 
 module.exports = router
