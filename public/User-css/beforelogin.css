@@ -326,6 +326,26 @@ h3 {
     background: linear-gradient(to bottom, #F2F5F3 20%, #ffffff 100%);
 }
 
+.category-link {
+    color: inherit;
+    text-decoration: none;
+    display: block;
+}
+
+.category-link:hover {
+    color: inherit;
+}
+
+.product-link {
+    color: inherit;
+    text-decoration: none;
+    display: block;
+}
+
+.product-link:hover {
+    color: inherit;
+}
+
 /* Header Styling */
 .header {
     display: flex;

@@ -13,15 +13,31 @@ const addressSchema = new Schema({
             type: String,
             required: true
         },
-        name: {
+        firstName: {
             type: String,
             required: true
+        },
+        lastName: {
+            type: String,
+            required: true
+        },
+        company: {
+            type: String,
+            required: false
+        },
+        streetAddress: {
+            type: String,
+            required: false
         },
         city: {
             type: String,
             required: true
         },
         landMark: {
+            type: String,
+            required: true
+        },
+        country: {
             type: String,
             required: true
         },
@@ -33,13 +49,17 @@ const addressSchema = new Schema({
             type: Number,
             required: true
         },
+        email: {
+            type: String,
+            required: false
+        },
         phone: {
             type: String,
             required: true
         },
         altPhone: {
             type: String,
-            required: true
+            required: false
         }
     }]
 })

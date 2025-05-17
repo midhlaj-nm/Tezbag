@@ -497,10 +497,10 @@ a {
 /* Favorite Icon */
 .product-card .fav-icon {
     position: absolute;
-    top: 8%;
+    bottom: 1%;
     right: 5%;
     font-size: 25px;
-    color: #999;
+    color: black;
     cursor: pointer;
     transition: color 0.3s;
 }

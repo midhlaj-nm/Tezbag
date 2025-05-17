@@ -24,30 +24,39 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
-    width: 14%;
-    height: 100%;
+    width: 100%; /* Adjust to fit the layout */
+    max-width: 100px; /* Limit the width for better control */
+    height: auto; /* Let the height adjust based on content */
 }
 
 .subImg {
-    width: 135%;
-    height: 25%;
-    border-radius: 5px; /* Added smooth rounded corners */
-    cursor: pointer; /* Indicating clickable items */
-    border: 2px solid transparent; /* Default border */
-    transition: border-color 0.3s ease-in-out; /* Smooth transition effect */
+    width: 80px; /* Fixed width for consistency */
+    height: 80px; /* Fixed height for consistency */
+    border-radius: 5px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: border-color 0.3s ease-in-out;
+    overflow: hidden; /* Ensure image doesn’t overflow */
+}
+
+.subImg img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Maintain aspect ratio, fill the container */
+    display: block; /* Remove any default spacing */
 }
 
 .subImg.active {
-    border-color: green; /* Highlight active thumbnail */
+    border-color: green;
 }
 
 .mainImage {
-    margin-left: 10%;
+    margin-right: 5%;
     width: 75%;
     height: 100%;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: left;
     border-radius: 8px; /* Slightly rounded edges */
 }
 
@@ -78,14 +87,22 @@
 }
 
 .stockstatus {
-    margin-bottom: 10px;
-    display: inline-block;  /* Adjust width based on content */
-    background-color: rgba(212, 237, 218, 0.4); /* Light green background */
-    color: #155724; /* Dark green text */
+    margin-top: .2%;
+    display: inline-block; /* Adjust width based on content */
     font-size: 18px; /* Adjust text size */
-    font-weight: bold; 
+    font-weight: bold;
     padding: 1px 10px; /* Adjust padding to match spacing */
     border-radius: 8px; /* Rounded corners */
+}
+
+.stock-available {
+    background-color: rgba(212, 237, 218, 0.4); /* Light green background */
+    color: #155724; /* Dark green text */
+}
+
+.stock-out {
+    background-color: rgba(237, 212, 212, 0.4); /* Light red background */
+    color: #ca2525; /* Dark red text */
 }
 
 .prdctdata {
@@ -165,7 +182,7 @@
 }
 
 .quantity-selector button {
-    background: #eee;
+    background: #ccc;
     border: none;
     padding: 5px 10px;
     border-radius: 50%;
@@ -289,6 +306,7 @@ hr {
 
 /* Tab Content */
 .tab-content {
+    height: fit-content;
     margin-bottom: 2rem;
     padding: 20px;
 }
@@ -310,7 +328,6 @@ hr {
     display: flex;
     flex-direction: column;
     width: 50%;
-    height: 60vh;
     margin-left: -23px; /* shifts the box 20px to the left */
 }
 
@@ -339,7 +356,6 @@ hr {
 .right-area{
     margin-left: 10%;
     width: 50%;
-    height: 70vh;
 }
 
 .delivery-boy{

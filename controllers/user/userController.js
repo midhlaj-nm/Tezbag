@@ -97,7 +97,7 @@ const loadHomepage = async (req, res, next) => {
       );
   
       const renderData = {
-        categories: categoriesWithData,
+        category: categoriesWithData,
         products: transformedProducts,
         latestProducts: transformedLatestProducts,
         showTodaysItems: transformedLatestProducts.length > 0,
@@ -639,30 +639,6 @@ const resendOtp = async (req, res, next) => {
 };
 
 // ===========================
-// Load Settings
-// ===========================
-const loadSettings = async (req, res) => {
-    try {
-        res.render('settings');
-    } catch (error) {
-        console.error("❌ Error loading settings:", error);
-        res.redirect('/404Error');
-    }
-};
-
-// ===========================
-// Load Dashboard
-// ===========================
-const loadDashboard = async (req, res) => {
-    try {
-        res.render('dashboard');
-    } catch (error) {
-        console.error("❌ Error loading dashboard:", error);
-        res.redirect('/404Error');
-    }
-};
-
-// ===========================
 // Logout
 // ===========================
 const logout = async (req, res) => {
@@ -696,7 +672,5 @@ module.exports = {
     otpver,
     verifyOtp,
     resendOtp,
-    loadSettings,
-    loadDashboard,
     logout
 };

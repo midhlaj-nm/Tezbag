@@ -1,95 +1,91 @@
-<%-include("../../views/Partials/user/header-ho")%>
+<%- include("../../views/Partials/user/header-ho") %>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=shopping_bag" />
-    <div class="container-fluid p-0 position-relative">
-        <img src="/BG.png" class="w-100">
-        <div class="text-content">
-            <p id="p1" class="text-success fw-semibold">WELCOME TO TEZBAG</p>
-            <h1 class="fw-bold">Fresh & Healthy <br> Organic Food</h1>
-            <p class="fs-5">Sale up to <span class="text-warning fw-bold">30% OFF</span></p>
-            <p id="p2" class="text-muted">Free shipping on all your orders. We deliver, you enjoy.</p>
-            <a href="/shop" class="btn btn-success">Shop Now</a>
-        </div>
-    </div>
-    <% if (showFeaturedProducts) { %>
-      <section class="featured-products">
-        <div class="container">
-          <div class="header">
-            <h2>Featured Products</h2>
+<div class="container-fluid p-0 position-relative">
+  <img src="/BG.png" class="w-100">
+  <div class="text-content">
+    <p id="p1" class="text-success fw-semibold">WELCOME TO TEZBAG</p>
+    <h1 class="fw-bold">Fresh & Healthy <br> Organic Food</h1>
+    <p class="fs-5">Sale up to <span class="text-warning fw-bold">30% OFF</span></p>
+    <p id="p2" class="text-muted">Free shipping on all your orders. We deliver, you enjoy.</p>
+    <a href="/shop" class="btn btn-success">Shop Now</a>
+  </div>
+</div>
+<% if (showFeaturedProducts) { %>
+  <section class="featured-products">
+    <div class="container">
+      <div class="header">
+        <h2>Featured Products</h2>
+      </div>
+      <div class="product-list">
+        <% products.slice(0, 4).forEach(product => { %>
+          <div class="product-card">
+            <a href="/product/<%= product._id %>" class="product-link">
+              <img src="<%= product.image || '/default-product.png' %>" alt="<%= product.name %>">
+              <h3><%= product.name %></h3>
+              <p class="price">
+                <span class="sale-price"><%= product.regularPrice.toFixed(2) %> ₹</span>
+                <del class="regular-price"><%= product.price.toFixed(2) %> ₹</del>
+              </p>
+            </a>
           </div>
-          <div class="product-list">
-            <% products.slice(0, 4).forEach(product => { %>
-              <div class="product-card">
+        <% }) %>
+      </div>
+    </div>
+  </section>
+<% } %>
+<% if (showTopCategories) { %>
+  <section class="top-categories">
+    <div class="container">
+      <div class="header">
+        <h2>Categories</h2>
+      </div>
+      <div class="categories">
+        <% category.forEach(category => { %>
+          <div class="category">
+            <a href="/shop?category=<%= category._id %>" class="category-link">
+              <% if (category.image) { %>
+                <img src="<%= category.image %>" alt="<%= category.name %>">
+              <% } else { %>
+                <div class="no-image">No Image</div>
+              <% } %>
+              <h3><%= category.name %></h3>
+              <p><%= category.productCount || 0 %> Products</p>
+            </a>
+          </div>
+        <% }) %>
+      </div>
+    </div>
+  </section>
+<% } %>
+<% if (showTodaysItems) { %>
+  <section class="todays-items">
+    <div class="container">
+      <div class="header">
+        <h2>Today's Fresh Items</h2>
+      </div>
+      <section id="todays-fresh-items">
+        <div class="product-row">
+          <% latestProducts.forEach(product => { %>
+            <div class="product-card">
+              <a href="/product/<%= product._id %>" class="product-link">
                 <img src="<%= product.image || '/default-product.png' %>" alt="<%= product.name %>">
                 <h3><%= product.name %></h3>
                 <p class="price">
-                  <span class="sale-price">₹<%= product.regularPrice.toFixed(2) %></span>
-                  <del class="regular-price">₹<%= product.price.toFixed(2) %></del>
+                  <span class="sale-price"><%= product.regularPrice.toFixed(2) %> ₹</span>
+                  <del class="regular-price"><%= product.price.toFixed(2) %> ₹</del>
                 </p>
-                <a href="/cart/add/<%= product._id %>">
-                  <button class="cart-btn">
-                    <span class="material-symbols-outlined">shopping_bag</span>
-                  </button>
-                </a>
-              </div>
-            <% }) %>
-          </div>
-        </div>
-      </section>
-    <% } %>
-    <% if (showTopCategories) { %>
-      <section class="top-categories">
-        <div class="container">
-          <div class="header">
-            <h2>Categories</h2>
-          </div>
-          <div class="categories">
-            <% categories.forEach(category => { %>
-              <div class="category">
-                <% if (category.image) { %>
-                  <img src="<%= category.image %>" alt="<%= category.name %>">
-                <% } else { %>
-                  <div class="no-image">No Image</div>
-                <% } %>
-                <h3><%= category.name %></h3>
-                <p><%= category.productCount || 0 %> Products</p>
-              </div>
-            <% }) %>
-          </div>
-        </div>
-      </section>
-    <% } %>
-      <% if (showTodaysItems) { %>
-        <section class="todays-items">
-          <div class="container">
-            <div class="header">
-              <h2>Today's Fresh Items</h2>
+              </a>
             </div>
-            <section id="todays-fresh-items">
-              <div class="product-row">
-                <% latestProducts.forEach(product => { %>
-                  <div class="product-card">
-                    <img src="<%= product.image || '/default-product.png' %>" alt="<%= product.name %>">
-                    <h3><%= product.name %></h3>
-                    <p class="price">
-                      <span class="sale-price">₹<%= product.regularPrice.toFixed(2) %></span>
-                      <del class="regular-price">₹<%= product.price.toFixed(2) %></del>
-                    </p>
-                    <a href="/cart/add/<%= product._id %>">
-                      <button class="cart-btn">
-                        <span class="material-symbols-outlined">shopping_bag</span>
-                      </button>
-                    </a>
-                  </div>
-                <% }) %>
-              </div>
-            </section>
-          </div>
-        </section>
-      <% } %>
-    <section class="offer-banner">
-        <div id="offerdiv" class="container">
-            <div class="promo-div left-div"></div>
-            <div class="promo-div right-div"></div>
+          <% }) %>
         </div>
-    </section> 
-<%-include("../../views/Partials/user/footer")%>
+      </section>
+    </div>
+  </section>
+<% } %>
+<section class="offer-banner">
+  <div id="offerdiv" class="container">
+    <div class="promo-div left-div"></div>
+    <div class="promo-div right-div"></div>
+  </div>
+</section>
+<%- include("../../views/Partials/user/footer") %>

@@ -132,7 +132,7 @@ const addProduct = async (req, res, next) => {
       productImage: resizedImages,
       SKU: SKU,
       quantity: quantity,
-      status: quantity > 0 ? 'Available' : 'OutOfStock'
+      status: quantity > 0 ? 'Available' : 'Out Of Stock'
     });
 
     await newProduct.save();
@@ -222,7 +222,7 @@ const editProduct = async (req, res, next) => {
         message: 'Price cannot be greater than MRP.',
       });
     }
-    if (isNaN(quantity) || quantity <= 0) {
+    if (isNaN(quantity) || quantity < 0) {
       return res.status(400).json({
         success: false,
         message: 'Quantity must be a Positive number.',
@@ -339,7 +339,7 @@ const editProduct = async (req, res, next) => {
     product.quantity = quantity;
     product.productImage = finalImages;
     product.SKU = SKU;
-    product.status = quantity > 0 ? 'Available' : 'OutOfStock';
+    product.status = quantity > 0 ? 'Available' : 'Out Of Stock';
 
     // Save the updated product
     await product.save();

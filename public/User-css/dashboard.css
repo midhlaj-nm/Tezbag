@@ -23,7 +23,7 @@ body {
     height: fit-content;
     font-family: 'Poppins', sans-serif;
     width: 30%;
-    padding: 20px;
+    padding: 20px 0 0 20px;
     padding-bottom: 0px;
     border: 1px solid #ddd;
     border-radius: 10px;
@@ -118,10 +118,6 @@ body {
 
   .add{
     color: #7b7b7b;
-  }
-
-  .num, .mail{
-    margin-bottom: 1.35rem;
   }
 
   .custom-link-add {

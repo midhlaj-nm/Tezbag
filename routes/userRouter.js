@@ -1,7 +1,8 @@
 const express = require('express')
 const router = express.Router()
 const userController = require('../controllers/user/userController');
-const productPage = require('../controllers/user/productPage')
+const productPageController = require('../controllers/user/productPageController');
+const profileController = require('../controllers/user/profileController')
 const passport = require('passport');
 const userAuth = require('../middlewares/userAuth');
 
@@ -50,11 +51,12 @@ router.get('/reset-password', userController.loadResetPassPage);
 router.post('/reset-password', userController.resetPasswordPost);
 
 // profileController.js
-router.get('/account-settings', userAuth, userController.loadSettings);
-router.get('/account', userAuth, userController.loadDashboard);
+router.get('/account-settings', userAuth, profileController.loadSettings);
+router.get('/account', userAuth, profileController.loadDashboard);
 router.get('/logout', userAuth, userController.logout);
 
 //productPage
-router.get('/shop', productPage.loadProduct)
+router.get('/shop', productPageController.loadshop)
+router.get('/product/:id', productPageController.loadProductDetails)
 
 module.exports = router

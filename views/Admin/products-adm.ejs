@@ -197,11 +197,11 @@
                     </td>
                     <td><%= product.productName %></td>
                     <td><%= product.category?.name %></td>
-                    <td>₹<%= product.regularPrice %></td>
-                    <td>₹<%= product.salePrice %></td>
-                    <td><%= product.quantity %> pcs</td>
-                    <td class="status <%= product.isBlocked ? 'inactive' : 'active' %>">
-                      <%= product.isBlocked ? 'Blocked' : 'Active' %>
+                    <td><%= product.regularPrice %>₹</td>
+                    <td><%= product.salePrice %> ₹</td>
+                    <td><%= product.quantity %> kg</td>
+                    <td class="status <%= product.status === 'Available' ? 'active' : 'inactive' %>">
+                      <%= product.status %>
                     </td>
                     <td class="actions">
                       <a href="#" class="btn edit-btn" 
@@ -232,7 +232,7 @@
   
       </div>
     </div>
-    <% if (totalPages => 1) { %>
+            <% if (totalPages >= 1) { %>
       <nav aria-label="Admin page navigation" class="custom-pagination">
         <ul class="pagination-list">
           <!-- Previous Button -->
@@ -299,8 +299,8 @@
             </div>
           </div>
           <div class="form-group">
-            <label for="qty">Qty</label>
-            <input type="number" id="qty" name="qty" placeholder="Enter Quantity" min="0" required>
+            <label for="qty">Qty (kg)</label>
+            <input type="number" id="qty" name="qty" placeholder="Enter Quantity (kg)" min="0" required>
             <div id="errQty" class="errr-msg"></div>
           </div>
           <div class="form-group">

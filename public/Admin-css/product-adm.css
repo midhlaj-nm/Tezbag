@@ -406,6 +406,7 @@ body {
 .product-table th:nth-child(8),
 .product-table td:nth-child(8) { /* STATUS */
   width: 10%;
+  padding-left: 0 !important;
 }
 
 .product-table th:nth-child(2),

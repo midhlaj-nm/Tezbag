@@ -100,7 +100,7 @@
       <div class="filters-left">
         <form action="/shop" method="GET">
           <select name="category" onchange="this.form.submit()">
-            <option value="" disabled <%= !selectedCategory ? 'selected' : '' %>>Filter by Category</option>
+            <option value="" disabled hidden <%= !selectedCategory ? 'selected' : '' %>>Filter by Category</option>
             <option value="" <%= selectedCategory === '' ? 'selected' : '' %>>All Category</option>
             <% categories.forEach(category => { %>
               <option value="<%= category._id %>" <%= selectedCategory === category._id.toString() ? 'selected' : '' %>>
@@ -115,12 +115,12 @@
 
         <form action="/shop" method="GET">
           <select name="priceRange" onchange="this.form.submit()">
-            <option value="" disabled <%= !selectedPriceRange ? 'selected' : '' %>>Filter by Price Range</option>
+            <option value="" disabled hidden <%= !selectedPriceRange ? 'selected' : '' %>>Filter by Price Range</option>
             <option value="" <%= selectedPriceRange === '' ? 'selected' : '' %>>All Price Range</option>
-            <option value="0-10" <%= selectedPriceRange === '0-10' ? 'selected' : '' %>>₹0 - ₹10</option>
-            <option value="10-50" <%= selectedPriceRange === '10-50' ? 'selected' : '' %>>₹10 - ₹50</option>
-            <option value="50-100" <%= selectedPriceRange === '50-100' ? 'selected' : '' %>>₹50 - ₹100</option>
-            <option value="100+" <%= selectedPriceRange === '100+' ? 'selected' : '' %>>₹100+</option>
+            <option value="50-100" <%= selectedPriceRange === '50-100' ? 'selected' : '' %>>50₹ - 100₹</option>
+            <option value="100-200" <%= selectedPriceRange === '10-50' ? 'selected' : '' %>>100₹ - 200₹</option>
+            <option value="200-300" <%= selectedPriceRange === '200-300' ? 'selected' : '' %>>200₹ - 300₹</option>
+            <option value="300+" <%= selectedPriceRange === '300+' ? 'selected' : '' %>>300₹+</option>
           </select>
           <input type="hidden" name="search" value="<%= searchQuery %>">
           <input type="hidden" name="category" value="<%= selectedCategory %>">
@@ -180,7 +180,7 @@
 
         <!-- Price Range Filter -->
         <div class="filter-section">
-          <div class="d-flex align-items-center justify-content-between">
+          <div class="d-flex align-items-center justify-content-between" style="border-bottom: 1px solid #eee; margin-bottom: 8px;">
             <h3>Price Range</h3>
             <% if (selectedPriceRange) { %>
               <a href="/shop?search=<%= searchQuery %>&category=<%= selectedCategory %>&sort=<%= selectedSort %>" class="material-symbols-outlined cancel-icon" style="cursor: pointer;">cancel</a>
@@ -188,24 +188,24 @@
           </div>
           <div class="price-options">
             <div class="price-option">
-              <input type="checkbox" id="price-0-10" <%= selectedPriceRange === '50-100' ? 'checked' : '' %>
+              <input type="checkbox" id="price-50-100" <%= selectedPriceRange === '50-100' ? 'checked' : '' %>
                 onchange="window.location.href='/shop?priceRange=50-100&search=<%= searchQuery %>&category=<%= selectedCategory %>&sort=<%= selectedSort %>'">
-              <label for="price-0-10">₹50 - ₹100</label>
+              <label for="price-0-10">50₹ - 100₹</label>
             </div>
             <div class="price-option">
-              <input type="checkbox" id="price-10-50" <%= selectedPriceRange === '100-200' ? 'checked' : '' %>
+              <input type="checkbox" id="price-100-200" <%= selectedPriceRange === '100-200' ? 'checked' : '' %>
                 onchange="window.location.href='/shop?priceRange=100-200&search=<%= searchQuery %>&category=<%= selectedCategory %>&sort=<%= selectedSort %>'">
-              <label for="price-10-50">₹100 - ₹200</label>
+              <label for="price-10-50">100₹ - 200₹</label>
             </div>
             <div class="price-option">
-              <input type="checkbox" id="price-50-100" <%= selectedPriceRange === '200-300' ? 'checked' : '' %>
+              <input type="checkbox" id="price-200-300" <%= selectedPriceRange === '200-300' ? 'checked' : '' %>
                 onchange="window.location.href='/shop?priceRange=200-300arch=<%= searchQuery %>&category=<%= selectedCategory %>&sort=<%= selectedSort %>'">
-              <label for="price-50-100">₹200 - ₹300</label>
+              <label for="price-50-100">200₹ - 300₹</label>
             </div>
             <div class="price-option">
-              <input type="checkbox" id="price-100-plus" <%= selectedPriceRange === '300+' ? 'checked' : '' %>
+              <input type="checkbox" id="price-300-plus" <%= selectedPriceRange === '300+' ? 'checked' : '' %>
                 onchange="window.location.href='/shop?priceRange=300+&search=<%= searchQuery %>&category=<%= selectedCategory %>&sort=<%= selectedSort %>'">
-              <label for="price-100-plus">₹300+</label>
+              <label for="price-100-plus">300₹+</label>
             </div>
           </div>
         </div>
@@ -221,17 +221,23 @@
                 <div class="row">
                   <% products.forEach(product => { %>
                     <div class="col-md">
-                      <div class="product-card">
-                        <img src="<%= product.image || '/default-product.png' %>" alt="<%= product.name %>">
-                        <p class="product-name"><%= product.name %></p>
-                        <p class="price">₹<%= product.regularPrice.toFixed(2) %></p>
-                        <del class="old-price">₹<%= product.price.toFixed(2) %></del>
-                        <a href="/cart/add/<%= product._id %>">
-                          <button class="cart-btn">
-                            <span class="material-symbols-outlined">shopping_bag</span>
+                      <div class="product-card <%= product.status === 'Out Of Stock' ? 'out-of-stock' : '' %>">
+                        <% if (product.status === 'Out Of Stock') { %>
+                          <span class="out-of-stock-label">Out of Stock</span>
+                        <% } %>
+                        <a href="/product/<%= product._id %>" class="product-link">
+                          <img src="<%= product.image || '/default-product.png' %>" alt="<%= product.name %>">
+                          <p class="product-name"><%= product.name %></p>
+                          <p class="price">
+                            <del class="old-price"><%= product.price.toFixed(2) %></del>
+                            <%= product.regularPrice.toFixed(2) %>
+                          </p>
+                        </a>
+                        <a href="/cart/add/<%= product._id %>" <%= product.status === 'Out Of Stock' ? 'class="disabled-link"' : '' %>>
+                          <button class="cart-btn" <%= product.status === 'Out Of Stock' ? 'disabled' : '' %>>
+                            <span class="material-symbols-outlined fav-icon">favorite</span>
                           </button>
                         </a>
-                        <span class="material-symbols-outlined fav-icon">favorite</span>
                       </div>
                     </div>
                   <% }) %>
@@ -249,24 +255,11 @@
                 </div>
               <% } %>
             </div>
-            <!-- <div class="product-card out-of-stock">
-              <span class="out-of-stock-label">Out of Stock</span>
-              <img src="/ladies-finger.png" alt="Ladies Finger">
-              <p class="product-name">Ladies Finger</p>
-              <p class="price"><span class="old-price">20.99₹ </span> 14.99₹</p>
-              <a href="#">
-                <button class="cart-btn">
-                  <span class="material-symbols-outlined">shopping_bag</span>
-                </button>
-              </a>
-              <div class="rating">⭐⭐⭐⭐</div>
-              <span class="material-symbols-outlined fav-icon">favorite</span>
-            </div> -->
           </div>
         </div>
 
         <!-- Pagination -->
-        <% if (totalPages => 1) { %>
+        <% if (totalPages >= 1) { %>
             <nav aria-label="Page navigation">
               <ul class="pagination justify-content-center mt-4">
                 <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
@@ -277,7 +270,7 @@
                     <a class="page-link" href="/shop?page=<%= i %>&search=<%= searchQuery %>&category=<%= selectedCategory %>&priceRange=<%= selectedPriceRange %>&sort=<%= selectedSort %>"><%= i %></a>
                   </li>
                 <% } %>
-                <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
+                <li class="page-item <%= currentPage === totalPages || products.length === 0 ? 'disabled' : '' %>">
                   <a class="page-link" href="/shop?page=<%= currentPage + 1 %>&search=<%= searchQuery %>&category=<%= selectedCategory %>&priceRange=<%= selectedPriceRange %>&sort=<%= selectedSort %>">Next</a>
                 </li>
               </ul>
@@ -286,7 +279,6 @@
       </div>
     </div>
   </div>
-
   <div class="footer-wrapper">
     <%- include("../../views/Partials/user/footer") %>
   </div>

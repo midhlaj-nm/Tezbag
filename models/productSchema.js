@@ -33,7 +33,7 @@ const productSchema = new Schema({
     },
     quantity: {
         type: Number,
-        default: true
+        default: 0
     },
     productImage: [{type: String}],
     isBlocked: {
@@ -42,14 +42,13 @@ const productSchema = new Schema({
     },
     status: {
         type: String,
-        enum: ['Available','Out of Stock'],
+        enum: ['Available','Out Of Stock'],
         required: true,
         default: 'Available'
     },
     SKU:{
         type: String,
         required: true,
-        default: null
     }
 },{timestamps: true});
 

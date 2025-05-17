@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const { v4: uuidv4 } = require('uuid');
+const Address = require('./addressSchema');
 const { Schema } = mongoose;
 
 const orderSchema = new Schema({
@@ -35,9 +36,14 @@ const orderSchema = new Schema({
     type: Number,
     required: true
   },
-  address: {
+  userId: {
     type: Schema.Types.ObjectId,
     ref: 'User',
+    required: true
+  },
+  address: {
+    type: Schema.Types.ObjectId,
+    ref: 'Address',
     required: true
   },
   invoiceDate: {

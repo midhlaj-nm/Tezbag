@@ -29,7 +29,7 @@ const userSchema = new Schema({
         required: false
     },
     oldPasswords: {
-        type: [String], // <-- NEW FIELD
+        type: [String], 
         default: []
     },
     isBlocked: {

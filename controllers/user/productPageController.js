@@ -1,7 +1,7 @@
 const Product = require('../../models/productSchema');
 const Category = require('../../models/categorySchema');
 
-const loadProduct = async (req, res) => {
+const loadshop = async (req, res) => {
   try {
     // Extract query parameters
     const { search, category, priceRange, sort, page = 1 } = req.query;
@@ -86,4 +86,27 @@ const loadProduct = async (req, res) => {
   }
 };
 
-module.exports = { loadProduct };
+const loadProductDetails = async (req, res) => {
+  try {
+    const productId = req.params.id;
+    const product = await Product.findById(productId)
+      .populate('category')
+      .lean();
+
+    if (!product || product.isBlocked) {
+      return res.redirect('/shop');
+    }
+
+    console.log('Product:', product); // Add this log to debug
+    console.log('Product Images:', product.productImage); // Add this log to debug
+
+    res.render('products', {
+      product
+    });
+  } catch (error) {
+    console.error('❌ Error loading product details:', error);
+    res.redirect('/404Error');
+  }
+};
+
+module.exports = { loadshop, loadProductDetails };

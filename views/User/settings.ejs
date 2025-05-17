@@ -1,4 +1,5 @@
-<%-include("../../views/Partials/user/header-srch")%>
+<%-include("../../views/Partials/user/header-ho")%>
+<hr style="margin: 0rem 0rem 1rem 0rem;">
 
 <link rel="stylesheet" href="/User-css/settings.css">
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -95,6 +96,14 @@
             <input type="text" id="streetAddress" placeholder="Street Address">
           </div>
         </div>
+
+        <!-- Row 2: Street Address -->
+        <div class="form-group">
+          <div class="input-wrapper full-width">
+            <label for="city">City</label>
+            <input type="text" id="city" placeholder="City">
+          </div>
+        </div>
   
         <!-- Row 3: Country, State, Landmark, Pincode -->
         <div class="form-group">
@@ -123,16 +132,16 @@
         <!-- Row 4: Email, Phone, Alt Phone -->
         <div class="form-group">
           <div class="input-wrapper">
-            <label for="email">Email</label>
-            <input type="email" id="email" placeholder="Email">
+            <label for="email">Email (optional)</label>
+            <input type="email" id="email" placeholder="Email (optional)">
           </div>
           <div class="input-wrapper">
             <label for="phone">Phone Number</label>
             <input type="tel" id="phone" placeholder="Phone">
           </div>
           <div class="input-wrapper">
-            <label for="altPhone">Alternative Phone</label>
-            <input type="tel" id="altPhone" placeholder="Alternative Phone">
+            <label for="altPhone">Alternative Phone (optional)</label>
+            <input type="tel" id="altPhone" placeholder="Alternative Phone (optional)">
           </div>
         </div>
   
