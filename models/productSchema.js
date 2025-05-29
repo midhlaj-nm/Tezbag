@@ -36,6 +36,10 @@ const productSchema = new Schema({
         default: 0
     },
     productImage: [{type: String}],
+    cuttingStyle: {
+        type: [String],
+        required: false
+    },
     isBlocked: {
         type: Boolean,
         default:false

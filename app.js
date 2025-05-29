@@ -3,6 +3,7 @@ const app = express();
 const path = require("path");
 const session = require("express-session");
 const flash = require('connect-flash');
+const nocache = require('nocache');
 const env = require("dotenv").config();
 const db = require("./config/db");
 const userRouter = require("./routes/userRouter");
@@ -11,8 +12,10 @@ const errorHandler = require('./middlewares/errorHandler');
 const passport = require('./config/passport')
 const passport_login = require('./config/passport-login')
 const stateRouter = require('./routes/countryStateApi');
+const breadcrump = require('./middlewares/breadcump')
 db();
 
+app.use(nocache())
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
@@ -40,7 +43,8 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(passport.initialize());
 app.use(passport.session())
 app.use(passport_login.initialize());
-app.use(passport_login.session())
+app.use(passport_login.session());
+app.use(breadcrump);
 app.use("/", userRouter);
 app.use('/tezgrani', adminRouter);
 app.use('/api', stateRouter);

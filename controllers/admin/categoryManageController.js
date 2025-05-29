@@ -1,13 +1,13 @@
 const Category = require('../../models/categorySchema');
 const slugify = require('slugify');
+const cloudinary = require('cloudinary').v2
 
 const loadCategory = async (req, res, next) => {
   try {
-
     let message = req.flash('message')[0] || null;
     let messageType = req.flash('messageType')[0] || null;
 
-    const limit = 6;
+    const limit = 5;
     const currentPage = parseInt(req.query.page) || 1;
     const search = req.query.search || "";
 
@@ -37,6 +37,7 @@ const loadCategory = async (req, res, next) => {
   }
 };
 
+// Add Category (with Cloudinary upload)
 const addCategory = async (req, res, next) => {
   try {
     console.log("➡️ addCategory controller triggered");
@@ -44,6 +45,7 @@ const addCategory = async (req, res, next) => {
     const { name, description } = req.body;
     console.log("📝 Request Body:", { name, description });
 
+    // Validation
     if (!name || !description) {
       console.warn("⚠️ Validation failed: Missing fields");
       return res.status(400).json({ success: false, message: "Name and description are required" });
@@ -66,11 +68,36 @@ const addCategory = async (req, res, next) => {
       return res.status(400).json({ success: false, message: "Category name already exists" });
     }
 
+    // Handle image upload to Cloudinary
+    let imageUrl = '';
+    let publicId = '';
+    if (req.files && req.files.length > 0) {
+      const file = req.files[0];
+      console.log("📤 Uploading image to Cloudinary...");
+
+      // Convert buffer to base64 for Cloudinary upload
+      const b64 = Buffer.from(file.buffer).toString('base64');
+      const dataURI = `data:${file.mimetype};base64,${b64}`;
+
+      // Upload to Cloudinary
+      const result = await cloudinary.uploader.upload(dataURI, {
+        folder: 'categories', // Optional: Store in a specific folder in Cloudinary
+        resource_type: 'image'
+      });
+
+      imageUrl = result.secure_url;
+      publicId = result.public_id;
+      console.log("✅ Image uploaded to Cloudinary:", { imageUrl, publicId });
+    }
+
+    // Create new category
     const newCategory = new Category({
       name,
       description,
       slug: slugify(name),
       isListed: false,
+      image: imageUrl,
+      publicId: publicId
     });
 
     console.log("📦 Saving new category:", newCategory);
@@ -81,12 +108,11 @@ const addCategory = async (req, res, next) => {
     return res.json({ success: true, message: "Category added successfully" });
   } catch (err) {
     console.error("❌ Error in addCategory:", err.message);
-    const error = new Error("Failed to add category");
-    error.status = 500;
-    next(error);
+    next(err);
   }
 };
 
+// Toggle Category Status (unchanged)
 const toggleCategoryStatus = async (req, res, next) => {
   try {
     console.log("🔁 toggleCategoryStatus triggered");
@@ -124,10 +150,12 @@ const toggleCategoryStatus = async (req, res, next) => {
   }
 };
 
+// Edit Category (with Cloudinary update/delete)
 const editCategory = async (req, res, next) => {
   try {
     const { name, description, isListed } = req.body;
 
+    // Validation
     if (!name || !description) {
       return res.status(400).json({ success: false, message: "Name and description are required" });
     }
@@ -148,10 +176,42 @@ const editCategory = async (req, res, next) => {
       return res.redirect("/404Error");
     }
 
+    // Handle image update
+    let imageUrl = category.image;
+    let publicId = category.publicId;
+
+    if (req.files && req.files.length > 0) {
+      const file = req.files[0];
+      console.log("📤 Uploading new image to Cloudinary...");
+
+      // Delete the old image from Cloudinary if it exists
+      if (category.publicId) {
+        console.log("🗑️ Deleting old image from Cloudinary:", category.publicId);
+        await cloudinary.uploader.destroy(category.publicId);
+      }
+
+      // Upload new image to Cloudinary
+      const b64 = Buffer.from(file.buffer).toString('base64');
+      const dataURI = `data:${file.mimetype};base64,${b64}`;
+
+      const result = await cloudinary.uploader.upload(dataURI, {
+        folder: 'categories',
+        resource_type: 'image'
+      });
+
+      imageUrl = result.secure_url;
+      publicId = result.public_id;
+      console.log("✅ New image uploaded to Cloudinary:", { imageUrl, publicId });
+    }
+
+    // Update category fields
     category.name = name;
     category.description = description;
     category.isListed = isListed !== undefined ? isListed : category.isListed;
     category.slug = slugify(name);
+    category.image = imageUrl;
+    category.publicId = publicId;
+
     await category.save();
 
     res.json({ success: true, message: "Category updated successfully" });

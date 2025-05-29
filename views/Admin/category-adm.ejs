@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Category Management</title>
   <link rel="stylesheet" href="/Admin-css/category-adm.css" />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=cancel" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
@@ -162,6 +162,8 @@
         <table class="category-table">
           <thead>
             <tr>
+                <th>SI. NO.</th>
+                <th>IMAGE</th>
                 <th>NAME</th>
                 <th>DESCRIPTION</th>
                 <th>STATUS</th>
@@ -172,7 +174,7 @@
           <tbody>
             <% if (!categories || categories.length === 0) { %>
               <tr>
-                <td colspan="5" style="padding: 1rem;">
+                <td colspan="7" style="padding: 1rem;">
                   <div style="
                     width: 105%;
                     display: flex;
@@ -187,8 +189,12 @@
                 </td>
               </tr>
             <% } %>
-            <% categories.forEach(category => { %>
+            <% categories.forEach((category, index) => { %>
               <tr>
+                <td><%= (currentPage - 1) * 10 + index + 1 %></td>
+                <td class="category-info">
+                  <img src="<%= category.image || '/default-category.png' %>" alt="Category Image" class="category-thumbnail">
+                </td>
                 <td><%= category.name %></td>
                 <td class="description-cell">
                   <%= category.description.length > 50 ? category.description.substring(0, 50) + '...' : category.description %>
@@ -202,7 +208,8 @@
                      data-categoryid="<%= category._id %>"
                      data-name="<%= category.name %>"
                      data-description="<%= category.description %>"
-                     data-islisted="<%= category.isListed %>">EDIT</a>
+                     data-islisted="<%= category.isListed %>"
+                     data-image="<%= category.image || '' %>">EDIT</a>
                   <a href="#" class="btn list-toggle" data-categoryid="<%= category._id %>" data-status="<%= category.isListed %>">
                     <%= category.isListed ? 'UNLIST' : 'LIST' %>
                   </a>
@@ -213,7 +220,7 @@
         </table>
       </div>
     </div>
-            <% if (totalPages >= 1) { %>
+    <% if (totalPages >= 1) { %>
       <nav aria-label="Admin page navigation" class="custom-pagination">
         <ul class="pagination-list">
           <!-- Previous Button -->
@@ -245,17 +252,32 @@
             <button class="close-btn" id="closePopup">×</button>
         </div>
         <div class="popup-content">
-            <form id="accountForm">
+            <form id="accountForm" enctype="multipart/form-data" novalidate>
                 <input type="hidden" id="categoryId" name="categoryId">
+                <input type="hidden" id="imageDeleted" name="imageDeleted" value="false">
                 <div class="form-group">
                     <label for="CategoryName">Category Name</label>
-                    <input type="text" id="CategoryName" name="CategoryName" placeholder="Enter Category Name">
+                    <input type="text" id="CategoryName" name="name" placeholder="Enter Category Name">
                     <div id="err1" class="errr-msg"></div>
                 </div>
                 <div class="form-group">
                     <label for="Description">Description</label>
-                    <input type="text" id="Description" name="Description" placeholder="Enter Category Description">
+                    <input type="text" id="Description" name="description" placeholder="Enter Category Description">
                     <div id="err2" class="errr-msg"></div>
+                </div>
+                <div class="form-group">
+                    <label for="categoryImage">Category Image</label>
+                    <div id="image-upload-container" class="image-upload-container">
+                        <input type="file" id="categoryImage" name="images" accept="image/*" class="image-input" style="display: none;">
+                        <div class="image-placeholder" id="imagePlaceholder" onclick="document.getElementById('categoryImage').click()">
+                            <span class="material-icons">
+                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f">
+                                    <path d="M480-480ZM200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h320v80H200v560h560v-320h80v320q0 33-23.5 56.5T760-120H200Zm40-160h480L570-480 450-320l-90-120-120 160Zm440-320v-80h-80v-80h80v-80h80v80h80v80h-80v80h-80Z"/>
+                                </svg>
+                            </span>
+                        </div>
+                    </div>
+                    <div id="errImage" class="errr-msg"></div>
                 </div>
             </form>
         </div>
@@ -331,7 +353,7 @@
             selectedButton.dataset.status = (!selectedCurrentStatus).toString();
             const row = selectedButton.closest("tr");
             const statusCell = row.querySelector(".status");
-            statusCell.textContent = !selectedCurrentStatus ? "Listed ✅" : "Unlisted ❌";
+            statusCell.textContent = !selectedCurrentStatus ? "Listed ✅" : "Unlisted❌";
             statusCell.className = "status " + (!selectedCurrentStatus ? "active" : "inactive");
             toastr.success("Category status updated successfully");
           } else {
@@ -354,6 +376,8 @@
       const categoryIdInput = document.getElementById("categoryId");
       const categoryNameInput = document.getElementById("CategoryName");
       const descriptionInput = document.getElementById("Description");
+      const imageInput = document.getElementById("categoryImage");
+      const imagePlaceholder = document.getElementById("imagePlaceholder");
 
       const closePopup = () => {
         popupOverlay.classList.add("hidden");
@@ -364,10 +388,19 @@
         categoryIdInput.value = "";
         categoryNameInput.value = "";
         descriptionInput.value = "";
+        imageInput.value = "";
+        document.getElementById('imageDeleted').value = 'false';
+        imagePlaceholder.innerHTML = `
+          <span class="material-icons">
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f">
+              <path d="M480-480ZM200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h320v80H200v560h560v-320h80v320q0 33-23.5 56.5T760-120H200Zm40-160h480L570-480 450-320l-90-120-120 160Zm440-320v-80h-80v-80h80v-80h80v80h80v80h-80v80h-80Z"/>
+            </svg>
+          </span>`;
         popupTitle.textContent = "Add Category";
         saveBtn.textContent = "Save Changes";
-        // Clear error messages
-        [errCategory, errDescription].forEach(err => {
+        saveBtn.disabled = false; // Re-enable the button
+        saveBtn.textContent = "Save Changes"; // Reset button text
+        [errCategory, errDescription, errImage].forEach(err => {
           err.textContent = "";
           err.style.display = "none";
         });
@@ -381,6 +414,23 @@
           descriptionInput.value = data.description || "";
           popupTitle.textContent = "Edit Category";
           saveBtn.textContent = "Update Category";
+          document.getElementById('imageDeleted').value = 'false';
+          if (data.image) {
+            imagePlaceholder.innerHTML = `
+              <img src="${data.image}" alt="Category Image" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
+              <div class="image-hover-controls">
+                <button type="button" class="control-btn edit-btn" onclick="event.stopPropagation(); document.getElementById('categoryImage').click()">
+                  <span class="material-symbols-outlined">edit</span>
+                </button>
+              </div>`;
+          } else {
+            imagePlaceholder.innerHTML = `
+              <span class="material-icons">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f">
+                  <path d="M480-480ZM200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h320v80H200v560h560v-320h80v320q0 33-23.5 56.5T760-120H200Zm40-160h480L570-480 450-320l-90-120-120 160Zm440-320v-80h-80v-80h80v-80h80v80h80v80h-80v80h-80Z"/>
+                </svg>
+              </span>`;
+          }
         } else {
           resetForm();
         }
@@ -393,6 +443,50 @@
       });
       cancelBtn?.addEventListener("click", closePopup);
 
+      // ================ Image Preview Handler ================
+      imageInput.addEventListener("change", (event) => {
+        const file = event.target.files[0];
+        if (file) {
+          if (!file.type.match('image.*')) {
+            errImage.textContent = "Please select a valid image file (e.g., JPEG, PNG).";
+            errImage.style.display = "block";
+            imageInput.value = "";
+            return;
+          }
+          if (file.size > 5 * 1024 * 1024) {
+            errImage.textContent = "Image file size must be less than 5MB.";
+            errImage.style.display = "block";
+            imageInput.value = "";
+            return;
+          }
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const isEditMode = !!categoryIdInput.value;
+            imagePlaceholder.innerHTML = `
+              <img src="${e.target.result}" alt="Category Image" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
+              <div class="image-hover-controls">
+                <button type="button" class="control-btn delete-btn" onclick="event.stopPropagation(); deleteImage()">
+                  <span class="material-symbols-outlined">edit</span>
+                </button>
+              </div>`;
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+
+      window.deleteImage = function() {
+        imageInput.value = "";
+        document.getElementById('imageDeleted').value = 'true';
+        imagePlaceholder.innerHTML = `
+          <span class="material-icons">
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f">
+              <path d="M480-480ZM200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h320v80H200v560h560v-320h80v320q0 33-23.5 56.5T760-120H200Zm40-160h480L570-480 450-320l-90-120-120 160Zm440-320v-80h-80v-80h80v-80h80v80h80v80h-80v80h-80Z"/>
+            </svg>
+          </span>`;
+        errImage.textContent = "";
+        errImage.style.display = "none";
+      };
+
       // ================ Edit Button Handler ================
       const editButtons = document.querySelectorAll(".edit-btn");
       editButtons.forEach(button => {
@@ -402,7 +496,8 @@
             categoryId: button.dataset.categoryid,
             name: button.dataset.name,
             description: button.dataset.description,
-            isListed: button.dataset.islisted === "true"
+            isListed: button.dataset.islisted === "true",
+            image: button.dataset.image
           };
           openPopup("edit", data);
         });
@@ -411,6 +506,7 @@
       // ================ Form Validation and API Calls ================
       const errCategory = document.getElementById("err1");
       const errDescription = document.getElementById("err2");
+      const errImage = document.getElementById("errImage");
 
       const validateInput = (input, errorElement, msg) => {
         const val = input.value.trim();
@@ -424,68 +520,80 @@
         return true;
       };
 
-      const addCategory = async (data) => {
-        try {
-          const response = await fetch('/tezgrani/category/save', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-          });
-          const result = await response.json();
-          if (result.success) {
-            toastr.success('Category added successfully');
-            closePopup();
-            window.location.reload();
-          } else {
-            toastr.error(result.message || 'Failed to add category');
-          }
-        } catch (error) {
-          console.error('Add category error:', error);
-          toastr.error('Something went wrong');
-        }
-      };
+      const validateImage = (imageInput, imageDeleted, existingImage, errorElement, msg) => {
+        const isEditMode = !!categoryIdInput.value;
+        const hasNewImage = imageInput.files && imageInput.files.length > 0;
+        const imageWasDeleted = imageDeleted.value === 'true';
+        const hasExistingImage = isEditMode && existingImage && !imageWasDeleted;
 
-      const editCategory = async (categoryId, data) => {
-        try {
-          const response = await fetch(`/tezgrani/category/update/${categoryId}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-          });
-          const result = await response.json();
-          if (result.success) {
-            toastr.success('Category updated successfully');
-            closePopup();
-            window.location.reload();
-          } else {
-            toastr.error(result.message || 'Failed to update category');
-          }
-        } catch (error) {
-          console.error('Update category error:', error);
-          toastr.error('Something went wrong');
+        if (!hasNewImage && !hasExistingImage) {
+          errorElement.textContent = msg;
+          errorElement.style.display = "block";
+          return false;
         }
+        errorElement.textContent = "";
+        errorElement.style.display = "none";
+        return true;
       };
 
       saveBtn?.addEventListener('click', async (e) => {
         e.preventDefault();
+
+        // Disable the button to prevent multiple submissions
+        saveBtn.disabled = true;
+        const originalText = saveBtn.textContent;
+        saveBtn.textContent = "Saving..."; // Show loading state
+
         const isCategoryValid = validateInput(categoryNameInput, errCategory, 'Category name is required');
         const isDescriptionValid = validateInput(descriptionInput, errDescription, 'Description is required');
+        const isImageValid = validateImage(
+          imageInput,
+          document.getElementById('imageDeleted'),
+          document.querySelector(`a[data-categoryid="${categoryIdInput.value}"]`)?.dataset.image,
+          errImage,
+          'Please add an image'
+        );
 
-        if (!isCategoryValid || !isDescriptionValid) return;
+        if (!isCategoryValid || !isDescriptionValid || !isImageValid) {
+          // Re-enable the button if validation fails
+          saveBtn.disabled = false;
+          saveBtn.textContent = originalText;
+          return;
+        }
 
         const categoryId = categoryIdInput.value;
         const isEditMode = !!categoryId;
 
-        const data = {
-          name: categoryNameInput.value.trim(),
-          description: descriptionInput.value.trim(),
-          isListed: isEditMode ? (document.querySelector(`a[data-categoryid="${categoryId}"]`).dataset.islisted === 'true') : true
-        };
+        const formData = new FormData(categoryForm);
+        const isListedValue = isEditMode ? (document.querySelector(`a[data-categoryid="${categoryId}"]`).dataset.islisted === 'true') : true;
+        formData.set('isListed', isListedValue);
 
-        if (isEditMode) {
-          await editCategory(categoryId, data);
-        } else {
-          await addCategory(data);
+        try {
+          const url = isEditMode ? `/tezgrani/category/update/${categoryId}` : '/tezgrani/category/save';
+          const method = isEditMode ? 'PUT' : 'POST';
+
+          const response = await fetch(url, {
+            method: method,
+            body: formData
+          });
+
+          const result = await response.json();
+          if (result.success) {
+            toastr.success(result.message);
+            closePopup();
+            setTimeout(() => {
+              window.location.reload();
+            }, 1000);
+          } else {
+            toastr.error(result.message || 'Failed to save category');
+            saveBtn.disabled = false;
+            saveBtn.textContent = originalText;
+          }
+        } catch (error) {
+          console.error('Error saving category:', error);
+          toastr.error('Something went wrong');
+          saveBtn.disabled = false;
+          saveBtn.textContent = originalText;
         }
       });
     });

@@ -901,3 +901,36 @@ textarea {
     justify-content: center;
   }
 }
+
+.checkbox-container {
+  max-height: fit-content;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 10px;
+}
+
+.checkbox-item {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  margin-bottom: 8px;
+  padding: 5px 0;
+}
+
+.checkbox-item input[type="checkbox"] {
+  grid-column: 1;
+  justify-self: start;
+  margin-left: 20px; /* Adjust this value as needed */
+  cursor: pointer;
+  width: 18px; /* Increase checkbox size */
+  height: 18px; /* Increase checkbox size */
+}
+
+.checkbox-item label {
+  grid-column: 2;
+  justify-self: start;
+  padding-left: 10px;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+}

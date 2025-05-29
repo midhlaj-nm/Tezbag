@@ -15,6 +15,22 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
+  <!-- breadcrumb -->
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/">Home</a></li>
+      <% breadcrumbs.forEach((crumb, index) => { %>
+        <li class="breadcrumb-item <%= index === breadcrumbs.length - 1 ? 'active' : '' %>">
+          <% if (index !== breadcrumbs.length - 1) { %>
+            <a href="<%= crumb.url %>"><%= crumb.name %></a>
+          <% } else { %>
+            <%= crumb.name %>
+          <% } %>
+        </li>
+      <% }) %>
+    </ol>
+  </nav>
+  
 <div class="page-wrapper">
   <!-- =======================Left area================= -->
   <div class="navigation-panel">

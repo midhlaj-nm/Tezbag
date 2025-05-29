@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const {SChema} = mongoose
+const {Schema} = mongoose
 
 
 const reviewSchema = new Schema({

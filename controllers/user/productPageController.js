@@ -1,10 +1,26 @@
 const Product = require('../../models/productSchema');
 const Category = require('../../models/categorySchema');
+const Review = require('../../models/reviewSchema')
 
 const loadshop = async (req, res) => {
   try {
     // Extract query parameters
     const { search, category, priceRange, sort, page = 1 } = req.query;
+
+    // Validate category if provided
+    if (category) {
+      const selectedCategory = await Category.findOne({ _id: category, isListed: true }).lean();
+      if (!selectedCategory) {
+        // Category doesn't exist or is not listed; redirect to /shop with other query params preserved
+        const queryParams = { search, priceRange, sort, page };
+        // Remove empty or undefined params
+        const filteredParams = Object.fromEntries(
+          Object.entries(queryParams).filter(([_, value]) => value != null && value !== '')
+        );
+        const queryString = new URLSearchParams(filteredParams).toString();
+        return res.redirect(`/shop${queryString ? `?${queryString}` : ''}`);
+      }
+    }
 
     // Fetch listed categories
     const categories = await Category.find({ isListed: true }).lean();
@@ -17,7 +33,7 @@ const loadshop = async (req, res) => {
       query.productName = { $regex: search, $options: 'i' }; // Case-insensitive search
     }
 
-    // Filter by category
+    // Filter by category (already validated)
     if (category) {
       query.category = category;
     }
@@ -89,6 +105,8 @@ const loadshop = async (req, res) => {
 const loadProductDetails = async (req, res) => {
   try {
     const productId = req.params.id;
+
+    // Fetch the product
     const product = await Product.findById(productId)
       .populate('category')
       .lean();
@@ -97,11 +115,19 @@ const loadProductDetails = async (req, res) => {
       return res.redirect('/shop');
     }
 
-    console.log('Product:', product); // Add this log to debug
-    console.log('Product Images:', product.productImage); // Add this log to debug
+    // Fetch reviews associated with this product
+    const reviews = await Review.find({ product: productId })
+      .populate('user', 'name email') // Populate user details (e.g., name)
+      .lean();
 
+    console.log('Product:', product); // Debug log
+    console.log('Product Images:', product.productImage); // Debug log
+    console.log('Reviews:', reviews); // Debug log for reviews
+
+    // Render the product page with both product and reviews
     res.render('products', {
-      product
+      product,
+      reviews, // Pass reviews to the template
     });
   } catch (error) {
     console.error('❌ Error loading product details:', error);

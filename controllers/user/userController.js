@@ -91,7 +91,7 @@ const loadHomepage = async (req, res, next) => {
           return {
             ...category,
             productCount,
-            image: banner?.image || null
+            image: category.image
           };
         })
       );
@@ -642,21 +642,17 @@ const resendOtp = async (req, res, next) => {
 // Logout
 // ===========================
 const logout = async (req, res) => {
-    try {
-        req.session.destroy((err) => {
-            if (err) {
-                console.error("❌ Session destroy error:", err.message);
-                return res.redirect('/404Error');
-            }
-            console.log("👋 User logged out");
-            res.redirect('/');
-        });
-    } catch (error) {
-        console.error("❌ Logout error:", error);
-        res.redirect('/404Error');
-    }
+  try {
+    // Clear the user property (optional, as destroy will handle this)
+    req.session.user = null;
+    // Redirect to login page
+    res.redirect('/');
+  } catch (error) {
+    console.error("❌ Logout error:", error);
+    res.redirect('/404Error');
+  }
 };
-
+    
 module.exports = {
     load404,
     loadHomepage,

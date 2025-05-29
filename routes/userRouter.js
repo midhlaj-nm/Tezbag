@@ -56,7 +56,7 @@ router.get('/account', userAuth, profileController.loadDashboard);
 router.get('/logout', userAuth, userController.logout);
 
 //productPage
-router.get('/shop', productPageController.loadshop)
-router.get('/product/:id', productPageController.loadProductDetails)
+router.get('/shop', userAuth, productPageController.loadshop)
+router.get('/product/:id', userAuth, productPageController.loadProductDetails)
 
 module.exports = router

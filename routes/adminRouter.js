@@ -24,9 +24,9 @@ router.patch('/user/block-toggle/:id', adminAuth, userManageController.isAction)
 
 //categoryManageController
 router.get('/category-management',adminAuth, categoryManageController.loadCategory);
-router.post('/category/save',adminAuth, categoryManageController.addCategory);
+router.post('/category/save',adminAuth,  upload.array('images', 1), categoryManageController.addCategory);
 router.patch('/list-toggle/:categoryId',adminAuth, categoryManageController.toggleCategoryStatus);
-router.put('/category/update/:id',adminAuth, categoryManageController.editCategory);
+router.put('/category/update/:id',adminAuth,  upload.array('images', 1), categoryManageController.editCategory);
 
 //productManageController
 router.get('/product-management', adminAuth, productManagementController.loadProduct);

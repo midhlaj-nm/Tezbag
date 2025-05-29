@@ -18,16 +18,18 @@
       </div>
       <div class="product-list">
         <% products.slice(0, 4).forEach(product => { %>
-          <div class="product-card">
-            <a href="/product/<%= product._id %>" class="product-link">
-              <img src="<%= product.image || '/default-product.png' %>" alt="<%= product.name %>">
-              <h3><%= product.name %></h3>
-              <p class="price">
-                <span class="sale-price"><%= product.regularPrice.toFixed(2) %> ₹</span>
-                <del class="regular-price"><%= product.price.toFixed(2) %> ₹</del>
-              </p>
-            </a>
-          </div>
+          <% if (product.status !== 'Out Of Stock') { %>
+            <div class="product-card">
+              <a href="/product/<%= product._id %>" class="product-link">
+                <img src="<%= product.image || '/default-product.png' %>" alt="<%= product.name %>">
+                <h3><%= product.name %></h3>
+                <p class="price">
+                  <span class="sale-price"><%= product.regularPrice.toFixed(2) %> ₹</span>
+                  <del class="regular-price"><%= product.price.toFixed(2) %> ₹</del>
+                </p>
+              </a>
+            </div>
+          <% } %>
         <% }) %>
       </div>
     </div>
@@ -66,6 +68,7 @@
       <section id="todays-fresh-items">
         <div class="product-row">
           <% latestProducts.forEach(product => { %>
+            <% if (product.status !== 'Out Of Stock') { %>
             <div class="product-card">
               <a href="/product/<%= product._id %>" class="product-link">
                 <img src="<%= product.image || '/default-product.png' %>" alt="<%= product.name %>">
@@ -76,6 +79,7 @@
                 </p>
               </a>
             </div>
+            <% } %>
           <% }) %>
         </div>
       </section>

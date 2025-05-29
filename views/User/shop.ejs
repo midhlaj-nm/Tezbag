@@ -90,11 +90,23 @@
       </span>
     </div>    
   </div>
-  <div id="breadcrumb">
-    <img src="/Breadcrumbs.jpg">
-  </div>
 
   <div class="shop-wrapper">
+    <!-- breadcrumb -->
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/">Home</a></li>
+        <% breadcrumbs.forEach((crumb, index) => { %>
+          <li class="breadcrumb-item <%= index === breadcrumbs.length - 1 ? 'active' : '' %>">
+            <% if (index !== breadcrumbs.length - 1) { %>
+              <a href="<%= crumb.url %>"><%= crumb.name %></a>
+            <% } else { %>
+              <%= crumb.name %>
+            <% } %>
+          </li>
+        <% }) %>
+      </ol>
+    </nav>
     <!-- Original dropdown filters -->
     <div class="filters">
       <div class="filters-left">
@@ -220,7 +232,7 @@
               <% if (products.length > 0) { %>
                 <div class="row">
                   <% products.forEach(product => { %>
-                    <div class="col-md">
+                    <div class="col-12 col-sm-6 col-md-3">
                       <div class="product-card <%= product.status === 'Out Of Stock' ? 'out-of-stock' : '' %>">
                         <% if (product.status === 'Out Of Stock') { %>
                           <span class="out-of-stock-label">Out of Stock</span>
@@ -229,8 +241,8 @@
                           <img src="<%= product.image || '/default-product.png' %>" alt="<%= product.name %>">
                           <p class="product-name"><%= product.name %></p>
                           <p class="price">
-                            <del class="old-price"><%= product.price.toFixed(2) %></del>
                             <%= product.regularPrice.toFixed(2) %>
+                            <del class="old-price"><%= product.price.toFixed(2) %></del>
                           </p>
                         </a>
                         <a href="/cart/add/<%= product._id %>" <%= product.status === 'Out Of Stock' ? 'class="disabled-link"' : '' %>>

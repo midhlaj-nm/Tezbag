@@ -424,78 +424,80 @@ a {
 /* Product Grid */
 .products-grid {
     width: 100%;
-}
-
-.product-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-}
-
-/* Product Card */
-.product-card {
+  }
+  
+  /* Product Card */
+  .product-card {
+    margin-bottom: 15px;
     background: white;
     padding: 15px;
     border-radius: 8px;
-    width: 220px;
+    width: 100%; /* Take full width of the Bootstrap column */
     position: relative;
     box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.product-card:hover {
+    /* Add min-height to ensure all cards are the same height */
+    min-height: 280px; /* Adjust based on your content */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Distribute content vertically */
+  }
+  
+  .product-card:hover {
     transform: translateY(-5px);
     border: 2px solid #048208;
-}
-
-.product-card img {
+  }
+  
+  .product-card img {
     width: 100%;
     height: 150px;
     object-fit: cover;
     border-radius: 8px;
     margin-bottom: 10px;
-}
-
-.product-card .product-name {
+  }
+  
+  .product-card .product-name {
     font-size: 16px;
     font-weight: 600;
     color: #333;
     margin: 10px 0 5px 0;
     transition: color 0.3s;
-}
-
-.product-card .price {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.4em; /* Adjust based on font size */
+    max-height: 2.8em; /* 2 lines * line-height */
+  }
+  
+  .product-card .price {
     font-size: 16px;
     color: #000000;
     font-weight: 500;
     margin-bottom: 0 !important;
-}
-
-.cart-btn {
+  }
+  
+  .cart-btn {
     position: absolute;
     bottom: 15px;
     right: 15px;
     background: none;
     border: none;
     cursor: pointer;
-}
-
-.material-symbols-outlined {
+  }
+  
+  .material-symbols-outlined {
     width: 30px;
     height: 30px;
-}
-
-.cart-btn:hover {
-    transform: scale(1.1);
-}
-
-.product-card .rating {
+  }
+  
+  .product-card .rating {
     font-size: 14px;
     color: #f39c12;
     margin-bottom: 5px;
-}
-
-/* Favorite Icon */
-.product-card .fav-icon {
+  }
+  
+  /* Favorite Icon */
+  .product-card .fav-icon {
     position: absolute;
     bottom: 1%;
     right: 5%;
@@ -503,19 +505,19 @@ a {
     color: black;
     cursor: pointer;
     transition: color 0.3s;
-}
-
-.product-card .fav-icon:hover {
+  }
+  
+  .product-card .fav-icon:hover {
     color: #e74c3c;
-}
-
-/* Out of Stock */
-.out-of-stock {
+  }
+  
+  /* Out of Stock */
+  .out-of-stock {
     position: relative;
     opacity: 0.7;
-}
-
-.out-of-stock-label {
+  }
+  
+  .out-of-stock-label {
     position: absolute;
     top: 10px;
     left: 10px;
@@ -526,14 +528,14 @@ a {
     font-weight: 500;
     border-radius: 4px;
     z-index: 1;
-}
-
-.old-price {
+  }
+  
+  .old-price {
     text-decoration: line-through;
     color: #999;
     margin-right: 5px;
     font-size: 14px;
-}
+  }
 
 /* Override Bootstrap's active pagination styling */
 .pagination .page-item.active .page-link {
@@ -622,3 +624,44 @@ a {
         width: 100%;
     }
 }
+
+
+
+.breadcrumb {
+    display: flex;
+    flex-wrap: wrap;
+    list-style: none;
+    padding: 0;
+    margin: 1rem 0;
+    background: none;
+  }
+  
+  .breadcrumb-item {
+    font-size: 14px;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+  }
+  
+  .breadcrumb-item + .breadcrumb-item::before {
+    content: "/";
+    color: #adb5bd;
+  }
+  
+  .breadcrumb-item a {
+    all: unset; /* Completely resets all default browser styles */
+    cursor: pointer;
+    color: #2f2f2f; /* Custom color */
+    font-weight: 500;
+  }
+  
+  .breadcrumb-item a:hover {
+    color: #000000;
+    text-decoration: underline;
+  }
+  
+  .breadcrumb-item.active {
+    color: #575757;
+    font-weight: 500;
+    pointer-events: none;
+  }

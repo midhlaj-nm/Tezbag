@@ -199,7 +199,7 @@
                     <td><%= product.category?.name %></td>
                     <td><%= product.regularPrice %>₹</td>
                     <td><%= product.salePrice %> ₹</td>
-                    <td><%= product.quantity %> kg</td>
+                    <td><%= product.quantity %></td>
                     <td class="status <%= product.status === 'Available' ? 'active' : 'inactive' %>">
                       <%= product.status %>
                     </td>
@@ -281,7 +281,7 @@
                 <option value="" disabled selected hidden>Select Category</option>
                 <% if (typeof categories !== 'undefined') { %>
                   <% categories.forEach(category => { %>
-                    <option value="<%= category._id %>"><%= category.name %></option>
+                    <option value="<%= category._id %>" data-name="<%= category.name %>"><%= category.name %></option>
                   <% }) %>
                 <% } %>
               </select>
@@ -298,9 +298,16 @@
               <div id="errMrp" class="errr-msg"></div>
             </div>
           </div>
+          <div class="form-group" id="cutStyleGroup" style="display: none; width: 100%;">
+            <label>Cutting Styles</label>
+            <div class="checkbox-container" id="cutStylesContainer">
+              <!-- Checkboxes will be populated dynamically -->
+            </div>
+            <div id="errCutStyles" class="errr-msg"></div>
+          </div>
           <div class="form-group">
-            <label for="qty">Qty (kg)</label>
-            <input type="number" id="qty" name="qty" placeholder="Enter Quantity (kg)" min="0" required>
+            <label for="qty">Qty</label>
+            <input type="number" id="qty" name="qty" placeholder="Enter Quantity" min="0" required>
             <div id="errQty" class="errr-msg"></div>
           </div>
           <div class="form-group">
@@ -352,6 +359,35 @@
 
   <script>
 document.addEventListener("DOMContentLoaded", function () {
+    // Define cutting styles for Meat and Fish, including "None"
+    const meatCutStyles = [
+      "None",
+      "Curry Cut",
+      "Biriyani Cut",
+      "Soup Cut",
+      "Bone Cut",
+      "Boneless Cut",
+      "Chops",
+      "Liver",
+      "Steak Cut",
+      "Heart",
+      "Keema (Minced)",
+      "Dry Fry Cut",
+      "Neck Cut",
+      "Full Chicken"
+    ];
+    const fishCutStyles = [
+      "None",
+      "Whole Fish",
+      "Sliced Cut",
+      "Steak Cut",
+      "Curry Cut",
+      "Fillet Cut",
+      "Head & Tail Removed",
+      "Butterfly Cut",
+      "Finger Cut",
+    ];
+
     // ==================== Sidebar Toggle ====================
     const sidebar = document.getElementById("adminSidebar");
     const icon = document.getElementById("drawer-icon");
@@ -371,8 +407,78 @@ document.addEventListener("DOMContentLoaded", function () {
     const imageCounter = document.getElementById("imageCounter");
     const existingImagesContainer = document.getElementById("existingImagesContainer");
     const deletedImagesContainer = document.getElementById("deletedImagesContainer");
+    const categorySelect = document.getElementById("category");
+    const cutStyleGroup = document.getElementById("cutStyleGroup");
+    const cutStylesContainer = document.getElementById("cutStylesContainer");
 
     let deletedImages = new Set(); // Track deleted images to avoid duplicates
+
+    // Function to populate Cut Styles checkboxes based on category
+    function populateCutStyles(categoryName) {
+      cutStylesContainer.innerHTML = ""; // Clear existing checkboxes
+      let styles = [];
+      if (categoryName === "Meat") {
+        styles = meatCutStyles;
+      } else if (categoryName === "Fish") {
+        styles = fishCutStyles;
+      }
+
+      styles.forEach(style => {
+        const checkboxDiv = document.createElement("div");
+        checkboxDiv.className = "checkbox-item";
+
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.name = "cutStyles";
+        checkbox.value = style;
+        checkbox.id = `cutStyle-${style.replace(/\s+/g, '-')}`; // Unique ID for each checkbox
+
+        const label = document.createElement("label");
+        label.htmlFor = checkbox.id;
+        label.textContent = style;
+
+        checkboxDiv.appendChild(checkbox);
+        checkboxDiv.appendChild(label);
+        cutStylesContainer.appendChild(checkboxDiv);
+
+        // Add event listener for "None" checkbox
+        if (style === "None") {
+          checkbox.addEventListener("change", function () {
+            if (this.checked) {
+              // Uncheck all other checkboxes if "None" is selected
+              const otherCheckboxes = cutStylesContainer.querySelectorAll('input[name="cutStyles"]:not([value="None"])');
+              otherCheckboxes.forEach(cb => {
+                cb.checked = false;
+              });
+            }
+          });
+        } else {
+          // Uncheck "None" if any other option is selected
+          checkbox.addEventListener("change", function () {
+            if (this.checked) {
+              const noneCheckbox = cutStylesContainer.querySelector('input[value="None"]');
+              if (noneCheckbox) {
+                noneCheckbox.checked = false;
+              }
+            }
+          });
+        }
+      });
+    }
+
+    // Show/Hide Cut Styles checkboxes and populate options based on category
+    categorySelect.addEventListener("change", function () {
+      const selectedOption = categorySelect.options[categorySelect.selectedIndex];
+      const categoryName = selectedOption.getAttribute("data-name");
+      if (categoryName === "Meat" || categoryName === "Fish") {
+        cutStyleGroup.style.display = "block";
+        populateCutStyles(categoryName);
+      } else {
+        cutStyleGroup.style.display = "none";
+        cutStylesContainer.innerHTML = ""; // Clear checkboxes
+        document.getElementById("errCutStyles").textContent = ""; // Clear error
+      }
+    });
 
     // Open modal for adding a new product
     openPopupBtn.addEventListener("click", () => {
@@ -386,6 +492,8 @@ document.addEventListener("DOMContentLoaded", function () {
       clearErrors();
       initializePlaceholders();
       updateImageCounter();
+      cutStyleGroup.style.display = "none"; // Reset Cut Styles visibility
+      cutStylesContainer.innerHTML = ""; // Reset Cut Styles checkboxes
       popup.classList.remove("hidden");
     });
 
@@ -437,6 +545,17 @@ document.addEventListener("DOMContentLoaded", function () {
         addImageChangeListeners();
         updateImageCounter();
 
+        // Show/Hide Cut Styles checkboxes based on category
+        const selectedOption = categorySelect.options[categorySelect.selectedIndex];
+        const categoryName = selectedOption.getAttribute("data-name");
+        if (categoryName === "Meat" || categoryName === "Fish") {
+          cutStyleGroup.style.display = "block";
+          populateCutStyles(categoryName);
+        } else {
+          cutStyleGroup.style.display = "none";
+          cutStylesContainer.innerHTML = "";
+        }
+
         popup.classList.remove("hidden");
       });
     });
@@ -449,6 +568,8 @@ document.addEventListener("DOMContentLoaded", function () {
       existingImagesContainer.innerHTML = "";
       deletedImagesContainer.innerHTML = "";
       deletedImages.clear();
+      cutStyleGroup.style.display = "none"; // Reset Cut Styles visibility
+      cutStylesContainer.innerHTML = ""; // Reset Cut Styles checkboxes
       updateImageCounter();
     });
 
@@ -468,6 +589,8 @@ document.addEventListener("DOMContentLoaded", function () {
         Array.from(deletedImages).forEach((url, index) => {
           formData.append(`deletedImages[${index}]`, url);
         });
+
+        // Ensure cutStyles is sent as an array (handled automatically by FormData with checkboxes)
 
         const productId = document.getElementById("productId").value;
         const url = productId ? `/tezgrani/product/edit/${productId}` : "/tezgrani/product/save";
@@ -713,6 +836,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const mrp = document.getElementById("mrp");
       const qty = document.getElementById("qty");
       const description = document.getElementById("description");
+      const cutStyles = Array.from(cutStylesContainer.querySelectorAll('input[name="cutStyles"]:checked')).map(cb => cb.value);
 
       if (!productName.value.trim()) {
         isValid = false;
@@ -722,6 +846,19 @@ document.addEventListener("DOMContentLoaded", function () {
       if (!category.value) {
         isValid = false;
         displayError("errCategory", "Please select a category.");
+      }
+
+      // Validate Cut Styles if visible (i.e., category is Meat or Fish)
+      const selectedOption = category.options[category.selectedIndex];
+      const categoryName = selectedOption ? selectedOption.getAttribute("data-name") : "";
+      if (categoryName === "Meat" || categoryName === "Fish") {
+        if (cutStyles.length === 0) {
+          isValid = false;
+          displayError("errCutStyles", "Please select at least one cutting style or 'None'.");
+        } else if (cutStyles.includes("None") && cutStyles.length > 1) {
+          isValid = false;
+          displayError("errCutStyles", "If 'None' is selected, no other cutting styles should be selected.");
+        }
       }
 
       if (!price.value.trim()) {

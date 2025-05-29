@@ -8,11 +8,11 @@ const loadProduct = async (req, res) => {
   try {
     const limit = 6;
     const currentPage = parseInt(req.query.page) || 1;
-    const search = req.query.search || "";
+    const search = req.query.search || '';
 
     const query = search
-      ? { productName: { $regex: new RegExp(search, 'i') } } // Changed 'name' to 'productName' to match your schema
-      : {};
+      ? { productName: { $regex: new RegExp(search, 'i') }, isBlocked: false } // Only show unblocked products
+      : { isBlocked: false };
 
     const totalCount = await Product.countDocuments(query);
     const totalPages = Math.ceil(totalCount / limit);
@@ -27,8 +27,16 @@ const loadProduct = async (req, res) => {
     // Fetch all listed categories (for the form)
     const categories = await Category.find({ isListed: true }).sort({ name: 1 });
 
-    console.log('Fetched Products:', products.map(p => ({ productName: p.productName, category: p.category?.name })));
+    console.log(
+      'Fetched Products:',
+      products.map(p => ({
+        productName: p.productName,
+        category: p.category?.name,
+        cuttingStyle: p.cuttingStyle,
+      }))
+    );
 
+    // Note: The view name 'products-adm' might need to be updated to match your actual EJS file ('product-management')
     res.render('products-adm', { products, categories, totalPages, search, currentPage });
   } catch (error) {
     console.error('Error loading products:', error);
@@ -44,30 +52,112 @@ const addProduct = async (req, res, next) => {
     console.log('req.body:', req.body);
 
     // Validate image count
-    const images = req.files;
+    const images = req.files || [];
     if (images.length < 3 || images.length > 5) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Please upload between 3 and 5 images.' 
+      return res.status(400).json({
+        success: false,
+        message: 'Please upload between 3 and 5 images.',
       });
     }
 
     // Check if req.body exists
     if (!req.body) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Form data is missing or malformed.' 
+      return res.status(400).json({
+        success: false,
+        message: 'Form data is missing or malformed.',
       });
     }
 
     // Extract form data
-    const { productName, category, price, mrp, qty, description } = req.body;
+    const { productName, category, price, mrp, qty, description, cutStyles } = req.body;
 
     // Validate required fields
     if (!productName || !category || !price || !mrp || !description || !qty) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Missing required fields (productName, category, price, mrp, qty, description).' 
+      return res.status(400).json({
+        success: false,
+        message: 'Missing required fields (productName, category, price, mrp, qty, description).',
+      });
+    }
+
+    // Validate price and MRP
+    const regularPrice = parseFloat(price);
+    const salePrice = parseFloat(mrp);
+    const quantity = parseInt(qty);
+
+    if (isNaN(regularPrice) || regularPrice <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Price must be a positive number.',
+      });
+    }
+    if (isNaN(salePrice) || salePrice <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'MRP must be a positive number.',
+      });
+    }
+    if (regularPrice > salePrice) {
+      return res.status(400).json({
+        success: false,
+        message: 'Price cannot be greater than MRP.',
+      });
+    }
+    if (isNaN(quantity) || quantity < 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Quantity must be a positive number.',
+      });
+    }
+
+    // Validate category by _id
+    const categoryDoc = await Category.findById(category);
+    if (!categoryDoc || !categoryDoc.isListed) {
+      console.log('Category not found or unlisted for ID:', category);
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid or unlisted category ID.',
+      });
+    }
+
+    // Validate cutting styles if category is Meat or Fish
+    let cuttingStyles = [];
+    if (['Meat', 'Fish'].includes(categoryDoc.name)) {
+      cuttingStyles = Array.isArray(cutStyles) ? cutStyles : cutStyles ? [cutStyles] : [];
+      if (cuttingStyles.length === 0) {
+        return res.status(400).json({
+          success: false,
+          message: "Please select at least one cutting style or 'None' for Meat or Fish products.",
+        });
+      }
+      if (cuttingStyles.includes('None') && cuttingStyles.length > 1) {
+        return res.status(400).json({
+          success: false,
+          message: "If 'None' is selected, no other cutting styles should be selected.",
+        });
+      }
+      // Optionally, validate against allowed cutting styles
+      const allowedStyles =
+        categoryDoc.name === 'Meat'
+          ? ["None","Curry Cut","Biriyani Cut","Soup Cut","Bone Cut","Boneless Cut","Chops","Liver","Steak Cut","Heart","Keema (Minced)","Dry Fry Cut","Neck Cut","Full Chicken"]
+          : ["None","Whole Fish","Sliced Cut","Steak Cut","Curry Cut","Fillet Cut","Head & Tail Removed","Butterfly Cut","Finger Cut",];
+      const invalidStyles = cuttingStyles.filter(style => !allowedStyles.includes(style));
+      if (invalidStyles.length > 0) {
+        return res.status(400).json({
+          success: false,
+          message: `Invalid cutting styles for ${categoryDoc.name}: ${invalidStyles.join(', ')}`,
+        });
+      }
+    }
+
+    // Check if product already exists in the same category (case-insensitive)
+    const productExists = await Product.findOne({
+      productName: { $regex: new RegExp(`^${productName}$`, 'i') },
+      category: categoryDoc._id, // Check duplicates within the same category
+    });
+    if (productExists) {
+      return res.status(400).json({
+        success: false,
+        message: 'Product already exists in this category, please try with another name.',
       });
     }
 
@@ -80,7 +170,7 @@ const addProduct = async (req, res, next) => {
             width: 440,
             height: 440,
             crop: 'fill',
-            folder: 'products'
+            folder: 'products',
           },
           (error, result) => {
             if (error) {
@@ -90,34 +180,12 @@ const addProduct = async (req, res, next) => {
             resolve(result.secure_url);
           }
         );
-        uploadStream.end(images[i].buffer); // Pass the file buffer directly
+        uploadStream.end(images[i].buffer);
       });
 
       const secureUrl = await uploadPromise;
       resizedImages.push(secureUrl);
     }
-
-    // Check if product already exists
-    const productExists = await Product.findOne({ productName });
-    if (productExists) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Product already exists, please try with another name' 
-      });
-    }
-
-    // Validate category by _id
-    const categoryDoc = await Category.findById(category);
-    if (!categoryDoc) {
-      console.log('Category not found for ID:', category);
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Invalid category ID' 
-      });
-    }
-
-    // Use qty to determine stock status
-    const quantity = parseInt(qty) || 0;
 
     // Generate SKU
     const SKU = generateSKU(categoryDoc, productName);
@@ -127,29 +195,30 @@ const addProduct = async (req, res, next) => {
       productName,
       description,
       category: categoryDoc._id,
-      regularPrice: parseFloat(price) || parseFloat(mrp),
-      salePrice: parseFloat(mrp) || parseFloat(price),
+      regularPrice,
+      salePrice,
       productImage: resizedImages,
-      SKU: SKU,
-      quantity: quantity,
-      status: quantity > 0 ? 'Available' : 'Out Of Stock'
+      SKU,
+      quantity,
+      cuttingStyle: cuttingStyles, // Add cutting styles
+      status: quantity > 0 ? 'Available' : 'Out Of Stock',
+      isBlocked: false, // Ensure default value
     });
 
     await newProduct.save();
 
     if (req.xhr || req.headers.accept.indexOf('json') > -1) {
-      return res.json({ success: true });
+      return res.json({ success: true, message: 'Product added successfully.' });
     } else {
-      return res.redirect('tezgrani/product-management');
+      return res.redirect('/tezgrani/product-management');
     }
-
   } catch (err) {
     console.error('Error saving product:', err);
     if (req.xhr || req.headers.accept.indexOf('json') > -1) {
-      return res.status(500).json({ 
-        success: false, 
+      return res.status(500).json({
+        success: false,
         message: 'Error saving product',
-        error: err.message 
+        error: err.message,
       });
     } else {
       return res.redirect('/404Error');
@@ -162,21 +231,25 @@ const toggleProductStatus = async (req, res) => {
   console.log('req.body:', req.body);
 
   if (!req.params || !req.params.productId) {
-    return res.status(400).json({ success: false, message: 'Product ID is required' });
+    return res.status(400).json({ success: false, message: 'Product not found.' });
   }
 
   if (!req.body || req.body.isBlocked === undefined) {
-    return res.status(400).json({ success: false, message: 'isBlocked field is required' });
+    return res.status(400).json({ success: false, message: 'Blocking field is required.' });
   }
 
   const { productId } = req.params;
   const { isBlocked } = req.body;
 
   try {
-    const product = await Product.findByIdAndUpdate(productId, { isBlocked }, { new: true });
+    const product = await Product.findById(productId);
     if (!product) {
-      return res.status(404).json({ success: false, message: 'Product not found' });
+      return res.status(404).json({ success: false, message: 'Product not found.' });
     }
+
+    product.isBlocked = isBlocked;
+    await product.save();
+
     res.json({ success: true, product });
   } catch (error) {
     console.error('Error in toggleProductStatus:', error);
@@ -186,10 +259,10 @@ const toggleProductStatus = async (req, res) => {
 
 const editProduct = async (req, res, next) => {
   try {
-    const { productId } = req.params; // Product ID from the URL
+    const { productId } = req.params;
 
     // Extract form data
-    const { productName, category, price, mrp, qty, description } = req.body;
+    const { productName, category, price, mrp, qty, description, cutStyles } = req.body;
 
     // Validate required fields
     if (!productName || !category || !price || !mrp || !qty || !description) {
@@ -225,18 +298,51 @@ const editProduct = async (req, res, next) => {
     if (isNaN(quantity) || quantity < 0) {
       return res.status(400).json({
         success: false,
-        message: 'Quantity must be a Positive number.',
+        message: 'Quantity must be a positive number.',
       });
     }
 
     // Validate category by _id
     const categoryDoc = await Category.findById(category);
-    if (!categoryDoc) {
-      console.log('Category not found for ID:', category);
+    if (!categoryDoc || !categoryDoc.isListed) {
+      console.log('Category not found or unlisted for ID:', category);
       return res.status(400).json({
         success: false,
-        message: 'Invalid category ID',
+        message: 'Invalid or unlisted category ID.',
       });
+    }
+
+    // Validate cutting styles if category is Meat or Fish
+    let cuttingStyles = [];
+    if (['Meat', 'Fish'].includes(categoryDoc.name)) {
+      cuttingStyles = Array.isArray(cutStyles) ? cutStyles : cutStyles ? [cutStyles] : [];
+      if (cuttingStyles.length === 0) {
+        return res.status(400).json({
+          success: false,
+          message: "Please select at least one cutting style or 'None' for Meat or Fish products.",
+        });
+      }
+      if (cuttingStyles.includes('None') && cuttingStyles.length > 1) {
+        return res.status(400).json({
+          success: false,
+          message: "If 'None' is selected, no other cutting styles should be selected.",
+        });
+      }
+      // Optionally, validate against allowed cutting styles
+      const allowedStyles =
+        categoryDoc.name === 'Meat'
+          ? ["None","Curry Cut","Biriyani Cut","Soup Cut","Bone Cut","Boneless Cut","Chops","Liver","Steak Cut","Heart","Keema (Minced)","Dry Fry Cut","Neck Cut","Full Chicken"]
+          : ["None","Whole Fish","Sliced Cut","Steak Cut","Curry Cut","Fillet Cut","Head & Tail Removed","Butterfly Cut","Finger Cut",];
+      const invalidStyles = cuttingStyles.filter(style => !allowedStyles.includes(style));
+      if (invalidStyles.length > 0) {
+        return res.status(400).json({
+          success: false,
+          message: `Invalid cutting styles for ${categoryDoc.name}: ${invalidStyles.join(', ')}`,
+        });
+      }
+    } else {
+      // If category is not Meat or Fish, clear cutting styles
+      cuttingStyles = [];
     }
 
     // Find the product by ID
@@ -250,19 +356,20 @@ const editProduct = async (req, res, next) => {
 
     // Check for duplicate product name if the name is being changed (case-insensitive)
     if (productName !== product.productName) {
-      const productExists = await Product.findOne({ 
+      const productExists = await Product.findOne({
         productName: { $regex: new RegExp(`^${productName}$`, 'i') },
-        _id: { $ne: productId } // Exclude the current product
+        category: product.category, // Check duplicates within the same category
+        _id: { $ne: productId },
       });
       if (productExists) {
         return res.status(400).json({
           success: false,
-          message:"Duplicate Found",
+          message: 'Product name already exists in this category.',
         });
       }
     }
 
-    // Handle deleted images (sent as deletedImages array from frontend)
+    // Handle deleted images
     let deletedImages = [];
     if (req.body.deletedImages) {
       deletedImages = Array.isArray(req.body.deletedImages)
@@ -272,23 +379,22 @@ const editProduct = async (req, res, next) => {
 
     // Remove deleted images from Cloudinary
     const existingImages = product.productImage || [];
-    const updatedImages = existingImages.filter((imageUrl) => !deletedImages.includes(imageUrl));
+    const updatedImages = existingImages.filter(imageUrl => !deletedImages.includes(imageUrl));
 
     for (const imageUrl of deletedImages) {
-      const publicId = imageUrl.split('/').slice(-2).join('/').split('.')[0]; // Extract public_id from URL (e.g., "products/image123")
+      const publicId = imageUrl.split('/').slice(-2).join('/').split('.')[0];
       try {
         await cloudinary.uploader.destroy(publicId);
       } catch (error) {
         console.error(`Failed to delete image from Cloudinary: ${publicId}`, error);
-        // Optionally, you might choose to continue despite failure to delete from Cloudinary
+        // Continue despite failure to avoid blocking the update
       }
     }
 
-    // Handle new images (uploaded via multer)
+    // Handle new images
     const newImages = req.files || [];
     const resizedImages = [];
 
-    // Upload new images to Cloudinary
     for (let i = 0; i < newImages.length; i++) {
       const uploadPromise = new Promise((resolve, reject) => {
         const uploadStream = cloudinary.uploader.upload_stream(
@@ -306,7 +412,7 @@ const editProduct = async (req, res, next) => {
             resolve(result.secure_url);
           }
         );
-        uploadStream.end(newImages[i].buffer); // Pass the file buffer directly
+        uploadStream.end(newImages[i].buffer);
       });
 
       const secureUrl = await uploadPromise;
@@ -316,7 +422,7 @@ const editProduct = async (req, res, next) => {
     // Combine remaining existing images with new images
     const finalImages = [...updatedImages, ...resizedImages];
 
-    // Validate image count (at least 3, max 5)
+    // Validate image count
     if (finalImages.length < 3 || finalImages.length > 5) {
       return res.status(400).json({
         success: false,
@@ -339,9 +445,9 @@ const editProduct = async (req, res, next) => {
     product.quantity = quantity;
     product.productImage = finalImages;
     product.SKU = SKU;
+    product.cuttingStyle = cuttingStyles; // Update cutting styles
     product.status = quantity > 0 ? 'Available' : 'Out Of Stock';
 
-    // Save the updated product
     await product.save();
 
     if (req.xhr || req.headers.accept.indexOf('json') > -1) {
@@ -349,7 +455,6 @@ const editProduct = async (req, res, next) => {
     } else {
       return res.redirect('/tezgrani/product-management');
     }
-
   } catch (error) {
     console.error('Error updating product:', error);
     if (req.xhr || req.headers.accept.indexOf('json') > -1) {
