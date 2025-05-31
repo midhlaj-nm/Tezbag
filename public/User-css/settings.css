@@ -1,13 +1,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 
-
 body {
     font-family: 'Poppins', sans-serif;
-  }  
+}  
 
-  .page-wrapper {
+* {
+    font-family: 'Poppins', sans-serif;
+}  
+ 
+
+.page-wrapper {
     display: flex;
-    flex-wrap: wrap;         /* This allows items to wrap if needed */
+    flex-wrap: wrap;
     gap: 30px;
     justify-content: center;
     max-width: 1090px;
@@ -15,6 +19,7 @@ body {
     width: 90%;
     box-sizing: border-box;
 }
+
 /* =========================== Nav-bar =========================== */
 .navigation-panel {
     height: fit-content;
@@ -24,15 +29,15 @@ body {
     border: 1px solid #ddd;
     border-radius: 10px;
     background-color: #fff;
-  }
-  
-  .nav-header {
+}
+
+.nav-header {
     font-size: 1.4rem;
     font-weight: 600;
     margin-bottom: 20px;
-  }
-  
-  .nav-item {
+}
+
+.nav-item {
     display: flex;
     align-items: center;
     gap: 12px;
@@ -40,64 +45,64 @@ body {
     margin-bottom: 20px;
     font-size: 1.2rem;
     cursor: pointer;
-    transition: color 0.2s ease;
-  }
-  
-  .nav-item i {
-    width: 20px;
-  }
-  
-  .nav-item:hover {
-    color: #000;
-  }
+}
 
-  .active {
+.nav-item i {
+    width: 20px;
+}
+
+.nav-item:hover {
     color: #000;
-  }
-/* ======================== Edit Acccount ======================== */
-  .rght-container{
+}
+
+.active {
+    color: #000;
+}
+
+/* ======================== Edit Account ======================== */
+.rght-container {
+  margin-bottom: 4%;
     padding: 25px 25px;
     border-radius: 10px;
     border: 1px solid #ccc;
     width: 65%;
     font-family: 'Poppins', sans-serif;
-  }
+    background-color: #fff;
+}
 
-  .settings-form {
+.settings-form {
     display: flex;
     flex-direction: column;
     gap: 4px;
-  }
-  
-  .settings-form label {
+}
+
+.settings-form label {
     font-weight: 600;
     margin-bottom: 1px;
     color: #333;
-  }
-  
-  .settings-form input {
+}
+
+.settings-form input {
     padding: 10px 12px;
     border: 1px solid #ccc;
     border-radius: 8px;
     font-size: 14px;
-    transition: border 0.2s ease-in-out;
     margin-bottom: 20px;
-  }
-  
-  .settings-form input:focus {
+}
+
+.settings-form input:focus {
     border-color: #28a745;
     outline: none;
-  }
-  
-  .button-group {
+}
+
+.button-group {
     display: flex;
     flex-wrap: wrap;
     gap: 15px;
-    margin-top: 20px;
-  }
-  
-  .save-btn,
-  .password-btn {
+}
+
+.save-btn,
+.password-btn {
     padding: 10px 20px;
     border: none;
     border-radius: 25px;
@@ -106,84 +111,34 @@ body {
     color: white;
     background-color: #28a745;
     cursor: pointer;
-    transition: background 0.3s ease;
-  }
-  
-  .save-btn:hover,
-  .password-btn:hover {
-    background-color: #218838;
-  }
-  
- /* ======================= Address Section ======================= */
+}
 
-  .rght-container-add {
-    padding: 25px;
-    border-radius: 10px;
-    border: 1px solid #ccc;
-    width: 65%;
-    margin-left: 22.5rem;
-    margin-bottom: 5%;
-    font-family: 'Poppins', sans-serif;
-    background-color: #fff;
-  }
-  
-  .address-form {
+.save-btn:hover,
+.password-btn:hover {
+    background-color: #218838;
+}
+
+/* ======================== Address Section ======================== */
+.address-section {
+    margin-top: 40px;
+}
+
+.section-header {
     display: flex;
-    flex-direction: column;
-    font-family: 'Poppins', sans-serif;
-  }
-  
-  .address-form h2 {
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 1.5rem;
-    font-size: 1.8rem;
-    font-weight: 600;
-    color: #333;
-  }
-  
-  .form-group {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    margin-bottom: 20px;
-  }
-  
-  .input-wrapper {
-    flex: 1;
-    min-width: 250px;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .input-wrapper.full-width {
-    flex: 100%;
-  }
-  
-  .input-wrapper label {
+}
+
+.section-header h2 {
+    font-size: 2rem;
     font-weight: 500;
-    margin-bottom: 6px;
     color: #333;
-    font-size: 14px;
-  }
-  
-  .input-wrapper input,
-  .input-wrapper select {
-    padding: 10px 12px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    font-size: 14px;
-    font-family: 'Poppins', sans-serif;
-    transition: border 0.2s ease-in-out;
-  }
-  
-  .input-wrapper input:focus,
-  .input-wrapper select:focus {
-    border-color: #28a745;
-    outline: none;
-  }
-  
-  .address-form button {
-    width: fit-content;
-    padding: 10px 24px;
+    margin: 0;
+}
+
+.add-address-btn {
+    padding: 10px 20px;
     border: none;
     border-radius: 25px;
     font-weight: 600;
@@ -191,20 +146,388 @@ body {
     color: white;
     background-color: #28a745;
     cursor: pointer;
-    transition: background 0.3s ease;
-    margin-top: 10px;
-  }
-  
-  .address-form button:hover {
-    background-color: #218838;
-  }
-  
-    
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
 
-  @media (max-width: 768px) {
+.add-address-btn:hover {
+    background-color: #218838;
+}
+
+.addresses-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.address-card {
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    padding: 20px;
+    background-color: #fff;
+    position: relative;
+}
+
+.address-card:hover {
+    border-color: #28a745;
+}
+
+.default-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background-color: #28a745;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.address-info h4 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.address-info p {
+    color: #666;
+    margin-bottom: 5px;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.address-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+}
+
+.action-btn {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #fff;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.action-btn:hover {
+    background-color: #f8f9fa;
+}
+
+.edit-btn:hover {
+    border-color: #28a745;
+    color: #28a745;
+}
+
+.delete-btn:hover {
+    border-color: #dc3545;
+    color: #dc3545;
+}
+
+.no-address {
+    text-align: center;
+    padding: 40px 20px;
+    color: #666;
+    background-color: #f8f9fa;
+    border-radius: 12px;
+    border: 2px dashed #ddd;
+}
+
+.no-address i {
+    font-size: 48px;
+    color: #ccc;
+    margin-bottom: 15px;
+}
+
+.no-address h3 {
+    font-size: 18px;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.no-address p {
+    margin-bottom: 20px;
+}
+
+/* ======================== Modal Styles ======================== */
+.modal-content {
+  background-color: #fff;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  width: 100%;
+  max-width: 600px;
+  height: 90%;
+  max-height: 600px;
+  overflow-y: hidden;
+  margin: 0 auto;
+  z-index: 1001;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header {
+    background-color: #fff;
+    border-bottom: 1px solid #dee2e6;
+    padding: 20px 25px;
+    flex-shrink: 0;
+}
+
+.modal-title {
+    font-weight: 600;
+    color: #333;
+    font-size: 1.25rem;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #666;
+  transition: color 0.2s ease;
+}
+
+.close-btn:hover {
+  color: #333;
+}
+
+.modal-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 25px;
+}
+
+.form-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.input-wrapper {
+    flex: 1;
+    min-width: 250px;
+    display: flex;
+    flex-direction: column;
+}
+
+.input-wrapper.full-width {
+    flex: 100%;
+}
+
+.input-wrapper label {
+    font-weight: 500;
+    margin-bottom: 6px;
+    color: #333;
+    font-size: 14px;
+}
+
+.input-wrapper input,
+.input-wrapper select {
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: 'Poppins', sans-serif;
+}
+
+.input-wrapper input:focus,
+.input-wrapper select:focus {
+    border-color: #28a745;
+    outline: none;
+}
+
+.optional {
+    color: #666;
+    font-weight: 400;
+}
+
+.modal-footer {
+    border-top: 1px solid #dee2e6;
+    padding: 20px 25px;
+    background-color: #fff;
+    flex-shrink: 0;
+}
+
+.btn-success {
+  background-color: #00B207 !important;
+  color: white !important;
+  padding: 10px 20px !important;
+  border-radius: 6px !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  border: none !important;
+  transition: background-color 0.2s ease !important;
+}
+
+.btn-success:hover {
+    background-color: #218838;
+    border-color: #218838;
+}
+
+.btn-secondary {
+    border-radius: 25px;
+    padding: 10px 20px;
+    font-weight: 600;
+}
+
+/* Confirmation Modal Styles */
+.confirmation-dialog {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .dialog-content {
+    font-family: 'Poppins', sans-serif;
+    background-color: white;
+    padding: 30px;
+    border-radius: 12px;
+    text-align: center;
+    width: 30%;
+    max-width: 400px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-clip: padding-box;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    outline: 0;
+  }
+  
+  .dialog-content h3 {
+    font-size: 1.7rem !important;
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #333;
+  }
+  
+  .dialog-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 30px;
+  }
+  
+  .btn-no {
+    font-family: 'Poppins', sans-serif;
+    background-color: #ff172e;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 25px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+  }
+  
+  .btn-no:hover {
+    background-color: #e30e24;
+  }
+  
+  .btn-yes {
+    font-family: 'Poppins', sans-serif;
+    background-color: #00B207;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 25px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+  }
+  
+  .btn-yes:hover {
+    background-color: #008C04;
+  }
+
+.errr-msg {
+    color: red;
+    font-size: 0.9rem;
+    margin-top: 5px;
+    padding-left: 2px;
+    font-weight: 500;
+    display: none; /* you can toggle this with JS */
+    text-align: left;
+  }
+
+  .breadcrumb {
+    display: flex;
+    flex-wrap: wrap;
+    list-style: none;
+    padding: 0;
+    margin: 1rem 0 1rem 3rem;
+    background: none;
+  }
+  
+  .breadcrumb-item {
+    font-size: 14px;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+  }
+  
+  .breadcrumb-item + .breadcrumb-item::before {
+    content: "/";
+    color: #adb5bd;
+  }
+  
+  .breadcrumb-item a {
+    all: unset; /* Completely resets all default browser styles */
+    cursor: pointer;
+    color: #2f2f2f; /* Custom color */
+    font-weight: 500;
+  }
+  
+  .breadcrumb-item a:hover {
+    color: #000000;
+    text-decoration: underline;
+  }
+  
+  .breadcrumb-item.active {
+    color: #575757;
+    font-weight: 500;
+    pointer-events: none;
+  }
+/* ======================== Responsive ======================== */
+@media (max-width: 768px) {
     .navigation-panel,
     .rght-container {
-      width: 100%;
+        width: 100%;
     }
-  }
-  
+
+    .section-header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: stretch;
+    }
+
+    .addresses-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .input-wrapper {
+        min-width: 100%;
+    }
+
+    .modal-content {
+        height: 90vh;
+    }
+}

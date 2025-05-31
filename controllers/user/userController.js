@@ -210,48 +210,34 @@ const loadVerifyEmail = async (req, res) => {
 // ===========================
 // Email Verification POST (Forget Passowrd)
 // ===========================
-const loadVerifyEmailPost = async (req, res, next) => {
-    try {
-        const { email } = req.body;
-        console.log("🔍 Received email for password reset:", email);
+const loadVerifyEmailPost = async (req, res) => {
+  try {
+      const { email } = req.body;
 
-        if (!email || email.trim() === "") {
-            req.flash('message', 'Enter your Email Address');
-            return res.redirect('/forget-password');
-        }
+      const user = await User.findOne({ email });
+      if (!user) {
+          req.flash('message', 'Email not found. Please register.');
+          return res.redirect('/forget-password');
+      }
 
-        const user = await User.findOne({ email });
+      const otp = generateOtp();
+      req.session.resetOtp = otp;
+      req.session.resetEmail = email;
+      req.session.otpType = "reset";
+      req.session.resetFlowOrigin = "forget-password"; // Add this to track the origin
 
-        if (!user) {
-            req.flash('message', 'User not found');
-            return res.redirect('/forget-password');
-        }
+      const emailSent = await sendVeriEmail(email, otp);
+      if (!emailSent) {
+          req.flash('message', 'Failed to send OTP. Try again later.');
+          return res.redirect('/forget-password');
+      }
 
-        // ✅ Save email in session
-        req.session.resetEmail = email;
-        console.log("✅ Email verified and stored in session:", req.session.resetEmail);
-
-        // ✅ Generate OTP
-        const otp = generateOtp(); // Make sure this function exists
-        req.session.resetOtp = otp;
-
-        // ✅ Send OTP to user's email
-        const emailSent = await sendVeriEmail(email, otp);
-        if (!emailSent) {
-            req.flash('message', 'Failed to send OTP. Try again later.');
-            return res.redirect('/forget-password');
-        }
-
-        console.log("📧 OTP sent to user:", otp);
-
-        // ✅ Redirect to OTP input page
-        req.session.otpType = "reset";
-        res.redirect('/otp-page');
-
-    } catch (error) {
-        console.error("💥 Error in loadVerifyEmailPost:", error);
-        next(error);
-    }
+      console.log("📧 OTP sent to user:", otp);
+      res.redirect('/otp-page');
+  } catch (error) {
+      console.error("💥 Error in loadVerifyEmailPost:", error);
+      res.redirect('/404Error');
+  }
 };
 
 // ===========================
@@ -320,78 +306,86 @@ const loadResetPassPage = async (req, res) => {
 // Reset Password POST
 // ===========================
 const resetPasswordPost = async (req, res, next) => {
-    try {
-        const { password, confirmPassword } = req.body;
-        const email = req.session.resetEmail;
+  try {
+      const { password, confirmPassword } = req.body;
+      const email = req.session.resetEmail;
 
-        console.log("🧩 Reset password for:", email);
+      console.log("🧩 Reset password for:", email);
 
-        if (!email) {
-            req.flash('message', 'Timeout. Please verify your email again.');
-            return res.redirect('/forget-password');
-        }
+      if (!email) {
+          req.flash('message', 'Timeout. Please verify your email again.');
+          return res.redirect('/forget-password');
+      }
 
-        if (!password || !confirmPassword) {
-            req.flash('message', 'Please fill in all fields.');
-            return res.redirect('/reset-password');
-        }
+      if (!password || !confirmPassword) {
+          req.flash('message', 'Please fill in all fields.');
+          return res.redirect('/reset-password');
+      }
 
-        if (password !== confirmPassword) {
-            req.flash('message', 'Passwords do not match.');
-            return res.redirect('/reset-password');
-        }
+      if (password !== confirmPassword) {
+          req.flash('message', 'Passwords do not match.');
+          return res.redirect('/reset-password');
+      }
 
-        const user = await User.findOne({ email });
-        if (!user) {
-            req.flash('message', 'User not found.');
-            return res.redirect('/reset-password');
-        }
+      const user = await User.findOne({ email });
+      if (!user) {
+          req.flash('message', 'User not found.');
+          return res.redirect('/reset-password');
+      }
 
-        console.log("🔐 Old (stored hashed) password:", user.password);
-        console.log("🔑 New (plain) password:", password);
+      console.log("🔐 Old (stored hashed) password:", user.password);
+      console.log("🔑 New (plain) password:", password);
 
-        const isSameAsCurrent = await bcrypt.compare(password, user.password);
+      const isSameAsCurrent = await bcrypt.compare(password, user.password);
 
-        let isSameAsOld = false;
-        if (user.oldPasswords && Array.isArray(user.oldPasswords)) {
-            for (let old of user.oldPasswords) {
-                const match = await bcrypt.compare(password, old);
-                if (match) {
-                    isSameAsOld = true;
-                    break;
-                }
-            }
-        }
+      let isSameAsOld = false;
+      if (user.oldPasswords && Array.isArray(user.oldPasswords)) {
+          for (let old of user.oldPasswords) {
+              const match = await bcrypt.compare(password, old);
+              if (match) {
+                  isSameAsOld = true;
+                  break;
+              }
+          }
+      }
 
-        if (isSameAsCurrent || isSameAsOld) {
-            req.flash('message', 'This password was used before. Please use a new one.');
-            return res.redirect('/reset-password');
-        }
+      if (isSameAsCurrent || isSameAsOld) {
+          req.flash('message', 'This password was used before. Please use a new one.');
+          return res.redirect('/reset-password');
+      }
 
-        // Store current password in oldPasswords array
-        if (user.password) {
-            if (!user.oldPasswords) user.oldPasswords = [];
-            if (user.oldPasswords.length >= 3) user.oldPasswords.shift(); // Keep only last 3
-            user.oldPasswords.push(user.password);
-        }
+      // Store current password in oldPasswords array
+      if (user.password) {
+          if (!user.oldPasswords) user.oldPasswords = [];
+          if (user.oldPasswords.length >= 3) user.oldPasswords.shift(); // Keep only last 3
+          user.oldPasswords.push(user.password);
+      }
 
-        const hashedPassword = await bcrypt.hash(password, 10);
-        console.log("🔑 New (plain) hashedPassword:", hashedPassword);
+      const hashedPassword = await bcrypt.hash(password, 10);
+      console.log("🔑 New (plain) hashedPassword:", hashedPassword);
 
-        user.password = hashedPassword;
-        await user.save();
+      user.password = hashedPassword;
+      await user.save();
 
-        delete req.session.resetEmail;
+      // Clear session variables
+      delete req.session.resetEmail;
+      req.session.otpType = null;
+      req.session.resetFlowOrigin = req.session.resetFlowOrigin || "forget-password"; // Default to forget-password if not set
 
-        console.log("✅ Password successfully updated for", email);
-        req.flash('message', 'Password updated successfully. Please log in.');
-        req.flash('messageType', 'success');
-        return res.redirect('/login');
+      console.log("✅ Password successfully updated for", email);
+      req.flash('message', 'Password updated successfully.');
+      req.flash('messageType', 'success');
 
-    } catch (error) {
-        console.error("💥 Error resetting password:", error);
-        next(error);
-    }
+      // Determine redirect URL based on the origin of the flow
+      const redirectUrl = req.session.resetFlowOrigin === "account-settings" ? "/account-settings" : "/login";
+      req.session.resetFlowOrigin = null; // Clear the origin
+
+      return res.redirect(redirectUrl);
+
+  } catch (error) {
+      console.error("💥 Error resetting password:", error);
+      next(error);
+  }
 };
 
 // ===========================

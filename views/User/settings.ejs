@@ -1,221 +1,822 @@
-<%-include("../../views/Partials/user/header-ho")%>
+<link rel="stylesheet" href="/User-css/settings.css">
+<%- include("../../views/Partials/user/header-ho") %>
 <hr style="margin: 0rem 0rem 1rem 0rem;">
 
-<link rel="stylesheet" href="/User-css/settings.css">
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <!-- Toastr CSS & JS -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet"/>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.css" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.js"></script>
 
 <!-- Bootstrap CSS -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 
-<!-- Font&Icon -->
+<!-- Font & Icon -->
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
+<style>
+.default-checkbox-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 1rem 0;
+}
+
+.default-checkbox-wrapper input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: #28a745;
+    cursor: pointer;
+}
+
+.default-checkbox-wrapper label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    cursor: pointer;
+    margin: 0;
+}
+
+#toast-container > .toast {
+    opacity: 1;
+}
+.toast-success {
+    background-color: #4CAF50;
+}
+.toast-error {
+    background-color: #e92e20;
+}
+
+.errr-msg {
+    color: red;
+    font-size: 0.9rem;
+    display: none;
+    margin-top: 5px;
+}
+
+/* Style the server-error-message when it has content */
+.server-error-message {
+    background-color: #ffe5e5;
+    color: #d10000;
+    font-weight: 500;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+/* Loading Indicator Styles */
+.loading-indicator {
+    display: none;
+    margin-left: 8px;
+}
+.loading-indicator.active {
+    display: inline-block;
+}
+.spinner {
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #3498db;
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    animation: spin 1s linear infinite;
+    display: inline-block;
+    vertical-align: middle;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+.password-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+</style>
+
+<!-- breadcrumb -->
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/">Home</a></li>
+        <% breadcrumbs.forEach((crumb, index) => { %>
+            <li class="breadcrumb-item <%= index === breadcrumbs.length - 1 ? 'active' : '' %>">
+                <% if (index !== breadcrumbs.length - 1) { %>
+                    <a href="<%= crumb.url %>"><%= crumb.name %></a>
+                <% } else { %>
+                    <%= crumb.name %>
+                <% } %>
+            </li>
+        <% }) %>
+    </ol>
+</nav>
+
 <div class="page-wrapper">
     <!-- =======================Left area================= -->
     <div class="navigation-panel">
-      <div class="nav-header">Navigation</div>
-      
-      <div class="nav-item" onclick="window.location.href='/account'">
-          <span class="material-symbols-outlined">Dashboard</span>Dashboard
-      </div>
-      <div class="nav-item" onclick="window.location.href=''">
-        <i class="fa-solid fa-rotate"></i> Order History
-      </div>
-      <div class="nav-item" onclick="window.location.href=''">
-          <span class="material-symbols-outlined">favorite</span>Wishlist
-      </div>
-      <div class="nav-item" onclick="window.location.href=''">
-          <span class="material-symbols-outlined">shopping_cart</span>Shopping Cart
-      </div>
-      <div class="nav-item active" onclick="window.location.href='/account-settings'">
-          <span class="material-symbols-outlined">settings</span>Settings
-      </div>
-      <div class="nav-item" onclick="window.location.href='#'">
-          <span class="material-symbols-outlined">wallet</span>Wallet
-      </div>
-      <div class="nav-item" onclick="window.location.href='/logout'">
-          <span class="material-symbols-outlined">logout</span>Log-out
-      </div>
+        <div class="nav-header">Navigation</div>
+        
+        <div class="nav-item" onclick="window.location.href='/account'">
+            <span class="material-symbols-outlined">dashboard</span>Dashboard
+        </div>
+        <div class="nav-item" onclick="window.location.href=''">
+            <i class="fa-solid fa-rotate"></i> Order History
+        </div>
+        <div class="nav-item" onclick="window.location.href=''">
+            <span class="material-symbols-outlined">favorite</span>Wishlist
+        </div>
+        <div class="nav-item" onclick="window.location.href=''">
+            <span class="material-symbols-outlined">shopping_cart</span>Shopping Cart
+        </div>
+        <div class="nav-item active" onclick="window.location.href='/account-settings'">
+            <span class="material-symbols-outlined">settings</span>Settings
+        </div>
+        <div class="nav-item" onclick="window.location.href='#'">
+            <span class="material-symbols-outlined">wallet</span>Wallet
+        </div>
+        <div class="nav-item" onclick="showLogoutModal()">
+            <span class="material-symbols-outlined">logout</span>Log-out
+        </div>
     </div>
 
-
-      <!-- =============================Right area================================ -->
-      <div class="rght-container">
-        <h2 style="margin-bottom: 1.5rem;">Account Settings</h2>
+    <!-- =============================Right area================================ -->
+    <div class="rght-container">
+        <h2>Account Settings</h2>
         <div style="border-bottom: 1px solid #ccc; width: 100%; margin-bottom: 1.5rem;"></div>             
-        <form class="settings-form">
-          <label for="firstName">First name</label>
-          <input type="text" id="firstName" placeholder="First Name" />
-    
-          <label for="lastName">Last name</label>
-          <input type="text" id="lastName" placeholder="last Name" />
-    
-          <label for="email">Email</label>
-          <input type="email" id="email" placeholder="email id" />
-    
-          <div class="button-group">
-            <button type="submit" class="save-btn">Save Changes</button>
-            <button type="button" class="password-btn">Change Password</button>
-          </div>
-        </form>
-      </div>
-
-<!-- ======Address-editing-Section============ -->
-<div class="rght-container-add"  id="edit-address">
-    <form class="settings-form-add">
-      <div class="address-form">
-        <h2>Edit Address</h2>
-        <div style="border-bottom: 1px solid #ccc; width: 100%; margin-bottom: 1.5rem;"></div>
-  
-        <!-- Row 1: First Name, Last Name, Company Name -->
-        <div class="form-group">
-          <div class="input-wrapper">
+        <form class="settings-form" id="profileForm" novalidate onsubmit="updateProfile(event)">
             <label for="firstName">First name</label>
-            <input type="text" id="firstName" placeholder="First name">
-          </div>
-          <div class="input-wrapper">
-            <label for="lastName">Last name</label>
-            <input type="text" id="lastName" placeholder="Last name">
-          </div>
-          <div class="input-wrapper">
-            <label for="company">Company name <span class="optional">(optional)</span></label>
-            <input type="text" id="company" placeholder="Company Name (optional)">
-          </div>
-        </div>
-  
-        <!-- Row 2: Street Address -->
-        <div class="form-group">
-          <div class="input-wrapper full-width">
-            <label for="streetAddress">Street address</label>
-            <input type="text" id="streetAddress" placeholder="Street Address">
-          </div>
-        </div>
+            <input type="text" id="firstName" name="firstName" placeholder="First Name" value="<%= user.firstName %>" />
+            <div id="errFirstName" class="errr-msg"></div>
 
-        <!-- Row 2: Street Address -->
-        <div class="form-group">
-          <div class="input-wrapper full-width">
-            <label for="city">City</label>
-            <input type="text" id="city" placeholder="City">
-          </div>
+            <label for="lastName">Last name</label>
+            <input type="text" id="lastName" name="lastName" placeholder="Last Name" value="<%= user.lastName %>" />
+            <div id="errLastName" class="errr-msg"></div>
+
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" placeholder="Email" value="<%= user.email %>" />
+            <div id="errEmail" class="errr-msg"></div>
+
+            <div class="button-group">
+                <button type="submit" class="save-btn">Save Changes</button>
+                <button type="button" class="password-btn" id="change-password-btn" onclick="changePassword()">
+                    Change Password
+                    <span id="loading-indicator" class="loading-indicator">
+                        <span class="spinner"></span>
+                    </span>
+                </button>
+            </div>
+        </form>
+
+        <!-- Address Management Section -->
+        <div class="address-section">
+            <div class="section-header">
+                <h2>Addresses</h2>
+                <button class="add-address-btn" onclick="openAddressModal()">
+                    <i class="fas fa-plus"></i>
+                    Add Address
+                </button>
+            </div>
+            <div style="border-bottom: 1px solid #ccc; width: 100%; margin-bottom: 1.5rem;"></div>
+
+            <!-- Address Cards Container -->
+            <div class="addresses-grid" id="addressesContainer">
+                <% if (addresses && addresses.length > 0) { %>
+                    <% addresses.forEach((address, index) => { %>
+                        <div class="address-card <%= address.isDefault ? 'default' : '' %>" data-index="<%= index %>">
+                            <% if (address.isDefault) { %>
+                                <div class="default-badge">Default</div>
+                            <% } %>
+                            <div class="address-info">
+                                <h4><%= address.firstName %> <%= address.lastName %></h4>
+                                <p><%= address.streetAddress %><%= address.landMark ? ', ' + address.landMark : '' %>, <%= address.city %>, <%= address.state %> <%= address.pinCode %></p>
+                                <p><strong>Phone:</strong> <%= address.phone %></p>
+                            </div>
+                            <div class="address-actions">
+                                <button class="action-btn edit-btn" onclick="editAddress()">
+                                    <span class="material-symbols-outlined">edit</span>
+                                </button>
+                                <button class="action-btn delete-btn" onclick="showConfirmModal()">
+                                    <span class="material-symbols-outlined">delete</span>
+                                </button>
+                            </div>
+                        </div>
+                    <% }); %>
+                <% } else { %>
+                    <!-- No Address State -->
+                    <div class="no-address" id="noAddressState">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="60px" viewBox="0 -960 960 960" width="60px" fill="#737373"><path d="M522-82v-60q45-6 87.5-23.5T689-212l41 44q-46 38-98 59T522-82Zm269-148-43-41q27-36 45-77.5t25-89.5h61q-8 60-30.5 112.5T791-230Zm27-292q-7-48-25-89t-45-78l43-41q38 50 58 99t30 109h-61ZM437-82Q284-99 182.5-212.5T81-480q0-154 101.5-267.5T437-878v60q-128 17-212 113t-84 225q0 129 84 225t212 113v60Zm253-666q-39-27-81.5-44.5T524-818v-60q54 8 107 29t99 57l-40 44ZM480-269q-60-51-113.5-110T313-516q0-71 48.5-121.5T480-688q70 0 118.5 50.5T647-516q0 78-53.5 137T480-269Zm0-209q19 0 32-13t13-32q0-17-13-31t-32-14q-19 0-32 14t-13 31q0 19 13 32t32 13Z"/></svg>
+                        <h3>No Addresses Found</h3>
+                        <p>You haven't added any addresses yet. Add your first address.</p>
+                    </div>
+                <% } %>
+            </div>
         </div>
-  
-        <!-- Row 3: Country, State, Landmark, Pincode -->
-        <div class="form-group">
-          <div class="input-wrapper">
-            <label for="countrySelect">Country</label>
-            <select id="countrySelect" name="country">
-                <option value="" disabled selected hidden>Select Country</option>
-            </select>
-          </div>
-          <div class="input-wrapper">
-            <label for="stateSelect">State</label>
-            <select id="stateSelect" name="state">
-                <option value="" disabled selected hidden>Select State</option>
-            </select>
-          </div>
-          <div class="input-wrapper">
-            <label for="landmark">Landmark</label>
-            <input type="text" id="landmark" placeholder="Landmark">
-          </div>
-          <div class="input-wrapper">
-            <label for="zipcode">Zip Code</label>
-            <input type="text" id="zipcode" placeholder="Zip Code">
-          </div>
-        </div>
-  
-        <!-- Row 4: Email, Phone, Alt Phone -->
-        <div class="form-group">
-          <div class="input-wrapper">
-            <label for="email">Email (optional)</label>
-            <input type="email" id="email" placeholder="Email (optional)">
-          </div>
-          <div class="input-wrapper">
-            <label for="phone">Phone Number</label>
-            <input type="tel" id="phone" placeholder="Phone">
-          </div>
-          <div class="input-wrapper">
-            <label for="altPhone">Alternative Phone (optional)</label>
-            <input type="tel" id="altPhone" placeholder="Alternative Phone (optional)">
-          </div>
-        </div>
-  
-        <!-- Button -->
-        <button type="submit">Save Changes</button>
-      </div>
-    </form>
-  </div>
+    </div>
 </div>
 
+<!-- Address Modal -->
+<div class="modal fade" id="addressModal" tabindex="-1" aria-labelledby="addressModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addressModalLabel">Add Address</h5>
+                <button class="close-btn" id="closePopup" onclick="closeAddressModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <form id="addressForm" novalidate>
+                    <!-- Hidden field for index when editing -->
+                    <input type="hidden" id="editIndex" name="index">
 
+                    <!-- Row 1: First Name, Last Name, Company Name -->
+                    <div class="form-group">
+                        <div class="input-wrapper">
+                            <label for="modalFirstName">First name</label>
+                            <input type="text" id="modalFirstName" name="firstName" placeholder="First name">
+                            <div id="errFirstName" class="errr-msg"></div>
+                        </div>
+                        <div class="input-wrapper">
+                            <label for="modalLastName">Last name</label>
+                            <input type="text" id="modalLastName" name="lastName" placeholder="Last name">
+                            <div id="errLastName" class="errr-msg"></div>
+                        </div>
+                        <div class="input-wrapper">
+                            <label for="modalCompany">Company name <span class="optional">(optional)</span></label>
+                            <input type="text" id="modalCompany" name="company" placeholder="Company Name (optional)">
+                        </div>
+                    </div>
 
+                    <!-- Row 2: Street Address -->
+                    <div class="form-group">
+                        <div class="input-wrapper full-width">
+                            <label for="modalStreetAddress">Street address</label>
+                            <input type="text" id="modalStreetAddress" name="streetAddress" placeholder="Street Address">
+                            <div id="errStreetAddress" class="errr-msg"></div>
+                        </div>
+                    </div>
 
+                    <!-- Row 3: City -->
+                    <div class="form-group">
+                        <div class="input-wrapper full-width">
+                            <label for="modalCity">City</label>
+                            <input type="text" id="modalCity" name="city" placeholder="City">
+                            <div id="errCity" class="errr-msg"></div>
+                        </div>
+                    </div>
 
+                    <!-- Row 4: Country, State, Landmark, Pincode -->
+                    <div class="form-group">
+                        <div class="input-wrapper">
+                            <label for="modalCountrySelect">Country</label>
+                            <select id="modalCountrySelect" name="country">
+                                <option value="" disabled selected hidden>Select Country</option>
+                            </select>
+                            <div id="errCountry" class="errr-msg"></div>
+                        </div>
+                        <div class="input-wrapper">
+                            <label for="modalStateSelect">State</label>
+                            <select id="modalStateSelect" name="state">
+                                <option value="" disabled selected hidden>Select State</option>
+                            </select>
+                            <div id="errState" class="errr-msg"></div>
+                        </div>
+                        <div class="input-wrapper">
+                            <label for="modalLandmark">Landmark</label>
+                            <input type="text" id="modalLandmark" name="landmark" placeholder="Landmark">
+                            <div id="errLandmark" class="errr-msg"></div>
+                        </div>
+                        <div class="input-wrapper">
+                            <label for="modalZipcode">Zip Code</label>
+                            <input type="text" id="modalZipcode" name="zipcode" placeholder="Zip Code">
+                            <div id="errZipcode" class="errr-msg"></div>
+                        </div>
+                    </div>
+
+                    <!-- Row 5: Email, Phone, Alt Phone -->
+                    <div class="form-group">
+                        <div class="input-wrapper">
+                            <label for="modalEmail">Email <span class="optional">(optional)</span></label>
+                            <input type="email" id="modalEmail" name="email" placeholder="Email (optional)">
+                        </div>
+                        <div class="input-wrapper">
+                            <label for="modalPhone">Phone Number</label>
+                            <input type="tel" id="modalPhone" name="phone" placeholder="Phone">
+                            <div id="errPhone" class="errr-msg"></div>
+                        </div>
+                        <div class="input-wrapper">
+                            <label for="modalAltPhone">Alternative Phone <span class="optional">(optional)</span></label>
+                            <input type="tel" id="modalAltPhone" name="altPhone" placeholder="Alternative Phone (optional)">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <!-- Default Address Checkbox -->
+                <div class="default-checkbox-wrapper">
+                    <input type="checkbox" id="makeDefaultCheckbox" name="isDefault">
+                    <label for="makeDefaultCheckbox">Make this address as default</label>
+                </div>
+                
+                <div class="ms-auto">
+                    <button type="button" class="btn btn-success" onclick="saveAddress()">ADD</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div id="confirm-modal" class="confirmation-dialog" style="display:none;">
+    <div class="dialog-content">
+        <h3>Are you sure?</h3>
+        <div class="dialog-buttons">
+            <button id="cancel-action" class="btn-no">NO</button>
+            <button id="confirm-action" class="btn-yes">YES</button>
+        </div>
+    </div>
+</div>
+
+<!-- Logout Modal -->
+<div id="logout-modal" class="confirmation-dialog" style="display:none;">
+    <div class="dialog-content">
+        <h3>Are you sure?</h3>
+        <div class="dialog-buttons">
+            <button id="cancel-logout" class="btn-no">NO</button>
+            <button id="confirm-logout" class="btn-yes">YES</button>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts -->
 <script>
+    const addresses = <%- JSON.stringify(addresses || []) %>;
+    let currentDeleteIndex = null;
+
+    // Configure Toastr global options
+    toastr.options = {
+        timeOut: 3000,
+        preventDuplicates: true,
+    };
+
+    // Check for persisted Toastr message on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        loadCountries();
+        setupConfirmModal();
+        setupLogoutModal();
+
+        // Check if there's a Toastr message to display after refresh
+        const toastrMessage = sessionStorage.getItem('toastrMessage');
+        const toastrType = sessionStorage.getItem('toastrType');
+
+        if (toastrMessage && toastrType) {
+            if (toastrType === 'success') {
+                toastr.success(toastrMessage);
+            } else if (toastrType === 'error') {
+                toastr.error(toastrMessage);
+            }
+            sessionStorage.removeItem('toastrMessage');
+            sessionStorage.removeItem('toastrType');
+        }
+    });
+
+    // Show logout modal
+    function showLogoutModal() {
+        const logoutModal = document.getElementById('logout-modal');
+        logoutModal.style.display = 'block';
+    }
+
+    // Setup event listeners for logout modal buttons
+    function setupLogoutModal() {
+        const logoutModal = document.getElementById('logout-modal');
+        const confirmLogoutButton = document.getElementById('confirm-logout');
+        const cancelLogoutButton = document.getElementById('cancel-logout');
+
+        confirmLogoutButton.addEventListener('click', () => {
+            logoutModal.style.display = 'none';
+            window.location.href = '/logout';
+        });
+
+        cancelLogoutButton.addEventListener('click', () => {
+            logoutModal.style.display = 'none';
+        });
+    }
+
+    // Validate profile form
+    function validateProfileForm() {
+        let isValid = true;
+
+        const fields = [
+            { id: 'firstName', name: 'firstName', errId: 'errFirstName', label: 'First name' },
+            { id: 'lastName', name: 'lastName', errId: 'errLastName', label: 'Last name' },
+            { id: 'email', name: 'email', errId: 'errEmail', label: 'Email' }
+        ];
+
+        const namePattern = /^[A-Za-z]+$/;
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        fields.forEach(field => {
+            const input = document.getElementById(field.id);
+            const errDiv = document.getElementById(field.errId);
+            const val = input.value.trim();
+
+            errDiv.style.display = 'none';
+            errDiv.innerHTML = '';
+
+            if (!val) {
+                errDiv.innerHTML = `${field.label} is required`;
+                errDiv.style.display = 'block';
+                isValid = false;
+            } else if ((field.id === 'firstName' || field.id === 'lastName') && val.length < 2) {
+                errDiv.innerHTML = `Minimum 2 characters required`;
+                errDiv.style.display = 'block';
+                isValid = false;
+            } else if ((field.id === 'firstName' || field.id === 'lastName') && !namePattern.test(val)) {
+                errDiv.innerHTML = `Only alphabets allowed`;
+                errDiv.style.display = 'block';
+                isValid = false;
+            } else if (field.id === 'email' && !emailPattern.test(val)) {
+                errDiv.innerHTML = `Please enter a valid email`;
+                errDiv.style.display = 'block';
+                isValid = false;
+            }
+        });
+
+        return isValid;
+    }
+
+    // Update profile (Save Changes button)
+    function updateProfile(event) {
+        event.preventDefault();
+
+        if (!validateProfileForm()) {
+            return;
+        }
+
+        const form = document.getElementById('profileForm');
+        const formData = new FormData(form);
+        const data = {};
+        formData.forEach((value, key) => {
+            data[key] = value;
+        });
+
+        fetch('/account-settings/update-profile', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            },
+            body: JSON.stringify(data),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                sessionStorage.setItem('toastrMessage', 'Profile updated successfully');
+                sessionStorage.setItem('toastrType', 'success');
+                toastr.success('Profile updated successfully');
+                setTimeout(() => {
+                    window.location.reload();
+                }, 0);
+            } else {
+                toastr.error(data.message || 'Failed to update profile');
+            }
+        })
+        .catch(error => {
+            console.error('Error updating profile:', error);
+            toastr.error('An error occurred while updating profile');
+        });
+    }
+
+    // Change password
+    function changePassword() {
+        // Get the button and loading indicator elements
+        const button = document.getElementById('change-password-btn');
+        const loadingIndicator = document.getElementById('loading-indicator');
+
+        // Disable the button and show the loading indicator
+        button.disabled = true;
+        loadingIndicator.classList.add('active');
+
+        fetch('/account-settings/password-reset', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            },
+            body: JSON.stringify({})
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Re-enable the button and hide the loading indicator
+            button.disabled = false;
+            loadingIndicator.classList.remove('active');
+
+            if (data.success) {
+                toastr.success(data.message || "OTP sent successfully!");
+                setTimeout(() => window.location.href = data.redirectUrl, 1000);
+            } else {
+                toastr.error(data.message || "Failed to initiate password reset");
+            }
+        })
+        .catch(error => {
+            // Re-enable the button and hide the loading indicator on error
+            button.disabled = false;
+            loadingIndicator.classList.remove('active');
+
+            console.error('Error initiating password reset:', error);
+            toastr.error('An error occurred while initiating password reset');
+        });
+    }
+
+    // Open modal for adding/editing address
+    function openAddressModal(index = null) {
+        const modal = new bootstrap.Modal(document.getElementById('addressModal'));
+        const modalTitle = document.getElementById('addressModalLabel');
+        const makeDefaultCheckbox = document.getElementById('makeDefaultCheckbox');
+        const editIndexInput = document.getElementById('editIndex');
+
+        if (index !== null) {
+            modalTitle.textContent = 'Edit Address';
+            editIndexInput.value = index;
+            const address = addresses[index];
+            populateForm(address);
+            makeDefaultCheckbox.checked = address.isDefault || false;
+        } else {
+            modalTitle.textContent = 'Add Address';
+            editIndexInput.value = '';
+            clearForm();
+            makeDefaultCheckbox.checked = false;
+        }
+        
+        modal.show();
+    }
+
+    // Close address modal
+    function closeAddressModal() {
+        const modal = bootstrap.Modal.getInstance(document.getElementById('addressModal'));
+        modal.hide();
+    }
+
+    // Edit address
+    function editAddress() {
+        const card = event.target.closest('.address-card');
+        const index = card.dataset.index;
+        openAddressModal(index);
+    }
+
+    // Show confirmation modal for delete action
+    function showConfirmModal() {
+        const card = event.target.closest('.address-card');
+        currentDeleteIndex = card.dataset.index;
+        const confirmModal = document.getElementById('confirm-modal');
+        confirmModal.style.display = 'block';
+    }
+
+    // Setup event listeners for confirmation modal buttons
+    function setupConfirmModal() {
+        const confirmModal = document.getElementById('confirm-modal');
+        const confirmButton = document.getElementById('confirm-action');
+        const cancelButton = document.getElementById('cancel-action');
+
+        confirmButton.addEventListener('click', () => {
+            confirmModal.style.display = 'none';
+            if (currentDeleteIndex !== null) {
+                deleteAddress(currentDeleteIndex);
+                currentDeleteIndex = null;
+            }
+        });
+
+        cancelButton.addEventListener('click', () => {
+            confirmModal.style.display = 'none';
+            currentDeleteIndex = null;
+        });
+    }
+
+    // Delete address
+    function deleteAddress(index) {
+        fetch('/account-settings/delete-address', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            },
+            body: JSON.stringify({ index }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                sessionStorage.setItem('toastrMessage', 'Address deleted successfully');
+                sessionStorage.setItem('toastrType', 'success');
+                toastr.success('Address deleted successfully');
+                const modal = bootstrap.Modal.getInstance(document.getElementById('addressModal'));
+                if (modal) modal.hide();
+                setTimeout(() => {
+                    window.location.reload();
+                }, 0);
+            } else {
+                toastr.error(data.message || 'Failed to delete address');
+            }
+        })
+        .catch(error => {
+            console.error('Error deleting address:', error);
+            toastr.error('An error occurred while deleting the address');
+        });
+    }
+
+    // Validate address form
+    function validateAddressForm() {
+        let isValid = true;
+
+        const fields = [
+            { id: 'modalFirstName', name: 'firstName', errId: 'errFirstName', label: 'First name' },
+            { id: 'modalLastName', name: 'lastName', errId: 'errLastName', label: 'Last name' },
+            { id: 'modalStreetAddress', name: 'streetAddress', errId: 'errStreetAddress', label: 'Street address' },
+            { id: 'modalCity', name: 'city', errId: 'errCity', label: 'City' },
+            { id: 'modalCountrySelect', name: 'country', errId: 'errCountry', label: 'Country' },
+            { id: 'modalStateSelect', name: 'state', errId: 'errState', label: 'State' },
+            { id: 'modalLandmark', name: 'landmark', errId: 'errLandmark', label: 'Landmark' },
+            { id: 'modalZipcode', name: 'zipcode', errId: 'errZipcode', label: 'Zip code' },
+            { id: 'modalPhone', name: 'phone', errId: 'errPhone', label: 'Phone number' }
+        ];
+
+        const namePattern = /^[A-Za-z]+$/;
+        const phonePattern = /^\+?[1-9]\d{1,14}$/;
+        const zipPattern = /^[1-9]\d{0,9}$/;
+
+        fields.forEach(field => {
+            const input = document.getElementById(field.id);
+            const errDiv = document.getElementById(field.errId);
+            const val = input.value.trim();
+
+            errDiv.style.display = 'none';
+            errDiv.innerHTML = '';
+
+            if (!val) {
+                errDiv.innerHTML = `${field.label} is required`;
+                errDiv.style.display = 'block';
+                isValid = false;
+            } else if ((field.id === 'modalFirstName' || field.id === 'modalLastName') && val.length < 2) {
+                errDiv.innerHTML = `Minimum 2 characters required`;
+                errDiv.style.display = 'block';
+                isValid = false;
+            } else if ((field.id === 'modalFirstName' || field.id === 'modalLastName') && !namePattern.test(val)) {
+                errDiv.innerHTML = `Only alphabets allowed`;
+                errDiv.style.display = 'block';
+                isValid = false;
+            } else if (field.id === 'modalPhone' && !phonePattern.test(val)) {
+                errDiv.innerHTML = `Please enter a valid phone number`;
+                errDiv.style.display = 'block';
+                isValid = false;
+            } else if (field.id === 'modalZipcode' && !zipPattern.test(val)) {
+                errDiv.innerHTML = `Zip code must be 1-10 digits and start with 1-9`;
+                errDiv.style.display = 'block';
+                isValid = false;
+            }
+        });
+
+        return isValid;
+    }
+
+    // Save address
+    function saveAddress() {
+        if (!validateAddressForm()) {
+            return;
+        }
+
+        const form = document.getElementById('addressForm');
+        const formData = new FormData(form);
+        const data = {};
+        formData.forEach((value, key) => {
+            data[key] = value;
+        });
+
+        data.isDefault = document.getElementById('makeDefaultCheckbox').checked;
+
+        const url = document.getElementById('editIndex').value === '' ? '/account-settings/add-address' : '/account-settings/edit-address';
+        const successMessage = document.getElementById('editIndex').value === '' ? 'Address added successfully' : 'Address updated successfully';
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            },
+            body: JSON.stringify(data),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                sessionStorage.setItem('toastrMessage', successMessage);
+                sessionStorage.setItem('toastrType', 'success');
+                toastr.success(successMessage);
+                const modal = bootstrap.Modal.getInstance(document.getElementById('addressModal'));
+                modal.hide();
+                setTimeout(() => {
+                    window.location.reload();
+                }, 0);
+            } else {
+                toastr.error(data.message || 'Failed to save address');
+            }
+        })
+        .catch(error => {
+            console.error('Error saving address:', error);
+            toastr.error('An error occurred while saving the address');
+        });
+    }
+
+    // Populate address form
+    function populateForm(data) {
+        document.getElementById('modalFirstName').value = data.firstName || '';
+        document.getElementById('modalLastName').value = data.lastName || '';
+        document.getElementById('modalCompany').value = data.company || '';
+        document.getElementById('modalStreetAddress').value = data.streetAddress || '';
+        document.getElementById('modalCity').value = data.city || '';
+        document.getElementById('modalLandmark').value = data.landMark || '';
+        document.getElementById('modalZipcode').value = data.pinCode || '';
+        document.getElementById('modalEmail').value = data.email || '';
+        document.getElementById('modalPhone').value = data.phone || '';
+        document.getElementById('modalAltPhone').value = data.altPhone || '';
+        
+        if (data.country) {
+            document.getElementById('modalCountrySelect').value = data.country;
+            if (data.state) {
+                loadStates(data.country).then(() => {
+                    document.getElementById('modalStateSelect').value = data.state;
+                });
+            }
+        }
+    }
+
+    // Clear address form
+    function clearForm() {
+        document.getElementById('addressForm').reset();
+        document.getElementById('modalStateSelect').innerHTML = '<option value="" disabled selected hidden>Select State</option>';
+        document.getElementById('makeDefaultCheckbox').checked = false;
+
+        const errorDivs = document.querySelectorAll('.errr-msg');
+        errorDivs.forEach(div => {
+            div.style.display = 'none';
+            div.innerHTML = '';
+        });
+    }
+
     // Load countries
     async function loadCountries() {
-      try {
-        const response = await fetch('https://restcountries.com/v3.1/all');
-        const data = await response.json();
-        const countrySelect = document.getElementById('countrySelect');
-  
-        const sortedCountries = data.sort((a, b) =>
-          a.name.common.localeCompare(b.name.common)
-        );
-  
-        sortedCountries.forEach(country => {
-          const option = document.createElement('option');
-          option.value = country.name.common;
-          option.textContent = country.name.common;
-          countrySelect.appendChild(option);
-        });
-      } catch (error) {
-        console.error('🌍 Failed to fetch countries:', error);
-      }
-    }
-  
-    // Load states based on selected country
-    async function loadStates(countryName) {
-      try {
-        const response = await fetch(`/api/states/${encodeURIComponent(countryName)}`);
-        const states = await response.json();
-  
-        const stateSelect = document.getElementById('stateSelect');
-        stateSelect.innerHTML = '<option value="" disabled selected hidden>Select State</option>';
-  
-        if (!states.length) {
-          const option = document.createElement('option');
-          option.disabled = true;
-          option.textContent = 'No states available';
-          stateSelect.appendChild(option);
-        } else {
-          states.forEach(state => {
-            const option = document.createElement('option');
-            option.value = state;
-            option.textContent = state;
-            stateSelect.appendChild(option);
-          });
+        try {
+            const response = await fetch('https://restcountries.com/v3.1/all');
+            const data = await response.json();
+            const countrySelect = document.getElementById('modalCountrySelect');
+
+            const sortedCountries = data.sort((a, b) =>
+                a.name.common.localeCompare(b.name.common)
+            );
+
+            sortedCountries.forEach(country => {
+                const option = document.createElement('option');
+                option.value = country.name.common;
+                option.textContent = country.name.common;
+                countrySelect.appendChild(option);
+            });
+        } catch (error) {
+            console.error('🌍 Failed to fetch countries:', error);
         }
-      } catch (error) {
-        console.error('📍 Failed to fetch states:', error);
-      }
     }
-  
+
+    // Load states
+    async function loadStates(countryName) {
+        try {
+            const response = await fetch(`/api/states/${encodeURIComponent(countryName)}`);
+            const states = await response.json();
+
+            const stateSelect = document.getElementById('modalStateSelect');
+            stateSelect.innerHTML = '<option value="" disabled selected hidden>Select State</option>';
+
+            if (!states.length) {
+                const option = document.createElement('option');
+                option.disabled = true;
+                option.textContent = 'No states available';
+                stateSelect.appendChild(option);
+            } else {
+                states.forEach(state => {
+                    const option = document.createElement('option');
+                    option.value = state;
+                    option.textContent = state;
+                    stateSelect.appendChild(option);
+                });
+            }
+        } catch (error) {
+            console.error('📍 Failed to fetch states:', error);
+        }
+    }
+
     // Trigger on country change
     document.addEventListener('DOMContentLoaded', () => {
-      loadCountries();
-  
-      const countrySelect = document.getElementById('countrySelect');
-      countrySelect.addEventListener('change', () => {
-        const selectedCountry = countrySelect.value;
-        loadStates(selectedCountry);
-      });
+        loadCountries();
+
+        const countrySelect = document.getElementById('modalCountrySelect');
+        countrySelect.addEventListener('change', () => {
+            const selectedCountry = countrySelect.value;
+            loadStates(selectedCountry);
+        });
     });
 </script>
 
-<%-include("../../views/Partials/user/footer")%>
+<%- include("../../views/Partials/user/footer") %>

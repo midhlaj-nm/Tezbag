@@ -72,7 +72,7 @@
     flex-direction: column; /* Stack children vertically */
     align-items: center;
     justify-content: flex-start;
-    padding: 30px;
+    padding: 30px 30px 21px 30px;
     border-radius: 12px;
     border: 1px solid #ccc;
     width: 32.5%;

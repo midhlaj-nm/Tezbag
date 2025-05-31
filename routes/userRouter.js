@@ -51,8 +51,12 @@ router.get('/reset-password', userController.loadResetPassPage);
 router.post('/reset-password', userController.resetPasswordPost);
 
 // profileController.js
-router.get('/account-settings', userAuth, profileController.loadSettings);
 router.get('/account', userAuth, profileController.loadDashboard);
+router.get('/account-settings', profileController.loadSettings);
+router.post('/account-settings/add-address', profileController.addAddress);
+router.post('/account-settings/edit-address', profileController.editAddress);
+router.post('/account-settings/delete-address', profileController.deleteAddress);
+router.post('/account-settings/password-reset', profileController.changePassword)
 router.get('/logout', userAuth, userController.logout);
 
 //productPage
