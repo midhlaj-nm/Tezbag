@@ -1,0 +1,180 @@
+<%- include("../../views/Partials/user/header-simple") %>
+<link rel="stylesheet" href="/User-css/otpverify-user.css">
+
+<!-- jQuery and Toastr -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+<style>
+  .server-error-message:empty {
+      display: none !important;
+  }
+  .server-error-message {
+    background-color: #ffe5e5;
+    color: #d10000;
+    font-weight: 500;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    text-align: left;
+  }
+</style>
+
+<div class="otp-container">
+  <div class="otp-box">
+    <h2 class="otp-title">OTP Verification</h2>
+    <p>Please enter the OTP sent to your email address to verify it.</p>
+    <form id="otp-form" onsubmit="return validateOTPform()" novalidate>
+      <div class="otp-inputs">
+        <input type="text" maxlength="1" class="otp-field">
+        <input type="text" maxlength="1" class="otp-field">
+        <input type="text" maxlength="1" class="otp-field">
+        <input type="text" maxlength="1" class="otp-field">
+      </div>
+
+      <div id="err1" class="errr-msg"></div>
+
+      <p class="resend-text">
+        <button type="button" id="resend-link" class="resend-btn" onclick="resendOtp()">Resend</button>
+        (<span id="timer">60</span> s)
+      </p>
+
+      <button type="submit" class="verify-btn">Verify</button>
+    </form>
+  </div>
+</div>
+
+<script>
+toastr.options = {
+    "closeButton": true,
+    "debug": false,
+    "newestOnTop": false,
+    "progressBar": false,
+    "positionClass": "toast-top-right",
+    "preventDuplicates": false,
+    "onclick": null,
+    "showDuration": "300",
+    "hideDuration": "1000",
+    "timeOut": "5000",
+    "extendedTimeOut": "1000",
+    "showEasing": "swing",
+    "hideEasing": "linear",
+    "showMethod": "fadeIn",
+    "hideMethod": "fadeOut"
+}
+
+const timerEl = document.getElementById("timer");
+const resendLink = document.getElementById("resend-link");
+const errMsg = document.getElementById("err1");
+const inputs = document.querySelectorAll(".otp-field");
+
+let timer = 60;
+
+function startCountdown() {
+    resendLink.disabled = true;
+    resendLink.style.color = "grey";
+    resendLink.style.cursor = "not-allowed";
+
+    const countdown = setInterval(() => {
+        timer--;
+        timerEl.textContent = timer;
+        if (timer <= 0) {
+            clearInterval(countdown);
+            resendLink.disabled = false;
+            resendLink.style.color = "#00B207";
+            resendLink.style.cursor = "pointer";
+            resendLink.textContent = "Click to resend";
+        }
+    }, 1000);
+}
+
+function getOtpFromInputs() {
+    let otp = "";
+    inputs.forEach(input => otp += input.value);
+    return otp;
+}
+
+function validateOTPform() {
+    const otpInput = getOtpFromInputs();
+
+    if (otpInput.length !== 4 || !/^\d{4}$/.test(otpInput)) {
+        errMsg.textContent = "Please enter a valid 4-digit OTP.";
+        errMsg.style.display = "block";
+        return false;
+    } else {
+        errMsg.textContent = "";
+        errMsg.style.display = "none";
+    }
+
+    console.log("🔐 Collected OTP from inputs:", otpInput);
+    const postUrl = '/verify-email-otp';
+    console.log("🔍 POST URL:", postUrl);
+    console.log("📤 Sending OTP data:", { otp: otpInput });
+
+    $.ajax({
+        type: "POST",
+        url: postUrl,
+        data: { otp: otpInput },
+        success: function (response) {
+            console.log("📩 AJAX Response:", response);
+            if (response.success) {
+                toastr.success("OTP verified!"); // Show on OTP page
+                setTimeout(() => window.location.href = response.redirectUrl, 1000);
+            } else {
+                toastr.error(response.message || "Invalid OTP");
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error("❌ AJAX Error:", status, error);
+            console.log("❌ AJAX Response Text:", xhr.responseText);
+            toastr.error("Something went wrong");
+        }
+    });
+
+    return false;
+}
+
+function resendOtp() {
+    if (timer > 0) return;
+
+    timer = 60;
+    resendLink.textContent = "Resend";
+    timerEl.textContent = timer;
+    startCountdown();
+
+    fetch("/resend-otp")
+        .then(res => res.json())
+        .then(data => {
+            console.log("📩 Resend OTP Response:", data);
+            if (data.success) {
+                toastr.success("OTP resent successfully!");
+            } else {
+                toastr.error(data.message || "Failed to resend OTP.");
+            }
+        })
+        .catch(error => {
+            console.error("❌ Resend OTP Error:", error);
+            toastr.error("Something went wrong");
+        });
+}
+
+inputs.forEach((input, index) => {
+    input.addEventListener("input", e => {
+        if (e.target.value.length === 1 && index < inputs.length - 1) {
+            inputs[index + 1].focus();
+        }
+    });
+
+    input.addEventListener("keydown", e => {
+        if (e.key === "Backspace" && !e.target.value && index > 0) {
+            inputs[index - 1].focus();
+        }
+    });
+});
+
+resendLink.addEventListener("click", resendOtp);
+window.onload = startCountdown;
+</script>
+
+<%- include("../../views/Partials/user/footer") %>

@@ -67,6 +67,16 @@
     text-align: left;
 }
 
+.success-msg {
+    background-color: rgb(214, 255, 214);
+    color: green;
+    font-weight: 500;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    text-align: left;
+}
+
 /* Loading Indicator Styles */
 .loading-indicator {
     display: none;
@@ -89,7 +99,8 @@
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
-.password-btn:disabled {
+.password-btn:disabled,
+.save-btn:disabled {
     opacity: 0.6;
     cursor: not-allowed;
 }
@@ -141,6 +152,12 @@
 
     <!-- =============================Right area================================ -->
     <div class="rght-container">
+        <% const type = typeof messageType !== 'undefined' ? messageType : 'error'; %>
+        <% if (message) { %>
+          <div class="<%= type === 'success' ? 'success-msg' : 'server-error-message' %>">
+            <%- message %>
+          </div>
+        <% } %>
         <h2>Account Settings</h2>
         <div style="border-bottom: 1px solid #ccc; width: 100%; margin-bottom: 1.5rem;"></div>             
         <form class="settings-form" id="profileForm" novalidate onsubmit="updateProfile(event)">
@@ -157,7 +174,12 @@
             <div id="errEmail" class="errr-msg"></div>
 
             <div class="button-group">
-                <button type="submit" class="save-btn">Save Changes</button>
+                <button type="submit" class="save-btn" id="save-changes-btn">
+                    Save Changes
+                    <span id="save-loading-indicator" class="loading-indicator">
+                        <span class="spinner"></span>
+                    </span>
+                </button>
                 <button type="button" class="password-btn" id="change-password-btn" onclick="changePassword()">
                     Change Password
                     <span id="loading-indicator" class="loading-indicator">
@@ -362,20 +384,6 @@
         loadCountries();
         setupConfirmModal();
         setupLogoutModal();
-
-        // Check if there's a Toastr message to display after refresh
-        const toastrMessage = sessionStorage.getItem('toastrMessage');
-        const toastrType = sessionStorage.getItem('toastrType');
-
-        if (toastrMessage && toastrType) {
-            if (toastrType === 'success') {
-                toastr.success(toastrMessage);
-            } else if (toastrType === 'error') {
-                toastr.error(toastrMessage);
-            }
-            sessionStorage.removeItem('toastrMessage');
-            sessionStorage.removeItem('toastrType');
-        }
     });
 
     // Show logout modal
@@ -451,6 +459,13 @@
             return;
         }
 
+        const button = document.getElementById('save-changes-btn');
+        const loadingIndicator = document.getElementById('save-loading-indicator');
+
+        // Disable the button and show the loading indicator
+        button.disabled = true;
+        loadingIndicator.classList.add('active');
+
         const form = document.getElementById('profileForm');
         const formData = new FormData(form);
         const data = {};
@@ -468,18 +483,32 @@
         })
         .then(response => response.json())
         .then(data => {
+            // Re-enable the button and hide the loading indicator
+            button.disabled = false;
+            loadingIndicator.classList.remove('active');
+
             if (data.success) {
-                sessionStorage.setItem('toastrMessage', 'Profile updated successfully');
-                sessionStorage.setItem('toastrType', 'success');
-                toastr.success('Profile updated successfully');
-                setTimeout(() => {
-                    window.location.reload();
-                }, 0);
+                // Check if redirectUrl is present (e.g., for email change requiring OTP)
+                if (data.redirectUrl) {
+                    toastr.success(data.message || 'OTP sent successfully');
+                    setTimeout(() => {
+                        window.location.href = data.redirectUrl; // Redirect to OTP page
+                    }, 1000);
+                } else {
+                    toastr.success(data.message || 'Profile updated successfully');
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 0);
+                }
             } else {
                 toastr.error(data.message || 'Failed to update profile');
             }
         })
         .catch(error => {
+            // Re-enable the button and hide the loading indicator on error
+            button.disabled = false;
+            loadingIndicator.classList.remove('active');
+
             console.error('Error updating profile:', error);
             toastr.error('An error occurred while updating profile');
         });

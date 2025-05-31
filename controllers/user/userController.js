@@ -657,13 +657,6 @@ const resendOtp = async (req, res, next) => {
 // ===========================
 const logout = async (req, res) => {
     try {
-        // Check if the user is logged in
-        if (!req.session.user) {
-            req.flash('message', 'Please log in to perform this action.');
-            req.flash('messageType', 'error');
-            return res.redirect('/login');
-        }
-
         // Clear the user property (optional, as destroy will handle this)
         req.session.user = null;
         // Redirect to login page

@@ -1,4 +1,5 @@
 const User = require('../../models/userSchema');
+const Admin = require('../../models/adminSchema')
 const Order = require('../../models/orderSchema');
 const Address = require('../../models/addressSchema');
 const Product = require('../../models/productSchema');
@@ -101,6 +102,8 @@ const loadDashboard = async (req, res) => {
 
 const loadSettings = async (req, res) => {
     try {
+        let message = req.flash('message')[0] || null;
+        let messageType = req.flash('messageType')[0] || null;
         const userId = req.session.user;
         console.log('User ID from session:', userId);
 
@@ -132,7 +135,7 @@ const loadSettings = async (req, res) => {
         };
 
         // Render the settings page and pass the addresses and user details to the frontend
-        res.render('settings', { addresses, user });
+        res.render('settings', { addresses, user, message, messageType });
     } catch (error) {
         console.error("❌ Error loading settings:", error);
         res.redirect('/404Error');
@@ -370,61 +373,252 @@ const deleteAddress = async (req, res) => {
     }
 };
 
+const emailOtpPage = async(req,res) => {
+    try {
+        res.render('otppage2')
+    } catch (error) {
+        console.log(error)
+    }
+}
+
 const changePassword = async (req, res) => {
-  try {
-      // Check if user is logged in
-      const userId = req.session.user;
-      if (!userId) {
-          return res.json({
-              success: false,
-              message: 'Please log in to change your password.'
-          });
-      }
+    try {
+        // Check if user is logged in
+        const userId = req.session.user;
+        if (!userId) {
+            return res.json({
+                success: false,
+                message: 'Please log in to change your password.'
+            });
+        }
+  
+        // Fetch the user from the database
+        const user = await User.findById(userId);
+        if (!user) {
+            req.session.destroy();
+            return res.json({
+                success: false,
+                message: 'User not found.'
+            });
+        }
+  
+        const email = user.email;
+        console.log("🔍 Initiating password reset for email:", email);
+  
+        // Generate OTP
+        const otp = generateOtp();
+        req.session.resetOtp = otp;
+        req.session.resetEmail = email;
+        req.session.otpType = "reset";
+        req.session.resetFlowOrigin = "account-settings"; // Track the origin
+  
+        // Send OTP to user's email
+        const emailSent = await sendVeriEmail(email, otp);
+        if (!emailSent) {
+            return res.json({
+                success: false,
+                message: 'Failed to send OTP. Try again later.'
+            });
+        }
+  
+        console.log("📧 OTP sent to user:", otp);
+  
+        // Return success response with redirect URL
+        return res.json({
+            success: true,
+            redirectUrl: '/otp-page',
+            message: 'OTP sent successfully.'
+        });
+    } catch (error) {
+        console.error('❌ Error initiating password reset:', error);
+        return res.json({
+            success: false,
+            message: 'An error occurred while initiating password reset.'
+        });
+    }
+  };
 
-      // Fetch the user from the database
-      const user = await User.findById(userId);
-      if (!user) {
-          req.session.destroy();
-          return res.json({
-              success: false,
-              message: 'User not found.'
-          });
-      }
+const updateProfile = async (req, res) => {
+    try {
+        const userId = req.session.user;
+        if (!userId) {
+            return res.status(401).json({
+                success: false,
+                message: 'User not authenticated.'
+            });
+        }
 
-      const email = user.email;
-      console.log("🔍 Initiating password reset for email:", email);
+        console.log("📝 Profile update attempt:");
+        const { firstName, lastName, email } = req.body;
+        console.log("👤 First Name:", firstName);
+        console.log("👤 Last Name:", lastName);
+        console.log("📧 Email:", email);
 
-      // Generate OTP
-      const otp = generateOtp();
-      req.session.resetOtp = otp;
-      req.session.resetEmail = email;
-      req.session.otpType = "reset";
-      req.session.resetFlowOrigin = "account-settings"; // Track the origin
+        if (!firstName || !lastName || !email) {
+            return res.json({
+                success: false,
+                message: 'All fields are required.'
+            });
+        }
 
-      // Send OTP to user's email
-      const emailSent = await sendVeriEmail(email, otp);
-      if (!emailSent) {
-          return res.json({
-              success: false,
-              message: 'Failed to send OTP. Try again later.'
-          });
-      }
+        const user = await User.findById(userId);
+        if (!user) {
+            req.session.destroy();
+            return res.json({
+                success: false,
+                message: 'User not found.'
+            });
+        }
 
-      console.log("📧 OTP sent to user:", otp);
+        const emailChanged = email && email.trim().toLowerCase() !== user.email.trim().toLowerCase();
+        const firstNameChanged = firstName && firstName.trim() !== user.f_Name.trim();
+        const lastNameChanged = lastName && lastName.trim() !== user.l_Name.trim();
 
-      // Return success response with redirect URL
-      return res.json({
-          success: true,
-          redirectUrl: '/otp-page',
-          message: 'OTP sent successfully.'
-      });
-  } catch (error) {
-      console.error('❌ Error initiating password reset:', error);
-      return res.json({
-          success: false,
-          message: 'An error occurred while initiating password reset.'
-      });
-  }
+        if (emailChanged) {
+            const existingUser = await User.findOne({ email: email.trim(), _id: { $ne: userId } });
+            if (existingUser) {
+                return res.json({
+                    success: false,
+                    message: 'This email is already in use by another account.'
+                });
+            }
+
+            const existingAdmin = await Admin.findOne({ email: email.trim() });
+            if (existingAdmin) {
+                return res.json({
+                    success: false,
+                    message: 'Cannot use an admin email for a user account.'
+                });
+            }
+
+            const otp = generateOtp();
+            const emailSent = await sendVeriEmail(email.trim(), otp);
+            if (!emailSent) {
+                return res.json({
+                    success: false,
+                    message: 'Failed to send OTP. Try again later.'
+                });
+            }
+
+            console.log("📧 OTP email sent:", emailSent);
+            console.log("📧 OTP sent for email update:", otp);
+
+            req.session.updateOtp = otp;
+            req.session.updatedProfile = { firstName, lastName, email: email.trim() };
+            req.session.otpType = "update-email";
+            req.session.lastOtpType = "update-email";
+
+            return res.json({
+                success: true,
+                message: "OTP sent successfully to your new email.",
+                redirectUrl: "/email-update-otp"
+            });
+        }
+
+        if (firstNameChanged || lastNameChanged) {
+            user.f_Name = firstName.trim();
+            user.l_Name = lastName.trim();
+            await user.save();
+            console.log("✅ Profile updated for user:", userId);
+        } else {
+            console.log("ℹ️ No changes detected in profile data.");
+        }
+
+        // Set flash message for direct profile update
+        req.flash('message', 'Profile updated successfully!');
+        req.flash('messageType', 'success');
+
+        return res.json({
+            success: true,
+            message: "Profile updated successfully!"
+        });
+
+    } catch (error) {
+        console.error("❌ Error updating profile:", error);
+        return res.json({
+            success: false,
+            message: "An error occurred while updating profile."
+        });
+    }
 };
 
-module.exports = { loadSettings, loadDashboard, addAddress, editAddress, deleteAddress, changePassword };
+const otpVerification = async (req, res) => {
+    try {
+        const userId = req.session.user;
+        if (!userId) {
+            return res.status(401).json({
+                success: false,
+                message: 'User not authenticated.'
+            });
+        }
+
+        const { otp } = req.body;
+        const sessionOtp = req.session.updateOtp;
+        const updatedProfile = req.session.updatedProfile;
+
+        console.log("📥 OTP Verification Request Received");
+        console.log("🔐 Entered OTP:", otp, "Type:", typeof otp);
+        console.log("📦 Session OTP:", sessionOtp, "Type:", typeof sessionOtp);
+        console.log("📧 Email to update:", updatedProfile?.email);
+
+        if (!otp || otp.length !== 4) {
+            console.warn("⚠️ OTP is missing or not 4 digits");
+            return res.json({ success: false, message: "OTP must be 4 digits." });
+        }
+
+        if (!sessionOtp || !updatedProfile) {
+            console.warn("⚠️ No OTP or profile data in session (session might have expired)");
+            return res.json({ success: false, message: "Session expired. Please try again." });
+        }
+
+        const enteredOtp = String(otp);
+        const storedOtp = String(sessionOtp);
+
+        console.log("🔍 Comparing OTPs:", enteredOtp, "vs", storedOtp);
+
+        if (enteredOtp !== storedOtp) {
+            console.warn("❌ Invalid OTP entered");
+            return res.json({ success: false, message: "Invalid OTP" });
+        }
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.json({
+                success: false,
+                message: "User not found."
+            });
+        }
+
+        user.f_Name = updatedProfile.firstName;
+        user.l_Name = updatedProfile.lastName;
+        user.email = updatedProfile.email;
+        await user.save();
+
+        console.log("✅ Profile updated for email:", user.email);
+
+        delete req.session.updateOtp;
+        delete req.session.updatedProfile;
+        req.session.otpType = null;
+        req.session.lastOtpType = null;
+
+        // Set flash message for successful OTP verification
+        req.flash('message', 'Profile updated successfully!');
+        req.flash('messageType', 'success');
+
+        return res.json({
+            success: true,
+            message: "Email verified and profile updated successfully!",
+            messageType: "success",
+            redirectUrl: "/account-settings"
+        });
+
+    } catch (error) {
+        console.error("❌ OTP verification error:", error);
+        return res.json({
+            success: false,
+            message: "An error occurred while verifying OTP."
+        });
+    }
+};
+
+module.exports = { loadSettings, loadDashboard, addAddress, editAddress, deleteAddress, changePassword, emailOtpPage, updateProfile, otpVerification };

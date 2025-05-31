@@ -53,6 +53,9 @@ router.post('/reset-password', userController.resetPasswordPost);
 // profileController.js
 router.get('/account', userAuth, profileController.loadDashboard);
 router.get('/account-settings', profileController.loadSettings);
+router.get('/email-update-otp', profileController.emailOtpPage);
+router.post('/verify-email-otp', profileController.otpVerification)
+router.post('/account-settings/update-profile', profileController.updateProfile)
 router.post('/account-settings/add-address', profileController.addAddress);
 router.post('/account-settings/edit-address', profileController.editAddress);
 router.post('/account-settings/delete-address', profileController.deleteAddress);
