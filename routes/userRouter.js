@@ -55,10 +55,10 @@ router.get('/account', userAuth, profileController.loadDashboard);
 router.get('/account-settings', profileController.loadSettings);
 router.get('/email-update-otp', profileController.emailOtpPage);
 router.post('/verify-email-otp', profileController.otpVerification)
-router.post('/account-settings/update-profile', profileController.updateProfile)
+router.patch('/account-settings/update-profile', profileController.updateProfile)
 router.post('/account-settings/add-address', profileController.addAddress);
-router.post('/account-settings/edit-address', profileController.editAddress);
-router.post('/account-settings/delete-address', profileController.deleteAddress);
+router.patch('/account-settings/edit-address', profileController.editAddress);
+router.delete('/account-settings/delete-address/:index', profileController.deleteAddress);
 router.post('/account-settings/password-reset', profileController.changePassword)
 router.get('/logout', userAuth, userController.logout);
 

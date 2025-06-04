@@ -36,7 +36,6 @@ const loadProduct = async (req, res) => {
       }))
     );
 
-    // Note: The view name 'products-adm' might need to be updated to match your actual EJS file ('product-management')
     res.render('products-adm', { products, categories, totalPages, search, currentPage });
   } catch (error) {
     console.error('Error loading products:', error);
@@ -46,10 +45,6 @@ const loadProduct = async (req, res) => {
 
 const addProduct = async (req, res, next) => {
   try {
-    // Debug: Log detailed request info
-    console.log('Request Headers:', req.headers);
-    console.log('req.files:', req.files);
-    console.log('req.body:', req.body);
 
     // Validate image count
     const images = req.files || [];

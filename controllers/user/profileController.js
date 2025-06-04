@@ -149,10 +149,6 @@ const addAddress = async (req, res) => {
             return res.status(401).json({ success: false, message: 'User not authenticated' });
         }
 
-        // Log the incoming request headers and body for debugging
-        console.log('Request headers:', req.headers);
-        console.log('Request body:', req.body);
-
         if (!req.body) {
             return res.status(400).json({ success: false, message: 'Request body is missing' });
         }
@@ -175,7 +171,7 @@ const addAddress = async (req, res) => {
         } = req.body;
 
         // Find the user's address document
-        const addressDoc = await Address.findOne({ userId });
+        let addressDoc = await Address.findOne({ userId });
 
         // Check for duplicate address
         if (addressDoc && addressDoc.address.length > 0) {
@@ -229,7 +225,9 @@ const addAddress = async (req, res) => {
             // If the user already has an address document, append the new address
             if (newAddress.isDefault) {
                 // If the new address is set as default, unset the previous default
-                addressDoc.address.forEach(addr => (addr.isDefault = false));
+                for (let i = 0; i < addressDoc.address.length; i++) {
+                    addressDoc.address[i].isDefault = false; // Use array indexing to modify subdocuments
+                }
             }
             addressDoc.address.push(newAddress);
             await addressDoc.save();
@@ -334,14 +332,7 @@ const deleteAddress = async (req, res) => {
             return res.status(401).json({ success: false, message: 'User not authenticated' });
         }
 
-        // Log the incoming request body for debugging
-        console.log('Request body:', req.body);
-
-        if (!req.body) {
-            return res.status(400).json({ success: false, message: 'Request body is missing' });
-        }
-
-        const { index } = req.body;
+        const { index } = req.params; // Changed from req.body to req.params
         if (index === undefined || index < 0) {
             return res.status(400).json({ success: false, message: 'Invalid address index' });
         }

@@ -474,7 +474,7 @@
         });
 
         fetch('/account-settings/update-profile', {
-            method: 'POST',
+            method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
@@ -621,8 +621,8 @@
 
     // Delete address
     function deleteAddress(index) {
-        fetch('/account-settings/delete-address', {
-            method: 'POST',
+        fetch(`/account-settings/delete-address/${index}`, {
+            method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
@@ -639,7 +639,7 @@
                 if (modal) modal.hide();
                 setTimeout(() => {
                     window.location.reload();
-                }, 0);
+                }, 1000);
             } else {
                 toastr.error(data.message || 'Failed to delete address');
             }
@@ -723,7 +723,7 @@
         const successMessage = document.getElementById('editIndex').value === '' ? 'Address added successfully' : 'Address updated successfully';
 
         fetch(url, {
-            method: 'POST',
+            method: url === '/account-settings/add-address' ? 'POST' : 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
@@ -740,7 +740,7 @@
                 modal.hide();
                 setTimeout(() => {
                     window.location.reload();
-                }, 0);
+                }, 1300);
             } else {
                 toastr.error(data.message || 'Failed to save address');
             }

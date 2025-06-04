@@ -111,16 +111,16 @@ body {
 
 /* Custom Pagination Styling */
 .custom-pagination {
-  margin-top: 1.5rem; /* Equivalent to Bootstrap's mt-4 */
-  text-align: center; /* Center the pagination */
+  margin-top: 1.5rem;
+  text-align: center;
 }
 
 .pagination-list {
-  display: inline-flex; /* Display items in a row */
+  display: inline-flex;
   list-style: none;
   padding: 0;
   margin: 0;
-  gap: 5px; /* Space between items */
+  gap: 5px;
 }
 
 .pagination-item {
@@ -129,35 +129,35 @@ body {
 
 .pagination-link {
   display: inline-block;
-  padding: 8px 12px; /* Padding for clickable area */
+  padding: 8px 12px;
   text-decoration: none;
-  color: #333; /* Default text color */
-  background-color: #f8f9fa; /* Light gray background */
-  border: 1px solid #ddd; /* Light border */
-  border-radius: 5px; /* Rounded corners */
+  color: #333;
+  background-color: #f8f9fa;
+  border: 1px solid #ddd;
+  border-radius: 5px;
   font-size: 14px;
-  transition: background-color 0.2s, color 0.2s; /* Smooth transition */
+  transition: background-color 0.2s, color 0.2s;
 }
 
 /* Active Page */
 .pagination-item.active .pagination-link {
-  background-color: #00B207; /* Green background for active page */
+  background-color: #00B207;
   border-color: #00B207;
-  color: white; /* White text for contrast */
+  color: white;
 }
 
 /* Disabled State */
 .pagination-item.disabled .pagination-link {
-  color: #aaa; /* Grayed-out text */
-  background-color: #f1f1f1; /* Slightly different background */
+  color: #aaa;
+  background-color: #f1f1f1;
   border-color: #ddd;
-  cursor: not-allowed; /* Indicate it's not clickable */
+  cursor: not-allowed;
 }
 
 /* Hover Effect for Non-Active, Non-Disabled Links */
 .pagination-item:not(.active):not(.disabled) .pagination-link:hover {
-  background-color: #e6f7e8; /* Light green background on hover */
-  color: #00B207; /* Green text on hover */
+  background-color: #e6f7e8;
+  color: #00B207;
   border-color: #00B207;
 }
 
@@ -282,7 +282,7 @@ body {
 }
 
 .active a {
-  background-color: #f2f2f2;
+  background-color: #e3e3e3;
   color: #000;
 }
 
@@ -290,21 +290,21 @@ body {
   fill: #000;
 }
 
-/* Content area with updated right margin */
+/* Content area */
 .content {
   margin-top: 60px;
   margin-left: 240px;
-  margin-right: 20px; /* Added right margin */
+  margin-right: 20px;
   padding: 8px 5px 5px 15px;
   flex: 1;
-  transition: margin-left 0.3s ease, margin-right 0.3s ease; /* Updated transition */
-  width: calc(100% - 260px); /* Updated calculation to account for right margin */
+  transition: margin-left 0.3s ease, margin-right 0.3s ease;
+  width: calc(100% - 260px);
 }
 
 .sidebar.collapsed ~ .content {
   margin-left: 80px;
-  margin-right: 20px; /* Added right margin */
-  width: calc(100% - 100px); /* Updated calculation */
+  margin-right: 20px;
+  width: calc(100% - 100px);
 }
 
 /* Table header styling */
@@ -343,6 +343,39 @@ body {
 
 .add-product-btn:hover {
   background-color: #008C04;
+}
+
+.tab-container {
+  display: flex;
+  width: 100%;
+}
+.tab-btn {
+  flex: 1;
+  padding: 0.75rem;
+  text-align: center;
+  background-color: #f1f1f1;
+  border: 1px solid #ddd;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.3s;
+}
+.tab-btn.active {
+  background-color: #f1f1f1;
+  color: #00B207;
+  border-color: #ddd;
+  border-bottom: 3px solid #00B207;
+}
+.tab-btn:hover {
+  background-color: #e0e0e0;
+}
+.tab-btn.active:hover {
+  background-color: #f1f1f1;
+}
+.tab-content {
+  display: none;
+}
+.tab-content.active {
+  display: block;
 }
 
 /* Table container */
@@ -393,47 +426,6 @@ body {
   background-color: #f9f9f9;
 }
 
-/* Column Widths */
-.product-table th:nth-child(1),
-.product-table td:nth-child(1), /* SI. NO. */
-.product-table th:nth-child(5),
-.product-table td:nth-child(5), /* PRICE */
-.product-table th:nth-child(6),
-.product-table td:nth-child(6), /* MRP */
-.product-table th:nth-child(7),
-.product-table td:nth-child(7), /* STOCK */
-.product-table th:nth-child(8),
-.product-table td:nth-child(8) { /* STATUS */
-  width: 10%;
-  padding-left: 0 !important;
-}
-
-.product-table th:nth-child(2),
-.product-table td:nth-child(2) { /* IMAGES */
-  width: 10%;
-}
-
-.product-table th:nth-child(3),
-.product-table td:nth-child(3), /* NAME */
-.product-table th:nth-child(4),
-.product-table td:nth-child(4) { /* CATEGORY */
-  width: 15%;
-}
-
-.product-table th:nth-child(9),
-.product-table td:nth-child(9) { /* ACTION */
-  width: 20%;
-  text-align: center;
-}
-
-/* Actions styling */
-.product-table td:nth-child(9) .actions {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
-}
-
 /* Status Cell Styling */
 .status {
   font-weight: 500;
@@ -445,22 +437,6 @@ body {
 
 .status.inactive {
   color: #ff172e;
-}
-
-/* Product Image Styling */
-.product-info {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.product-thumbnail {
-  margin-left: 4.6vw;
-  width: 50px;
-  height: 50px;
-  object-fit: cover;
-  border-radius: 4px;
-  border: 1px solid #eee;
 }
 
 /* Action Buttons */
@@ -484,26 +460,23 @@ body {
   background-color: #e0e0e0;
 }
 
-.list-toggle {
+.toggle-status {
   background-color: #ff172e;
   color: white;
 }
 
-.list-toggle[data-status="false"] {
+.toggle-status[data-status="false"] {
   background-color: #00B207;
 }
 
-.list-toggle:hover {
+.toggle-status:hover {
   opacity: 0.9;
 }
 
-/* Empty State Message */
-.product-table tbody tr td[colspan] div {
-  padding: 30px 0;
-  text-align: center;
-  width: 100% !important;
-  color: #666;
-  font-size: 1.1rem;
+.actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 /* Popup Form Styles */
@@ -597,7 +570,7 @@ label {
   font-size: 14px;
 }
 
-input, select, textarea {
+input, select {
   width: 100%;
   padding: 10px 12px;
   border: 1px solid #ccc;
@@ -608,79 +581,9 @@ input, select, textarea {
   box-sizing: border-box;
 }
 
-input:focus, select:focus, textarea:focus {
+input:focus, select:focus {
   outline: none;
   border-color: #00B207;
-}
-
-textarea {
-  min-height: 100px;
-  resize: none;
-}
-
-/* Image Upload Styles */
-.image-upload-container {
-  display: flex;
-  gap: 15px;
-  flex-wrap: wrap;
-}
-
-.image-placeholder {
-  width: 100px;
-  height: 100px;
-  border: 2px dashed #ccc;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  background-color: #f9f9f9;
-  border-radius: 8px;
-  transition: all 0.2s ease;
-  position: relative;
-}
-
-.image-placeholder:hover {
-  border-color: #00B207;
-  background-color: #f0f0f0;
-}
-
-.image-placeholder .material-icons {
-  font-size: 36px;
-  color: #666;
-}
-
-.image-hover-controls {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  display: none;
-  gap: 6px;
-}
-
-.image-placeholder:hover .image-hover-controls {
-  display: flex;
-}
-
-.control-btn {
-  width: 25px;
-  height: 25px;
-  border-radius: 50%;
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s;
-  background-color: rgba(255, 255, 255, 0.9);
-}
-
-.control-btn:hover {
-  transform: scale(1.1);
-}
-
-.material-symbols-outlined {
-  font-size: 15px !important;
-  line-height: 1;
 }
 
 .popup-footer {
@@ -707,21 +610,6 @@ textarea {
 
 .btn-primary:hover {
   background-color: #008C04;
-}
-
-.btn-secondary {
-  background-color: #f0f0f0;
-  color: #333;
-  padding: 10px 20px;
-  border-radius: 6px;
-  font-weight: 500;
-  cursor: pointer;
-  border: none;
-  transition: background-color 0.2s ease;
-}
-
-.btn-secondary:hover {
-  background-color: #e0e0e0;
 }
 
 .hidden {
@@ -820,7 +708,7 @@ textarea {
   .content {
     width: calc(100% - 100px);
     margin-left: 80px;
-    margin-right: 20px; /* Added right margin for responsive design */
+    margin-right: 20px;
     padding: 15px 10px;
   }
   
@@ -895,41 +783,4 @@ textarea {
     width: 95%;
     height: 90vh;
   }
-  
-  .image-upload-container {
-    justify-content: center;
-  }
-}
-
-.checkbox-container {
-  max-height: fit-content;
-  overflow-y: auto;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  padding: 10px;
-}
-
-.checkbox-item {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  margin-bottom: 8px;
-  padding: 5px 0;
-}
-
-.checkbox-item input[type="checkbox"] {
-  grid-column: 1;
-  justify-self: start;
-  margin-left: 20px; /* Adjust this value as needed */
-  cursor: pointer;
-  width: 18px; /* Increase checkbox size */
-  height: 18px; /* Increase checkbox size */
-}
-
-.checkbox-item label {
-  grid-column: 2;
-  justify-self: start;
-  padding-left: 10px;
-  font-size: 14px;
-  color: #333;
-  cursor: pointer;
 }

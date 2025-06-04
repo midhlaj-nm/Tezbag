@@ -281,6 +281,18 @@ const loadDashboard = async (req, res) => {
     }
   }
 
+const logoutAdmin = async (req, res) => {
+    try {
+        // Clear the user property (optional, as destroy will handle this)
+        req.session.admin = null;
+        // Redirect to login page
+        res.redirect('/tezgrani/login');
+    } catch (error) {
+        console.error("❌ Logout error:", error);
+        res.redirect('/404Error');
+    }
+};
+
 module.exports = {
   loadLogin,
   verifyLogin,
@@ -290,4 +302,5 @@ module.exports = {
   loadDashboard,
   storePunchin,
   storePunchout,
+  logoutAdmin
 };

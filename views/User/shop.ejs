@@ -234,9 +234,11 @@
                   <% products.forEach(product => { %>
                     <div class="col-12 col-sm-6 col-md-3">
                       <div class="product-card <%= product.status === 'Out Of Stock' ? 'out-of-stock' : '' %>">
-                        <% if (product.status === 'Out Of Stock') { %>
-                          <span class="out-of-stock-label">Out of Stock</span>
-                        <% } %>
+                        <% const priceDifference = (product.price - product.regularPrice); %>
+                        <% const percentageDiscount = product.price > 0 ? Math.round((priceDifference / product.price) * 100) : 0; %>
+                        <span class="out-of-stock-label">
+                          <%= product.status === 'Out Of Stock' ? 'Out of Stock' : `-${percentageDiscount}% off` %>
+                        </span>
                         <a href="/product/<%= product._id %>" class="product-link">
                           <img src="<%= product.image || '/default-product.png' %>" alt="<%= product.name %>">
                           <p class="product-name"><%= product.name %></p>

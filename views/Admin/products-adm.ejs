@@ -68,7 +68,7 @@
         </a>
       </li>
       <li class="active">
-        <a href="/tezgrani/products-management">
+        <a href="/tezgrani/product-management">
           <span class="icon-svg">
             <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f">
               <path d="M200-80q-33 0-56.5-23.5T120-160v-451q-18-11-29-28.5T80-680v-120q0-33 23.5-56.5T160-880h640q33 0 56.5 23.5T880-800v120q0 23-11 40.5T840-611v451q0 33-23.5 56.5T760-80H200Zm0-520v440h560v-440H200Zm-40-80h640v-120H160v120Zm200 280h240v-80H360v80Zm120 20Z"/>
@@ -88,7 +88,7 @@
         </a>
       </li>
       <li>
-        <a href="#">
+      <a href="/tezgrani/deals-management">
           <span class="icon-svg">
             <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f">
               <path d="M160-280v80h640v-80H160Zm0-440h88q-5-9-6.5-19t-1.5-21q0-50 35-85t85-35q30 0 55.5 15.5T460-826l20 26 20-26q18-24 44-39t56-15q50 0 85 35t35 85q0 11-1.5 21t-6.5 19h88q33 0 56.5 23.5T880-640v440q0 33-23.5 56.5T800-120H160q-33 0-56.5-23.5T80-200v-440q0-33 23.5-56.5T160-720Zm0 320h640v-240H596l84 114-64 46-136-184-136 184-64-46 82-114H160v240Zm200-320q17 0 28.5-11.5T400-760q0-17-11.5-28.5T360-800q-17 0-28.5 11.5T320-760q0 17 11.5 28.5T360-720Zm240 0q17 0 28.5-11.5T640-760q0-17-11.5-28.5T600-800q-17 0-28.5 11.5T560-760q0 17 11.5 28.5T600-720Z"/>
@@ -128,10 +128,9 @@
         </a>
       </li>
       <li>
-        <a href="#">
+        <a href="#" onclick="showLogoutModal()">
           <span class="icon-svg">
             <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h280v80H200v560h280v80H200Zm440-160-55-58 102-102H360v-80h327L585-622l55-58 200 200-200 200Z"/></svg>
-            </svg>
           </span>
           <span>Log-out</span>
         </a>
@@ -346,13 +345,24 @@
     </div>
   </div>
 
-  <!-- Confirmation modal -->
+  <!-- Block/Unblock Confirmation Modal -->
   <div id="confirm-modal" class="modal" style="display:none;">
     <div class="modal-content">
       <h3>Are you sure?</h3>
       <div class="modal-buttons">
         <button id="cancel-action" class="btn-no">NO</button>
         <button id="confirm-action" class="btn-yes">YES</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Logout Modal -->
+  <div id="logout-modal" class="modal" style="display:none;">
+    <div class="modal-content">
+    <h3 style="font-size: 1.75rem; font-weight: 500;">Are you sure?</h3>
+      <div class="modal-buttons">
+        <button id="cancel-logout" class="btn-no">NO</button>
+        <button id="confirm-logout" class="btn-yes">YES</button>
       </div>
     </div>
   </div>
@@ -590,7 +600,6 @@ document.addEventListener("DOMContentLoaded", function () {
           formData.append(`deletedImages[${index}]`, url);
         });
 
-        // Ensure cutStyles is sent as an array (handled automatically by FormData with checkboxes)
 
         const productId = document.getElementById("productId").value;
         const url = productId ? `/tezgrani/product/edit/${productId}` : "/tezgrani/product/save";
@@ -1002,6 +1011,7 @@ document.addEventListener("DOMContentLoaded", function () {
           const data = await response.json();
           console.log('Server response:', data);
           if (data.success) {
+            toastr.success(newStatus ? "Product blocked successfully!" : "Product unblocked successfully!");
             window.location.reload();
           } else {
             toastr.error(`Failed to update product status: ${data.message || 'No message provided'}`);
@@ -1025,6 +1035,39 @@ document.addEventListener("DOMContentLoaded", function () {
         confirmModal.dataset.newStatus = newStatus;
         confirmModal.style.display = 'block';
       });
+    });
+
+    // Logout Modal Logic
+    const logoutModal = document.getElementById("logout-modal");
+    const confirmLogoutBtn = document.getElementById("confirm-logout");
+    const cancelLogoutBtn = document.getElementById("cancel-logout");
+
+    window.showLogoutModal = function() {
+      logoutModal.style.display = "flex";
+    };
+
+    confirmLogoutBtn.addEventListener("click", function () {
+      logoutModal.style.display = "none";
+      window.location.href = "/tezgrani/logout";
+    });
+
+    cancelLogoutBtn.addEventListener("click", function () {
+      logoutModal.style.display = "none";
+    });
+
+    window.addEventListener("click", function (e) {
+      if (e.target === logoutModal) {
+        logoutModal.style.display = "none";
+      }
+    });
+
+    // Add click outside handler for block/unblock modal
+    window.addEventListener("click", function (e) {
+      if (e.target === confirmModal) {
+        confirmModal.style.display = "none";
+        confirmModal.removeAttribute('data-productId');
+        confirmModal.removeAttribute('data-newStatus');
+      }
     });
 });
   </script>
