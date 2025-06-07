@@ -147,10 +147,8 @@ body {
 }
 
 /* Disabled State */
-.pagination-item.disabled .pagination-link {
+.custom-pagination .pagination-list .pagination-item.disabled .pagination-link {
   color: #aaa;
-  background-color: #f1f1f1;
-  border-color: #ddd;
   cursor: not-allowed;
 }
 

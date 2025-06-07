@@ -242,6 +242,19 @@ body{
     padding: 10px 0;
 }
 
+  .out-of-stock-label {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: red;
+    color: white;
+    padding: 3px 8px;
+    font-size: 12px;
+    font-weight: 500;
+    border-radius: 4px;
+    z-index: 1;
+  }
+  
 .container {
     width: 80%;
     margin: auto;
@@ -258,36 +271,6 @@ body{
     font-size: 24px;
     font-weight: bold;
 }
-
-.view-all {
-    text-decoration: none;
-    color: green;
-    font-weight: bold;
-    position: relative;
-    transition: color 0.3s ease-in-out;
-}
-
-.view-all:hover {
-    color: darkgreen; /* Change text color on hover */
-}
-
-.view-all::after {
-    content: "";
-    display: block;
-    width: 100%;
-    height: 2px;
-    background-color: darkgreen; /* Change underline color */
-    position: absolute;
-    left: 0;
-    bottom: -2px;
-    transform: scaleX(0);
-    transition: transform 0.3s ease-in-out, background-color 0.3s ease-in-out;
-}
-
-.view-all:hover::after {
-    transform: scaleX(1);
-}
-
 
 .product-list {
     display: flex;
@@ -355,8 +338,6 @@ h3 {
   
   .cart-btn .material-symbols-outlined {
     font-size: 30px; /* Matches the previous 40px width/height */
-    /* width: 40px; */
-    /* height: 40px; */
     line-height: 40px; /* Centers the icon vertically */
   }
 
@@ -374,7 +355,6 @@ h3 {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
-    padding: 0 20px;
 }
 
 h2 {
@@ -383,17 +363,6 @@ h2 {
     margin: 0;
 }
 
-.view-all {
-    font-size: 14px;
-    text-decoration: none;
-    color: #2c7a2c;
-    font-weight: bold;
-    transition: all 0.3s ease-in-out;
-}
-
-.view-all:hover {
-    color: darkgreen;
-}
 
 /* Category Container */
 .categories {
@@ -436,7 +405,6 @@ h2 {
 /* Hover Effect */
 .category:hover {
     border: 2px solid #2c7a2c;
-    box-shadow: 0px 4px 10px rgba(44, 122, 44, 0.3);
 }
 
 .category-link {
@@ -490,7 +458,7 @@ h2 {
 
 /* Hover Effect for Product Card */
 .product-card:hover {
-    transform: scale(1.05);
+    border: 2px solid #2c7a2c;
 }
 
 /* Image Styling */

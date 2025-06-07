@@ -1,19 +1,20 @@
 const Product = require('../../models/productSchema');
 const Category = require('../../models/categorySchema');
-const Review = require('../../models/reviewSchema')
+const Review = require('../../models/reviewSchema');
+const Deal = require('../../models/dealSchema')
 
 const loadshop = async (req, res) => {
   try {
-    // Extract query parameters
     const { search, category, priceRange, sort, page = 1 } = req.query;
+
+    // Fetch listed categories
+    const categories = await Category.find({ isListed: true }).lean();
 
     // Validate category if provided
     if (category) {
       const selectedCategory = await Category.findOne({ _id: category, isListed: true }).lean();
       if (!selectedCategory) {
-        // Category doesn't exist or is not listed; redirect to /shop with other query params preserved
         const queryParams = { search, priceRange, sort, page };
-        // Remove empty or undefined params
         const filteredParams = Object.fromEntries(
           Object.entries(queryParams).filter(([_, value]) => value != null && value !== '')
         );
@@ -22,23 +23,41 @@ const loadshop = async (req, res) => {
       }
     }
 
-    // Fetch listed categories
-    const categories = await Category.find({ isListed: true }).lean();
+    // Fetch active deals with offerType="Percentage" and status="Active"
+    const activeDeals = await Deal.find({
+      offerType: 'percentage',
+      status: 'Active'
+    }).lean();
+    console.log('This all are the activeDeals: ', activeDeals)
+
+    // Separate product-specific and category-specific deals
+    const productDeals = activeDeals.filter(deal => deal.appliedTo === 'products').reduce((acc, deal) => {
+      deal.selectedItems.forEach(itemId => {
+        acc[itemId] = deal.offerPrice;
+      });
+      return acc;
+    }, {});
+    console.log('This is productDeals: ', productDeals)
+
+    const categoryDeals = activeDeals.filter(deal => deal.appliedTo === 'category').reduce((acc, deal) => {
+      deal.selectedItems.forEach(itemId => {
+        acc[itemId] = deal.offerPrice;
+      });
+      return acc;
+    }, {});
+    console.log('This is categoryDeals :', categoryDeals)
 
     // Build the product query
     let query = { isBlocked: false };
 
-    // Search functionality
     if (search) {
-      query.productName = { $regex: search, $options: 'i' }; // Case-insensitive search
+      query.productName = { $regex: search, $options: 'i' };
     }
 
-    // Filter by category (already validated)
     if (category) {
       query.category = category;
     }
 
-    // Filter by price range
     if (priceRange) {
       const [minPrice, maxPrice] = priceRange.split('-').map(Number);
       if (maxPrice) {
@@ -49,7 +68,7 @@ const loadshop = async (req, res) => {
     }
 
     // Pagination
-    const limit = 12; // Products per page
+    const limit = 20;
     const skip = (page - 1) * limit;
 
     // Sorting
@@ -63,26 +82,48 @@ const loadshop = async (req, res) => {
     } else if (sort === 'name-z-to-a') {
       sortOption.productName = -1;
     } else {
-      sortOption.createdAt = 1; // Default: first added, first place
+      sortOption.createdAt = 1;
     }
 
     // Fetch products with filters, sorting, and pagination
     const products = await Product.find(query)
+      .populate('category')
       .sort(sortOption)
       .skip(skip)
       .limit(limit)
       .lean();
 
-    // Transform products
-    const transformedProducts = products.map(p => ({
-      ...p,
-      name: p.productName,
-      image: Array.isArray(p.productImage) ? p.productImage[0] : p.productImage,
-      price: p.salePrice,
-      regularPrice: p.regularPrice
-    }));
+    // Transform products and calculate applicable offers
+    const transformedProducts = products.map(p => {
+      const productOffer = productDeals[p._id.toString()] || 0;
+      const categoryOffer = categoryDeals[p.category?._id.toString()] || 0;
+      const largestOffer = Math.max(productOffer, categoryOffer);
 
-    // Get total product count for pagination
+      let discountPercentage = 0;
+      let finalPrice = p.regularPrice; // Main price is regularPrice
+
+      // If a deal applies, use the largest offer and update the price
+      if (largestOffer > 0) {
+        discountPercentage = largestOffer;
+        finalPrice = p.regularPrice * (1 - largestOffer / 100);
+      } else {
+        // If no deal applies, calculate discount using the template's logic
+        const priceDifference = p.salePrice - p.regularPrice;
+        discountPercentage = p.salePrice > 0 ? Math.round((priceDifference / p.salePrice) * 100) : 0;
+      }
+
+      return {
+        ...p,
+        name: p.productName,
+        image: Array.isArray(p.productImage) ? p.productImage[0] : p.productImage,
+        price: finalPrice, // Main price (regularPrice or deal-applied price)
+        regularPrice: p.regularPrice,
+        salePrice: p.salePrice, // Strikethrough price
+        largestOffer: largestOffer > 0 ? largestOffer : null,
+        discountPercentage // Add discountPercentage field
+      };
+    });
+
     const totalProducts = await Product.countDocuments(query);
     const totalPages = Math.ceil(totalProducts / limit);
 
@@ -115,19 +156,85 @@ const loadProductDetails = async (req, res) => {
       return res.redirect('/shop');
     }
 
-    // Fetch reviews associated with this product
-    const reviews = await Review.find({ product: productId })
-      .populate('user', 'name email') // Populate user details (e.g., name)
+    // Fetch active deals with offerType="Percentage" and status="Active"
+    const activeDeals = await Deal.find({
+      offerType: 'percentage',
+      status: 'Active'
+    }).lean();
+
+    // Separate product-specific and category-specific deals
+    const productDeals = activeDeals.filter(deal => deal.appliedTo === 'products').reduce((acc, deal) => {
+      deal.selectedItems.forEach(itemId => {
+        acc[itemId] = deal.offerPrice;
+      });
+      return acc;
+    }, {});
+
+    const categoryDeals = activeDeals.filter(deal => deal.appliedTo === 'category').reduce((acc, deal) => {
+      deal.selectedItems.forEach(itemId => {
+        acc[itemId] = deal.offerPrice;
+      });
+      return acc;
+    }, {});
+
+    // Helper to transform product for frontend
+    const transformProduct = (p) => {
+      const productOffer = productDeals[p._id.toString()] || 0;
+      const categoryOffer = categoryDeals[p.category?._id.toString()] || 0;
+      const largestOffer = Math.max(productOffer, categoryOffer);
+
+      let discountPercentage = 0;
+      let finalPrice = p.regularPrice;
+
+      if (largestOffer > 0) {
+        discountPercentage = largestOffer;
+        finalPrice = p.regularPrice * (1 - largestOffer / 100);
+      } else {
+        const priceDifference = p.salePrice - p.regularPrice;
+        discountPercentage = p.salePrice > 0 ? Math.round((priceDifference / p.salePrice) * 100) : 0;
+      }
+
+      return {
+        ...p,
+        name: p.productName,
+        image: Array.isArray(p.productImage) ? p.productImage[0] : p.productImage,
+        price: finalPrice,
+        regularPrice: p.regularPrice,
+        salePrice: p.salePrice,
+        largestOffer: largestOffer > 0 ? largestOffer : null,
+        discountPercentage
+      };
+    };
+
+    // Transform the current product
+    const transformedProduct = transformProduct(product);
+
+    // Fetch recommended products (same category, exclude current product)
+    const recommendedProducts = await Product.find({
+      category: product.category?._id,
+      _id: { $ne: productId },
+      isBlocked: false
+    })
+      .limit(4)
       .lean();
 
-    console.log('Product:', product); // Debug log
-    console.log('Product Images:', product.productImage); // Debug log
-    console.log('Reviews:', reviews); // Debug log for reviews
+    const transformedRecommendedProducts = recommendedProducts.map(transformProduct);
 
-    // Render the product page with both product and reviews
+    // Fetch reviews associated with this product
+    const reviews = await Review.find({ product: productId })
+      .populate('user', 'name email')
+      .lean();
+
+    console.log('Product:', transformedProduct);
+    console.log('Product Images:', transformedProduct.productImage);
+    console.log('Recommended Products:', transformedRecommendedProducts);
+    console.log('Reviews:', reviews);
+
+    // Render the product page with all data
     res.render('products', {
-      product,
-      reviews, // Pass reviews to the template
+      product: transformedProduct,
+      products: transformedRecommendedProducts,
+      reviews,
     });
   } catch (error) {
     console.error('❌ Error loading product details:', error);

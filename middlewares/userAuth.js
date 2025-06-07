@@ -7,7 +7,7 @@ const userAuth = async (req, res, next) => {
     // Step 1: Check if session contains userId
     if (!req.session.user) {
       console.log("❌ No userId found in session. Redirecting to login.");
-      return res.redirect('/login'); 
+      return res.redirect('/'); 
     }
 
     // Step 2: Fetch the user from the DB
@@ -17,12 +17,12 @@ const userAuth = async (req, res, next) => {
     // Step 3: Validate user existence and block status
     if (!user) {
       console.log("⛔ User not found in DB. Destroying session.");
-      return req.session.destroy(() => res.redirect('/login'));
+      return req.session.destroy(() => res.redirect('/'));
     }
 
     if (user.isBlocked) {
       console.log("🚫 User is blocked. Destroying session.");
-      return req.session.destroy(() => res.redirect('/login'));
+      return req.session.destroy(() => res.redirect('/'));
     }
 
     // Step 4: All good, proceed
@@ -31,7 +31,7 @@ const userAuth = async (req, res, next) => {
 
   } catch (err) {
     console.log("❌ Error in userAuth middleware:", err);
-    res.redirect('/login');
+    res.redirect('/');
   }
 };
 

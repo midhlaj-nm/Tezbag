@@ -109,7 +109,7 @@ const loadSettings = async (req, res) => {
 
         // Check if userId exists in session
         if (!userId) {
-            return res.redirect('/login'); // Redirect to login if session is invalid
+            return res.redirect('/'); // Redirect to login if session is invalid
         }
 
         // Fetch user details from the database
@@ -120,7 +120,7 @@ const loadSettings = async (req, res) => {
         // Check if user exists
         if (!userDoc) {
             req.session.destroy(); // Clear invalid session
-            return res.redirect('/login'); // Redirect to login if user not found
+            return res.redirect('/'); // Redirect to login if user not found
         }
 
         // Fetch the user's addresses from the database

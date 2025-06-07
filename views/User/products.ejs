@@ -137,6 +137,43 @@
     </div>
   </div>
 </div>
+<% if (products.length > 0) { %>
+  <section class="featured-products">
+    <div class="container">
+      <div class="header">
+        <h2>Recommended Products</h2>
+      </div>
+      <div class="product-list">
+        <% products.slice(0, 4).forEach(product => { %>
+          <% if (product.status !== 'Out Of Stock') { %>
+            <div class="product-card <%= product.status === 'Out Of Stock' ? 'out-of-stock' : '' %>">
+              <span class="out-of-stock-label">
+                <%= product.status === 'Out Of Stock' ? 'Out of Stock' : (product.discountPercentage > 0 ? `-${product.discountPercentage}% off` : '') %>
+              </span>
+              <a href="/product/<%= product._id %>" class="product-link">
+                <img src="<%= product.image || '/default-product.png' %>" alt="<%= product.name %>">
+                <h3><%= product.name %></h3>
+                <p class="price">
+                  <% if (product.largestOffer && product.largestOffer > 0) { %>
+                    <%= product.price.toFixed(2) %>
+                    <% if (product.price < product.regularPrice) { %>
+                      <del class="old-price"><%= product.regularPrice.toFixed(2) %></del>
+                    <% } %>
+                  <% } else { %>
+                    <%= product.regularPrice.toFixed(2) %>
+                    <% if (product.salePrice !== product.regularPrice) { %>
+                      <del class="old-price"><%= product.salePrice.toFixed(2) %></del>
+                    <% } %>
+                  <% } %>
+                </p>
+              </a>
+            </div>
+          <% } %>
+        <% }) %>
+      </div>
+    </div>
+  </section>
+<% } %>
 
 <%- include("../../views/Partials/user/footer") %>
 
@@ -144,13 +181,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
 <script>
-  // Configure Toastr options
-  toastr.options = {
-    positionClass: 'toast-top-right',
-    timeOut: 3000,
-    showMethod: 'fadeIn',
-    hideMethod: 'fadeOut',
-  };
 
   document.querySelectorAll(".subImg").forEach((img) => {
     img.addEventListener("click", function () {

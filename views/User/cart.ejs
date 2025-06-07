@@ -1,0 +1,216 @@
+<%- include("../../views/Partials/user/header-ho") %>
+<hr style="margin: 0rem 0rem 1rem 0rem; background-color: #535353;">
+<link rel="stylesheet" href="/User-css/cart.css">
+<!-- Add Material Symbols font -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+</head>
+<body>
+
+<!-- breadcrumb -->
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="/">Home</a></li>
+    <% breadcrumbs.forEach((crumb, index) => { %>
+      <li class="breadcrumb-item <%= index === breadcrumbs.length - 1 ? 'active' : '' %>">
+        <% if (index !== breadcrumbs.length - 1) { %>
+          <a href="<%= crumb.url %>"><%= crumb.name %></a>
+        <% } else { %>
+          <%= crumb.name %>
+        <% } %>
+      </li>
+    <% }) %>
+  </ol>
+</nav>
+
+<div class="container-fluid">
+    <div class="cart-container">
+        <h1 class="cart-title">My Shopping Cart</h1>
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="cart-table">
+                    <table class="table">
+                        <thead>
+                            <tr style="text-align: center;">
+                                <th>PRODUCT</th>
+                                <th>PRICE</th>
+                                <th>QUANTITY</th>
+                                <th>SUBTOTAL</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="cart-items" style="text-align: center;">
+                            <% if (cartItems && cartItems.length > 0) { %>
+                                <% cartItems.forEach(item => { %>
+                                    <tr data-item-id="<%= item._id %>">
+                                        <td>
+                                            <div class="product-info">
+                                                <img src="/uploads/<%= item.product.image %>"  class="product-image">
+                                                <h6 class="product-name"><%= item.product.productName %></h6>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="price-text" data-price="<%= item.price %>">₹<%= item.price.toFixed(2) %></span>
+                                        </td>
+                                        <td>
+                                            <div class="quantity-selector">
+                                                <button class="decrease" data-product-id="<%= item.productId._id %>">-</button>
+                                                <span class="quantity"><%= item.quantity %></span>
+                                                <button class="increase" data-product-id="<%= item.productId._id %>">+</button>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="price-text subtotal">₹<%= item.totalPrice.toFixed(2) %></span>
+                                        </td>
+                                        <td>
+                                            <button class="remove-btn" data-product-id="<%= item.productId._id %>">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                <% }) %>
+                            <% } else { %>
+                                    <td colspan="4" style="text-align: center; padding: 20px;">
+                                        <div style="
+                                          font-weight: 500;
+                                          font-size: 1.1rem;
+                                          color: #666;
+                                        ">
+                                          No products available in the Cart!.
+                                          Continue<a href="/shop" style="color: rgb(43, 43, 43);"> Shopping</a>
+                                        </div>
+                                    </td>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="cart-actions">
+                    <a href="/shop" class="action-btn">
+                        <span class="material-symbols-outlined">arrow_back</span>Return to shop
+                    </a>
+                    <button class="action-btn clear-cart-btn">
+                        <span class="material-symbols-outlined">clear_all</span>Clear Cart
+                    </button>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="cart-summary">
+                    <h4>Cart Total</h4>
+                    
+                    <div class="summary-row">
+                        <span>Subtotal:</span>
+                        <span class="cart-subtotal">₹<%= cartTotal ? cartTotal.toFixed(2) : '0.00' %></span>
+                    </div>
+                    
+                    <div class="summary-row">
+                        <span>Shipping:</span>
+                        <span class="shipping-rate" style="color: #00B207;">Free</span>
+                    </div>
+                    
+                    <div class="summary-row total">
+                        <span>Total:</span>
+                        <span class="cart-total">₹<%= cartTotal ? cartTotal.toFixed(2) : '0.00' %></span>
+                    </div>
+                    
+                    <button class="checkout-btn">
+                        Proceed to checkout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add JavaScript for cart actions -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Increase quantity
+    document.querySelectorAll('.increase').forEach(button => {
+        button.addEventListener('click', async () => {
+            const productId = button.getAttribute('data-product-id');
+            try {
+                const response = await fetch('/cart/increase-quantity', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ productId })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    window.location.reload();
+                } else {
+                    alert(data.message || 'Failed to update quantity');
+                }
+            } catch (error) {
+                console.error('Error increasing quantity:', error);
+            }
+        });
+    });
+
+    // Decrease quantity
+    document.querySelectorAll('.decrease').forEach(button => {
+        button.addEventListener('click', async () => {
+            const productId = button.getAttribute('data-product-id');
+            try {
+                const response = await fetch('/cart/decrease-quantity', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ productId })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    window.location.reload();
+                } else {
+                    alert(data.message || 'Failed to update quantity');
+                }
+            } catch (error) {
+                console.error('Error decreasing quantity:', error);
+            }
+        });
+    });
+
+    // Remove item
+    document.querySelectorAll('.remove-btn').forEach(button => {
+        button.addEventListener('click', async () => {
+            const productId = button.getAttribute('data-product-id');
+            try {
+                const response = await fetch('/cart/remove-item', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ productId })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    window.location.reload();
+                } else {
+                    alert(data.message || 'Failed to remove item');
+                }
+            } catch (error) {
+                console.error('Error removing item:', error);
+            }
+        });
+    });
+
+    // Clear cart
+    document.querySelector('.clear-cart-btn').addEventListener('click', async () => {
+        try {
+            const response = await fetch('/cart/clear', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            const data = await response.json();
+            if (data.success) {
+                window.location.reload();
+            } else {
+                alert(data.message || 'Failed to clear cart');
+            }
+        } catch (error) {
+            console.error('Error clearing cart:', error);
+        }
+    });
+});
+</script>
+
+<%- include("../../views/Partials/user/footer") %>
+</body>
+</html>

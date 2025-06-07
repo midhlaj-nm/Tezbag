@@ -174,6 +174,19 @@ body{
     margin-bottom: 20px;
 }
 
+  .out-of-stock-label {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: red;
+    color: white;
+    padding: 3px 8px;
+    font-size: 12px;
+    font-weight: 500;
+    border-radius: 4px;
+    z-index: 1;
+  }
+  
 .btn-success {
     background-color: #00B207; /* Custom Green */
     padding: 10px 20px;

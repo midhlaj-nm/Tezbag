@@ -3,6 +3,7 @@ const Category = require('../../models/categorySchema');
 const Product = require('../../models/productSchema');
 const Gallery = require('../../models/bannerSchema');
 const Admin = require('../../models/adminSchema');
+const Deal = require('../../models/dealSchema')
 const env = require('dotenv').config();
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
@@ -59,17 +60,57 @@ const loadHomepage = async (req, res, next) => {
                 .lean();
         }
 
+        // Fetch active deals with offerType="Percentage" and status="Active"
+        const activeDeals = await Deal.find({
+            offerType: 'percentage',
+            status: 'Active'
+        }).lean();
+
+        // Separate product-specific and category-specific deals
+        const productDeals = activeDeals.filter(deal => deal.appliedTo === 'products').reduce((acc, deal) => {
+            deal.selectedItems.forEach(itemId => {
+                acc[itemId] = deal.offerPrice;
+            });
+            return acc;
+        }, {});
+
+        const categoryDeals = activeDeals.filter(deal => deal.appliedTo === 'category').reduce((acc, deal) => {
+            deal.selectedItems.forEach(itemId => {
+                acc[itemId] = deal.offerPrice;
+            });
+            return acc;
+        }, {});
+
         // Helper to transform product for frontend
-        const transformProduct = (product) => ({
-            ...product,
-            name: product.productName,
-            image: Array.isArray(product.productImage) ? product.productImage[0] : product.productImage,
-            price: product.salePrice,
-            regularPrice: product.regularPrice,
-            discount: product.regularPrice > 0
-                ? (((product.regularPrice - product.salePrice) / product.regularPrice) * 100).toFixed(0)
-                : 0
-        });
+        const transformProduct = (product) => {
+            const productOffer = productDeals[product._id.toString()] || 0;
+            const categoryOffer = categoryDeals[product.category?.toString()] || 0;
+            const largestOffer = Math.max(productOffer, categoryOffer);
+
+            let discountPercentage = 0;
+            let finalPrice = product.regularPrice; // Main price is regularPrice
+
+            // If a deal applies, use the largest offer and update the price
+            if (largestOffer > 0) {
+                discountPercentage = largestOffer;
+                finalPrice = product.regularPrice * (1 - largestOffer / 100);
+            } else {
+                // If no deal applies, calculate discount using the specified logic
+                const priceDifference = product.salePrice - product.regularPrice;
+                discountPercentage = product.salePrice > 0 ? Math.round((priceDifference / product.salePrice) * 100) : 0;
+            }
+
+            return {
+                ...product,
+                name: product.productName,
+                image: Array.isArray(product.productImage) ? product.productImage[0] : product.productImage,
+                price: finalPrice, // Main price (regularPrice or deal-applied price)
+                regularPrice: product.regularPrice,
+                salePrice: product.salePrice, // Strikethrough price
+                largestOffer: largestOffer > 0 ? largestOffer : null,
+                discountPercentage // Add discountPercentage field
+            };
+        };
 
         const transformedProducts = products.map(transformProduct);
         const transformedLatestProducts = latestProducts.map(transformProduct);

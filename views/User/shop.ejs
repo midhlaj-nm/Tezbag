@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tez Bag</title>
+  <title>Tez Bag | shop</title>
 
   <!-- jQuery (required for Toastr) -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -60,7 +60,7 @@
           </div>
         </a>
         <div class="divider"></div>
-        <a href="" class="cart-link">
+        <a href="/cart" class="cart-link">
           <div class="cart-content">
             <span class="material-symbols-outlined icon">shopping_bag</span>
             <div class="cart-text">
@@ -234,17 +234,24 @@
                   <% products.forEach(product => { %>
                     <div class="col-12 col-sm-6 col-md-3">
                       <div class="product-card <%= product.status === 'Out Of Stock' ? 'out-of-stock' : '' %>">
-                        <% const priceDifference = (product.price - product.regularPrice); %>
-                        <% const percentageDiscount = product.price > 0 ? Math.round((priceDifference / product.price) * 100) : 0; %>
                         <span class="out-of-stock-label">
-                          <%= product.status === 'Out Of Stock' ? 'Out of Stock' : `-${percentageDiscount}% off` %>
+                          <%= product.status === 'Out Of Stock' ? 'Out of Stock' : (product.discountPercentage > 0 ? `-${product.discountPercentage}% off` : '') %>
                         </span>
                         <a href="/product/<%= product._id %>" class="product-link">
-                          <img src="<%= product.image || '/default-product.png' %>" alt="<%= product.name %>">
+                          <img src="<%= product.image %>" alt="<%= product.name %>">
                           <p class="product-name"><%= product.name %></p>
                           <p class="price">
-                            <%= product.regularPrice.toFixed(2) %>
-                            <del class="old-price"><%= product.price.toFixed(2) %></del>
+                            <% if (product.largestOffer && product.largestOffer > 0) { %>
+                              <%= product.price.toFixed(2) %>
+                              <% if (product.price < product.regularPrice) { %>
+                                <del class="old-price"><%= product.regularPrice.toFixed(2) %></del>
+                              <% } %>
+                            <% } else { %>
+                              <%= product.regularPrice.toFixed(2) %>
+                              <% if (product.salePrice !== product.regularPrice) { %>
+                                <del class="old-price"><%= product.salePrice.toFixed(2) %></del>
+                              <% } %>
+                            <% } %>
                           </p>
                         </a>
                         <a href="/cart/add/<%= product._id %>" <%= product.status === 'Out Of Stock' ? 'class="disabled-link"' : '' %>>

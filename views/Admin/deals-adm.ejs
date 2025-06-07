@@ -378,7 +378,11 @@
       <nav aria-label="Admin page navigation" class="custom-pagination">
         <ul class="pagination-list">
           <li class="pagination-item <%= currentPage === 1 ? 'disabled' : '' %>">
-            <a class="pagination-link" href="?page=<%= currentPage - 1 %><%= search ? '&search=' + encodeURIComponent(search) : '' %>">Previous</a>
+            <% if (currentPage === 1) { %>
+              <span class="pagination-link">Previous</span>
+            <% } else { %>
+              <a class="pagination-link" href="?page=<%= currentPage - 1 %><%= search ? '&search=' + encodeURIComponent(search) : '' %>">Previous</a>
+            <% } %>
           </li>
           <% for (let i = 1; i <= totalPages; i++) { %>
             <li class="pagination-item <%= currentPage === i ? 'active' : '' %>">
@@ -386,7 +390,11 @@
             </li>
           <% } %>
           <li class="pagination-item <%= currentPage === totalPages ? 'disabled' : '' %>">
-            <a class="pagination-link" href="?page=<%= currentPage + 1 %><%= search ? '&search=' + encodeURIComponent(search) : '' %>">Next</a>
+            <% if (currentPage === totalPages) { %>
+              <span class="pagination-link">Next</span>
+            <% } else { %>
+              <a class="pagination-link" href="?page=<%= currentPage + 1 %><%= search ? '&search=' + encodeURIComponent(search) : '' %>">Next</a>
+            <% } %>
           </li>
         </ul>
       </nav>
@@ -402,7 +410,7 @@
       </div>
       <div class="popup-content">
         <!-- Percentage Offer Form -->
-        <form id="percentageForm" style="display: block;" enctype="multipart/form-data" novalidate>
+        <form id="percentageForm" style="display: block;" novalidate>
           <input type="hidden" id="dealIdPercentage" name="dealId">
           <input type="hidden" name="offerType" value="percentage">
           <div class="form-group">
@@ -473,7 +481,7 @@
         </form>
 
         <!-- Coupon Offer Form -->
-        <form id="couponForm" style="display: none;" enctype="multipart/form-data" novalidate>
+        <form id="couponForm" style="display: none;" novalidate>
           <input type="hidden" id="dealIdCoupon" name="dealId">
           <input type="hidden" name="offerType" value="coupon">
           <div class="form-group">
@@ -924,6 +932,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       const formData = new FormData(percentageForm);
       const formObject = Object.fromEntries(formData);
+      formObject.selectedItems = selectedItems;     
       const jsonData = JSON.stringify(formObject);
 
       // Debug: Log FormData contents
@@ -975,7 +984,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       if (!isValid) return;
 
-      const formData = new FormData(percentageForm);
+      const formData = new FormData(couponForm);
       const formObject = Object.fromEntries(formData);
       const jsonData = JSON.stringify(formObject);
 

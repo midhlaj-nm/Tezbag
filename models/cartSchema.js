@@ -1,5 +1,5 @@
-const mongoose = require('mongoose')
-const {Schema} = mongoose;
+const mongoose = require('mongoose');
+const { Schema } = mongoose;
 
 const cartSchema = new Schema({
     userId: {
@@ -8,14 +8,14 @@ const cartSchema = new Schema({
         required: true
     },
     items: [{
-        productId:{
-            type:Schema.Types.ObjectId,
+        productId: {
+            type: Schema.Types.ObjectId,
             ref: 'Product',
             required: true
         },
         quantity: {
-            type:Number,
-            default:1
+            type: Number,
+            default: 1
         },
         price: {
             type: Number,
@@ -29,14 +29,21 @@ const cartSchema = new Schema({
             type: String,
             default: 'placed'
         },
-        cancellationReason:{
+        cancellationReason: {
             type: String,
             default: 'none'
+        },
+        createdAt: {
+            type: Date,
+            default: Date.now
+        },
+        updatedAt: {
+            type: Date,
+            default: Date.now
         }
     }]
-})
+}, { timestamps: true });
 
+const Cart = mongoose.model('Cart', cartSchema);
 
-const Cart = mongoose.model('Cart',cartSchema)
-
-module.exports = Cart
+module.exports = Cart;

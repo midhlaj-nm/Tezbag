@@ -2,6 +2,7 @@ const Deal = require('../../models/dealSchema');
 const Product = require('../../models/productSchema');
 const Category = require('../../models/categorySchema');
 const mongoose = require('mongoose');
+const updateDealStatuses = require('../../utils/updateDealStatuses')
 
 const loadDeals = async (req, res) => {
   try {
@@ -20,11 +21,38 @@ const loadDeals = async (req, res) => {
     const dealQuery = search.trim() ? { name: { $regex: search, $options: 'i' } } : {};
 
     // Fetch deals with pagination and search
-    const deals = await Deal.find(dealQuery)
-        .sort({ createdAt: -1 }) // Sort by createdOn in descending order (newest first)
+    let deals = await Deal.find(dealQuery)
+        .sort({ createdAt: -1 })
         .skip(skip)
-        .limit(limit)
-        .lean();
+        .limit(limit);
+
+    // Normalize current date to IST
+    const currentDate = new Date();
+    const currentISTOffset = 5.5 * 60;
+    currentDate.setMinutes(currentDate.getMinutes() + currentDate.getTimezoneOffset() + currentISTOffset);
+    currentDate.setHours(0, 0, 0, 0);
+
+    // Check and update status for each deal
+    for (let deal of deals) {
+      const start = new Date(deal.createdOn);
+      start.setHours(0, 0, 0, 0);
+      const end = new Date(deal.expireOn);
+      end.setHours(23, 59, 59, 999);
+
+      let expectedStatus = deal.status;
+      if (start <= currentDate && end >= currentDate) expectedStatus = 'Active';
+      else if (end < currentDate) expectedStatus = 'Expired';
+      else expectedStatus = 'Scheduled';
+
+      // Update status if outdated
+      if (deal.status !== expectedStatus) {
+        deal.status = expectedStatus;
+        await deal.save();
+      }
+    }
+
+    // Convert to plain objects after saving
+    deals = deals.map(deal => deal.toObject());
 
     // Populate selectedItems based on appliedTo
     for (let deal of deals) {
@@ -97,9 +125,6 @@ const saveDeals = async (req, res) => {
     currentDate.setMinutes(currentDate.getMinutes() + currentDate.getTimezoneOffset() + currentISTOffset);
     currentDate.setHours(0, 0, 0, 0);
 
-    let newDeal = {};
-    let status = 'Scheduled';
-
     // Parse startDate and endDate, assuming they come as YYYY-MM-DD in browser's local timezone (likely IST)
     const start = new Date(startDate + 'T00:00:00+05:30'); // Explicitly set to IST
     const end = new Date(endDate + 'T23:59:59+05:30'); // End of the day in IST
@@ -115,9 +140,12 @@ const saveDeals = async (req, res) => {
       return res.status(400).json({ success: false, message: 'End date must be after start date' });
     }
 
-    // Determine status based on IST dates
+    // Determine initial status
+    let status = 'Scheduled';
     if (start <= currentDate && end >= currentDate) status = 'Active';
     else if (end < currentDate) status = 'Expired';
+
+    let newDeal = {};
 
     if (offerType === 'percentage') {
       // Validate required fields
@@ -160,8 +188,8 @@ const saveDeals = async (req, res) => {
         expireOn: end,
         appliedTo: selectedType,
         selectedItems: itemsArray,
-        status,
         isListed: true,
+        status,
       });
     } else if (offerType === 'coupon') {
       // Validate required fields
@@ -190,10 +218,10 @@ const saveDeals = async (req, res) => {
         expireOn: end,
         minPrice: min,
         maxPrice: max,
-        appliedTo: undefined, // Not applicable for coupon offers
-        selectedItems: undefined, // Not applicable for coupon offers
-        status,
+        appliedTo: undefined,
+        selectedItems: undefined,
         isListed: true,
+        status,
       });
     }
 
@@ -230,7 +258,7 @@ const editDeals = async (req, res) => {
     // Check for duplicate deal name (case-insensitive), excluding the current deal
     const existingDeal = await Deal.findOne({
       name: { $regex: `^${dealName.trim()}$`, $options: 'i' },
-      _id: { $ne: dealId }, // Exclude the current deal
+      _id: { $ne: dealId },
     });
     if (existingDeal) {
       return res.status(400).json({ success: false, message: 'A deal with this name already exists' });
@@ -242,8 +270,6 @@ const editDeals = async (req, res) => {
     currentDate.setMinutes(currentDate.getMinutes() + currentDate.getTimezoneOffset() + currentISTOffset);
     currentDate.setHours(0, 0, 0, 0);
 
-    let status = deal.status; // Preserve existing status by default
-
     // Parse startDate and endDate
     const start = new Date(startDate + 'T00:00:00+05:30'); // Explicitly set to IST
     const end = new Date(endDate + 'T23:59:59+05:30'); // End of the day in IST
@@ -252,12 +278,12 @@ const editDeals = async (req, res) => {
     if (isNaN(start.getTime()) || isNaN(end.getTime())) {
       return res.status(400).json({ success: false, message: 'Invalid date format' });
     }
-    // Allow past dates for editing existing deals, but validate end date
     if (end < start) {
       return res.status(400).json({ success: false, message: 'End date must be after start date' });
     }
 
-    // Update status only if dates have changed
+    // Update status based on dates
+    let status = deal.status;
     if (start.getTime() !== deal.createdOn.getTime() || end.getTime() !== deal.expireOn.getTime()) {
       if (start <= currentDate && end >= currentDate) status = 'Active';
       else if (end < currentDate) status = 'Expired';
@@ -334,8 +360,8 @@ const editDeals = async (req, res) => {
         expireOn: end,
         minPrice: min,
         maxPrice: max,
-        appliedTo: undefined, // Not applicable for coupon offers
-        selectedItems: undefined, // Not applicable for coupon offers
+        appliedTo: undefined,
+        selectedItems: undefined,
         status,
       });
     } else {

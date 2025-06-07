@@ -2,7 +2,8 @@ const express = require('express')
 const router = express.Router()
 const userController = require('../controllers/user/userController');
 const productPageController = require('../controllers/user/productPageController');
-const profileController = require('../controllers/user/profileController')
+const profileController = require('../controllers/user/profileController');
+const cartPageController = require('../controllers/user/cartPageController')
 const passport = require('passport');
 const userAuth = require('../middlewares/userAuth');
 
@@ -51,7 +52,7 @@ router.get('/reset-password', userController.loadResetPassPage);
 router.post('/reset-password', userController.resetPasswordPost);
 
 // profileController.js
-router.get('/account', userAuth, profileController.loadDashboard);
+router.get('/account',  profileController.loadDashboard);
 router.get('/account-settings', profileController.loadSettings);
 router.get('/email-update-otp', profileController.emailOtpPage);
 router.post('/verify-email-otp', profileController.otpVerification)
@@ -63,7 +64,10 @@ router.post('/account-settings/password-reset', profileController.changePassword
 router.get('/logout', userAuth, userController.logout);
 
 //productPage
-router.get('/shop', userAuth, productPageController.loadshop)
-router.get('/product/:id', userAuth, productPageController.loadProductDetails)
+router.get('/shop', productPageController.loadshop)
+router.get('/product/:id', productPageController.loadProductDetails)
+
+//cartPageController
+router.get('/cart', cartPageController.loadCart)
 
 module.exports = router
