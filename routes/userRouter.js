@@ -55,19 +55,24 @@ router.post('/reset-password', userController.resetPasswordPost);
 router.get('/account',  profileController.loadDashboard);
 router.get('/account-settings', profileController.loadSettings);
 router.get('/email-update-otp', profileController.emailOtpPage);
-router.post('/verify-email-otp', profileController.otpVerification)
-router.patch('/account-settings/update-profile', profileController.updateProfile)
+router.post('/verify-email-otp', profileController.otpVerification);
+router.patch('/account-settings/update-profile', profileController.updateProfile);
 router.post('/account-settings/add-address', profileController.addAddress);
 router.patch('/account-settings/edit-address', profileController.editAddress);
 router.delete('/account-settings/delete-address/:index', profileController.deleteAddress);
-router.post('/account-settings/password-reset', profileController.changePassword)
+router.post('/account-settings/password-reset', profileController.changePassword);
 router.get('/logout', userAuth, userController.logout);
 
 //productPage
-router.get('/shop', productPageController.loadshop)
-router.get('/product/:id', productPageController.loadProductDetails)
+router.get('/shop', productPageController.loadshop);
+router.get('/product/:id', productPageController.loadProductDetails);
 
 //cartPageController
-router.get('/cart', cartPageController.loadCart)
+router.get('/cart', cartPageController.loadCart);
+router.post('/cart/add/:productId', cartPageController.addToCart)
+router.patch('/cart/increase-quantity', cartPageController.increaseQuantity);
+router.patch('/cart/decrease-quantity', cartPageController.decreaseQuantity);
+router.delete('/cart/remove-item', cartPageController.removeItem);
+router.delete('/cart/clear', cartPageController.clearCart);
 
 module.exports = router

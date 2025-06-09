@@ -37,10 +37,10 @@ router.patch('/product/toggle-block/:productId', adminAuth, productManagementCon
 router.patch('/product/edit/:productId', adminAuth, upload.array('images'), productManagementController.editProduct)
 
 //dealsManageController
-router.get('/deals-management', dealsManageController.loadDeals);
-router.post('/deals/save', dealsManageController.saveDeals);
-router.patch('/deals/edit/:dealId', dealsManageController.editDeals)
-router.delete('/deals/delete/:dealId', dealsManageController.deleteDeal)
+router.get('/deals-management', adminAuth, dealsManageController.loadDeals);
+router.post('/deals/save', adminAuth, dealsManageController.saveDeals);
+router.patch('/deals/edit/:dealId', adminAuth, dealsManageController.editDeals)
+router.delete('/deals/delete/:dealId', adminAuth, dealsManageController.deleteDeal)
 
 
 module.exports = router;

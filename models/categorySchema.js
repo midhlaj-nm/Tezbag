@@ -31,12 +31,16 @@ const categorySchema = new Schema({
   },
   image: {
     type: String,
-    default: '' // Store Cloudinary URL
+    default: '' 
   },
   publicId: {
     type: String,
-    default: '' // Store Cloudinary public ID for deletion
-  }
+    default: '' 
+  },
+    activeDealIds: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Deal'
+    }]
 }, { timestamps: true });
 
 const Category = mongoose.model('Category', categorySchema);

@@ -10,7 +10,7 @@ a {
 
 #toast-container > .toast.fade.show {
     opacity: 1 !important;
-  }
+}
 
 body{
     font-family: 'Poppins', sans-serif;    

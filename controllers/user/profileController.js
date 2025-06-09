@@ -146,7 +146,7 @@ const addAddress = async (req, res) => {
     try {
         const userId = req.session.user;
         if (!userId) {
-            return res.status(401).json({ success: false, message: 'User not authenticated' });
+            return res.status(401).json({ success: false, message: 'Please Login First' });
         }
 
         if (!req.body) {
@@ -251,7 +251,7 @@ const editAddress = async (req, res) => {
     try {
         const userId = req.session.user;
         if (!userId) {
-            return res.status(401).json({ success: false, message: 'User not authenticated' });
+            return res.status(401).json({ success: false, message: 'Please Login First' });
         }
 
         // Log the incoming request body for debugging
@@ -329,7 +329,7 @@ const deleteAddress = async (req, res) => {
     try {
         const userId = req.session.user;
         if (!userId) {
-            return res.status(401).json({ success: false, message: 'User not authenticated' });
+            return res.status(401).json({ success: false, message: 'Please Login First' });
         }
 
         const { index } = req.params; // Changed from req.body to req.params
@@ -389,7 +389,7 @@ const changePassword = async (req, res) => {
             req.session.destroy();
             return res.json({
                 success: false,
-                message: 'User not found.'
+                message: 'Please Login First found.'
             });
         }
   
@@ -435,7 +435,7 @@ const updateProfile = async (req, res) => {
         if (!userId) {
             return res.status(401).json({
                 success: false,
-                message: 'User not authenticated.'
+                message: 'Please Login First.'
             });
         }
 
@@ -457,7 +457,7 @@ const updateProfile = async (req, res) => {
             req.session.destroy();
             return res.json({
                 success: false,
-                message: 'User not found.'
+                message: 'Please Login First found.'
             });
         }
 
@@ -539,7 +539,7 @@ const otpVerification = async (req, res) => {
         if (!userId) {
             return res.status(401).json({
                 success: false,
-                message: 'User not authenticated.'
+                message: 'Please Login First.'
             });
         }
 
@@ -576,7 +576,7 @@ const otpVerification = async (req, res) => {
         if (!user) {
             return res.json({
                 success: false,
-                message: "User not found."
+                message: "Please Login First found."
             });
         }
 

@@ -1,7 +1,6 @@
 const Category = require('../../models/categorySchema');
 const Product = require('../../models/productSchema');
 const generateSKU = require('../../utils/SKUgenerator');
-const User = require('../../models/userSchema');
 const cloudinary = require('../../config/cloudinary');
 
 const loadProduct = async (req, res) => {
@@ -10,9 +9,10 @@ const loadProduct = async (req, res) => {
     const currentPage = parseInt(req.query.page) || 1;
     const search = req.query.search || '';
 
-    const query = search
-      ? { productName: { $regex: new RegExp(search, 'i') }, isBlocked: false } // Only show unblocked products
-      : { isBlocked: false };
+    let query = {};
+    if (search) {
+      query.productName = { $regex: search, $options: 'i' };
+    }
 
     const totalCount = await Product.countDocuments(query);
     const totalPages = Math.ceil(totalCount / limit);

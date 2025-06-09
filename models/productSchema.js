@@ -53,7 +53,11 @@ const productSchema = new Schema({
     SKU:{
         type: String,
         required: true,
-    }
+    },
+    activeDealIds: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Deal'
+    }]
 },{timestamps: true});
 
 const Product = mongoose.model('Product',productSchema)

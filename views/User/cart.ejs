@@ -3,6 +3,10 @@
 <link rel="stylesheet" href="/User-css/cart.css">
 <!-- Add Material Symbols font -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+<!-- jQuery and Toastr -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 </head>
 <body>
 
@@ -31,7 +35,8 @@
                     <table class="table">
                         <thead>
                             <tr style="text-align: center;">
-                                <th>PRODUCT</th>
+                                <th></th>
+                                <th style="text-align: left;">PRODUCT</th>
                                 <th>PRICE</th>
                                 <th>QUANTITY</th>
                                 <th>SUBTOTAL</th>
@@ -42,43 +47,49 @@
                             <% if (cartItems && cartItems.length > 0) { %>
                                 <% cartItems.forEach(item => { %>
                                     <tr data-item-id="<%= item._id %>">
-                                        <td>
-                                            <div class="product-info">
-                                                <img src="/uploads/<%= item.product.image %>"  class="product-image">
-                                                <h6 class="product-name"><%= item.product.productName %></h6>
-                                            </div>
+                                        <td class="image-column" style="padding: 20px 0px 20px 20px;">
+                                            <a href="/product/<%= item.productId._id %>">
+                                                <img src="<%= item.product.image || '/default-product.png' %>" class="product-image" alt="Product Image">
+                                            </a>
+                                        </td>
+                                        <td class="product-column" style="padding: 20px 15px 20px 0px">
+                                            <a href="/product/<%= item.productId._id %>">
+                                                <h6 class="product-name"><%= item.product.productName || 'Unnamed Product' %></h6>
+                                            </a>
                                         </td>
                                         <td>
-                                            <span class="price-text" data-price="<%= item.price %>">₹<%= item.price.toFixed(2) %></span>
+                                            <span class="price-text" data-price="<%= item.price %>"><%= item.price.toFixed(2) %>₹</span>
                                         </td>
                                         <td>
                                             <div class="quantity-selector">
-                                                <button class="decrease" data-product-id="<%= item.productId._id %>">-</button>
+                                                <button class="decrease" data-product-id="<%= item.productId._id %>" data-item-id="<%= item._id %>">-</button>
                                                 <span class="quantity"><%= item.quantity %></span>
-                                                <button class="increase" data-product-id="<%= item.productId._id %>">+</button>
+                                                <button class="increase" data-product-id="<%= item.productId._id %>" data-item-id="<%= item._id %>">+</button>
                                             </div>
                                         </td>
                                         <td>
-                                            <span class="price-text subtotal">₹<%= item.totalPrice.toFixed(2) %></span>
+                                            <span class="price-text subtotal"><%= item.totalPrice.toFixed(2) %>₹</span>
                                         </td>
                                         <td>
-                                            <button class="remove-btn" data-product-id="<%= item.productId._id %>">
-                                                <i class="fas fa-times"></i>
+                                            <button class="remove-btn" data-product-id="<%= item.productId._id %>" data-item-id="<%= item._id %>">
+                                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#ff0000"><path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z"/></svg>
                                             </button>
                                         </td>
                                     </tr>
                                 <% }) %>
                             <% } else { %>
-                                    <td colspan="4" style="text-align: center; padding: 20px;">
+                                <tr>
+                                    <td colspan="6" style="text-align: center; padding: 20px;">
                                         <div style="
                                           font-weight: 500;
                                           font-size: 1.1rem;
                                           color: #666;
                                         ">
                                           No products available in the Cart!.
-                                          Continue<a href="/shop" style="color: rgb(43, 43, 43);"> Shopping</a>
+                                          Continue <a href="/shop" style="color: rgb(43, 43, 43);">Shopping</a>
                                         </div>
                                     </td>
+                                </tr>
                             <% } %>
                         </tbody>
                     </table>
@@ -100,7 +111,7 @@
                     
                     <div class="summary-row">
                         <span>Subtotal:</span>
-                        <span class="cart-subtotal">₹<%= cartTotal ? cartTotal.toFixed(2) : '0.00' %></span>
+                        <span class="cart-subtotal"><%= cartTotal ? cartTotal.toFixed(2) : '0.00' %>₹</span>
                     </div>
                     
                     <div class="summary-row">
@@ -110,10 +121,12 @@
                     
                     <div class="summary-row total">
                         <span>Total:</span>
-                        <span class="cart-total">₹<%= cartTotal ? cartTotal.toFixed(2) : '0.00' %></span>
+                        <span class="cart-total"><%= cartTotal ? cartTotal.toFixed(2) : '0.00' %>₹</span>
                     </div>
                     
-                    <button class="checkout-btn">
+                    <button 
+                        class="checkout-btn" 
+                        <%= cartItems && cartItems.length > 0 ? '' : 'disabled' %> >
                         Proceed to checkout
                     </button>
                 </div>
@@ -121,92 +134,265 @@
         </div>
     </div>
 </div>
+<div id="logout-modal" class="modal" style="display:none;">
+    <div class="modal-content">
+        <h3>Are you sure?</h3>
+        <div class="modal-buttons">
+            <button id="btn-no" class="btn-no">NO</button>
+            <button id="btn-yes" class="btn-yes">YES</button>
+        </div>
+    </div>
+</div>
 
 <!-- Add JavaScript for cart actions -->
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    // Increase quantity
-    document.querySelectorAll('.increase').forEach(button => {
-        button.addEventListener('click', async () => {
-            const productId = button.getAttribute('data-product-id');
-            try {
-                const response = await fetch('/cart/increase-quantity', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ productId })
-                });
-                const data = await response.json();
-                if (data.success) {
-                    window.location.reload();
-                } else {
-                    alert(data.message || 'Failed to update quantity');
-                }
-            } catch (error) {
-                console.error('Error increasing quantity:', error);
-            }
-        });
+    let currentAction = null;
+    let currentProductId = null;
+    let currentItemId = null;
+
+    // Function to show the modal
+    function showModal(action, productId = null, itemId = null) {
+        currentAction = action;
+        currentProductId = productId;
+        currentItemId = itemId;
+        document.getElementById('logout-modal').style.display = 'block';
+    }
+
+    // Handle modal "NO" button
+    document.getElementById('btn-no').addEventListener('click', () => {
+        document.getElementById('logout-modal').style.display = 'none';
+        currentAction = null;
+        currentProductId = null;
+        currentItemId = null;
     });
+
+    // Handle modal "YES" button
+    document.getElementById('btn-yes').addEventListener('click', async () => {
+        document.getElementById('logout-modal').style.display = 'none';
+        
+        if (currentAction === 'remove') {
+            await removeItem(currentProductId, currentItemId);
+        } else if (currentAction === 'clear') {
+            await clearCart();
+        }
+
+        currentAction = null;
+        currentProductId = null;
+        currentItemId = null;
+    });
+
+    // Function to update the cart UI
+    const updateCartUI = (data) => {
+        const tbody = document.querySelector('#cart-items');
+        tbody.innerHTML = ''; // Clear existing items
+
+        // Ensure cartItems is an array, default to empty array if not
+        const cartItems = Array.isArray(data.cartItems) ? data.cartItems : [];
+        const cartTotal = data.cartTotal || 0; // Default to 0 if not provided
+
+        if (cartItems.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="6" style="text-align: center; padding: 20px;">
+                        <div style="font-weight: 500; font-size: 1.1rem; color: #666;">
+                            No products available in the Cart!.
+                            Continue <a href="/shop" style="color: rgb(43, 43, 43);">Shopping</a>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            // Disable checkout button
+            document.querySelector('.checkout-btn').disabled = true;
+        } else {
+            cartItems.forEach(item => {
+                const row = document.createElement('tr');
+                row.setAttribute('data-item-id', item._id);
+                row.innerHTML = `
+                    <td class="image-column" style="padding: 20px 0px 20px 20px;">
+                        <a href="/product/${item.productId._id}">
+                            <img src="${item.product.image || '/default-product.png'}" class="product-image" alt="Product Image">
+                        </a>
+                    </td>
+                    <td class="product-column" style="padding: 20px 15px 20px 0px">
+                        <a href="/product/${item.productId._id}">
+                            <h6 class="product-name">${item.product.productName || 'Unnamed Product'}</h6>
+                        </a>
+                    </td>
+                    <td>
+                        <span class="price-text" data-price="${item.price}">${item.price.toFixed(2)}₹</span>
+                    </td>
+                    <td>
+                        <div class="quantity-selector">
+                            <button class="decrease" data-product-id="${item.productId._id}" data-item-id="${item._id}">-</button>
+                            <span class="quantity">${item.quantity}</span>
+                            <button class="increase" data-product-id="${item.productId._id}" data-item-id="${item._id}">+</button>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="price-text subtotal">${item.totalPrice.toFixed(2)}₹</span>
+                    </td>
+                    <td>
+                        <button class="remove-btn" data-product-id="${item.productId._id}" data-item-id="${item._id}">
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#ff0000"><path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z"/></svg>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+            // Ensure checkout button is enabled
+            document.querySelector('.checkout-btn').disabled = false;
+
+            // Re-attach event listeners to the new buttons
+            attachEventListeners();
+        }
+
+        // Update cart totals
+        document.querySelector('.cart-subtotal').textContent = `${cartTotal.toFixed(2)}₹`;
+        document.querySelector('.cart-total').textContent = `${cartTotal.toFixed(2)}₹`;
+    };
+
+    // Increase quantity
+    async function increaseQuantity(productId, itemId) {
+        try {
+            const response = await fetch('/cart/increase-quantity', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ productId, itemId })
+            });
+            const data = await response.json();
+            if (data.success) {
+                updateCartUI(data);
+            } else {
+                toastr.error(data.message || 'Failed to update quantity');
+            }
+        } catch (error) {
+            console.error('Error increasing quantity:', error);
+            toastr.error('An error occurred while increasing quantity');
+        }
+    }
 
     // Decrease quantity
-    document.querySelectorAll('.decrease').forEach(button => {
-        button.addEventListener('click', async () => {
-            const productId = button.getAttribute('data-product-id');
-            try {
-                const response = await fetch('/cart/decrease-quantity', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ productId })
-                });
-                const data = await response.json();
-                if (data.success) {
-                    window.location.reload();
-                } else {
-                    alert(data.message || 'Failed to update quantity');
-                }
-            } catch (error) {
-                console.error('Error decreasing quantity:', error);
+    async function decreaseQuantity(productId, itemId) {
+        try {
+            const response = await fetch('/cart/decrease-quantity', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ productId, itemId })
+            });
+            const data = await response.json();
+            if (data.success) {
+                updateCartUI(data);
+            } else {
+                toastr.error(data.message || 'Failed to update quantity');
             }
-        });
-    });
+        } catch (error) {
+            console.error('Error decreasing quantity:', error);
+            toastr.error('An error occurred while decreasing quantity');
+        }
+    }
 
     // Remove item
-    document.querySelectorAll('.remove-btn').forEach(button => {
-        button.addEventListener('click', async () => {
-            const productId = button.getAttribute('data-product-id');
-            try {
-                const response = await fetch('/cart/remove-item', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ productId })
-                });
-                const data = await response.json();
-                if (data.success) {
-                    window.location.reload();
-                } else {
-                    alert(data.message || 'Failed to remove item');
-                }
-            } catch (error) {
-                console.error('Error removing item:', error);
+    async function removeItem(productId, itemId) {
+        try {
+            const response = await fetch('/cart/remove-item', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ productId, itemId })
+            });
+            const data = await response.json();
+            if (data.success) {
+                updateCartUI(data);
+                toastr.success('Item removed successfully!');
+            } else {
+                toastr.error(data.message || 'Failed to remove item');
             }
-        });
-    });
+        } catch (error) {
+            console.error('Error removing item:', error);
+            toastr.error('An error occurred while removing item');
+        }
+    }
 
     // Clear cart
-    document.querySelector('.clear-cart-btn').addEventListener('click', async () => {
+    async function clearCart() {
         try {
             const response = await fetch('/cart/clear', {
-                method: 'POST',
+                method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' }
             });
             const data = await response.json();
             if (data.success) {
-                window.location.reload();
+                updateCartUI(data);
+                toastr.success('Cart cleared successfully!');
             } else {
-                alert(data.message || 'Failed to clear cart');
+                toastr.error(data.message || 'Failed to clear cart');
             }
         } catch (error) {
             console.error('Error clearing cart:', error);
+            toastr.error('An error occurred while clearing cart');
         }
+    }
+
+    // Proceed to checkout
+    async function proceedToCheckout() {
+        try {
+            const response = await fetch('/checkout', {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            const data = await response.json();
+            if (data.success) {
+                window.location.href = '/checkout';
+            } else {
+                toastr.error(data.message || 'Failed to proceed to checkout');
+            }
+        } catch (error) {
+            console.error('Error proceeding to checkout:', error);
+            toastr.error('An error occurred while proceeding to checkout');
+        }
+    }
+
+    // Function to attach event listeners to buttons
+    function attachEventListeners() {
+        // Increase quantity buttons
+        document.querySelectorAll('.increase').forEach(button => {
+            button.addEventListener('click', () => {
+                const productId = button.getAttribute('data-product-id');
+                const itemId = button.getAttribute('data-item-id');
+                increaseQuantity(productId, itemId);
+            });
+        });
+
+        // Decrease quantity buttons
+        document.querySelectorAll('.decrease').forEach(button => {
+            button.addEventListener('click', () => {
+                const productId = button.getAttribute('data-product-id');
+                const itemId = button.getAttribute('data-item-id');
+                decreaseQuantity(productId, itemId);
+            });
+        });
+
+        // Remove item buttons
+        document.querySelectorAll('.remove-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                const productId = button.getAttribute('data-product-id');
+                const itemId = button.getAttribute('data-item-id');
+                showModal('remove', productId, itemId);
+            });
+        });
+    }
+
+    // Initial event listener attachments
+    attachEventListeners();
+
+    // Clear cart button
+    document.querySelector('.clear-cart-btn').addEventListener('click', () => {
+        showModal('clear');
+    });
+
+    // Proceed to checkout button
+    document.querySelector('.checkout-btn').addEventListener('click', () => {
+        proceedToCheckout();
     });
 });
 </script>

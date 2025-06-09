@@ -1,7 +1,8 @@
 const Product = require('../../models/productSchema');
 const Category = require('../../models/categorySchema');
 const Review = require('../../models/reviewSchema');
-const Deal = require('../../models/dealSchema')
+const Deal = require('../../models/dealSchema');
+const Cart = require('../../models/cartSchema')
 
 const loadshop = async (req, res) => {
   try {
@@ -28,7 +29,7 @@ const loadshop = async (req, res) => {
       offerType: 'percentage',
       status: 'Active'
     }).lean();
-    console.log('This all are the activeDeals: ', activeDeals)
+    console.log('This all are the activeDeals: ', activeDeals);
 
     // Separate product-specific and category-specific deals
     const productDeals = activeDeals.filter(deal => deal.appliedTo === 'products').reduce((acc, deal) => {
@@ -37,7 +38,7 @@ const loadshop = async (req, res) => {
       });
       return acc;
     }, {});
-    console.log('This is productDeals: ', productDeals)
+    console.log('This is productDeals: ', productDeals);
 
     const categoryDeals = activeDeals.filter(deal => deal.appliedTo === 'category').reduce((acc, deal) => {
       deal.selectedItems.forEach(itemId => {
@@ -45,7 +46,7 @@ const loadshop = async (req, res) => {
       });
       return acc;
     }, {});
-    console.log('This is categoryDeals :', categoryDeals)
+    console.log('This is categoryDeals :', categoryDeals);
 
     // Build the product query
     let query = { isBlocked: false };
@@ -127,6 +128,16 @@ const loadshop = async (req, res) => {
     const totalProducts = await Product.countDocuments(query);
     const totalPages = Math.ceil(totalProducts / limit);
 
+    // Fetch the user's cart to get the total
+    let cartTotal = 0;
+    if (req.session.user) {
+      const userId = req.session.user;
+      const cart = await Cart.findOne({ userId }).lean();
+      if (cart) {
+        cartTotal = cart.total || 0; // Use the total field from the cart schema
+      }
+    }
+
     res.render('shop', {
       categories,
       products: transformedProducts,
@@ -135,7 +146,8 @@ const loadshop = async (req, res) => {
       searchQuery: search || '',
       selectedCategory: category || '',
       selectedPriceRange: priceRange || '',
-      selectedSort: sort || ''
+      selectedSort: sort || '',
+      cartTotal // Pass the cart total to the template
     });
   } catch (err) {
     console.error('❌ Error loading products:', err);
@@ -185,22 +197,27 @@ const loadProductDetails = async (req, res) => {
 
       let discountPercentage = 0;
       let finalPrice = p.regularPrice;
+      let displaySalePrice = p.salePrice; // This will be the strikethrough price
 
       if (largestOffer > 0) {
+        // If a deal is applied, calculate the discounted price and set salePrice to regularPrice for strikethrough
         discountPercentage = largestOffer;
         finalPrice = p.regularPrice * (1 - largestOffer / 100);
+        displaySalePrice = p.regularPrice; // Use regularPrice as the strikethrough price when a deal is applied
       } else {
+        // If no deal is applied, calculate discount using the template's logic
         const priceDifference = p.salePrice - p.regularPrice;
         discountPercentage = p.salePrice > 0 ? Math.round((priceDifference / p.salePrice) * 100) : 0;
+        // displaySalePrice remains p.salePrice, template will decide if it should be shown as strikethrough
       }
 
       return {
         ...p,
         name: p.productName,
         image: Array.isArray(p.productImage) ? p.productImage[0] : p.productImage,
-        price: finalPrice,
-        regularPrice: p.regularPrice,
-        salePrice: p.salePrice,
+        price: finalPrice, // Main price after discount
+        regularPrice: p.regularPrice, // Original price
+        salePrice: displaySalePrice, // Strikethrough price (adjusted to regularPrice if deal applied)
         largestOffer: largestOffer > 0 ? largestOffer : null,
         discountPercentage
       };

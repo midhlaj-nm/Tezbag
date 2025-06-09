@@ -7,6 +7,10 @@ const cartSchema = new Schema({
         ref: 'User',
         required: true
     },
+    total:{
+        type: Number,
+        default:0
+    },
     items: [{
         productId: {
             type: Schema.Types.ObjectId,
@@ -25,13 +29,9 @@ const cartSchema = new Schema({
             type: Number,
             required: true
         },
-        status: {
+        cuttingStyle: {
             type: String,
-            default: 'placed'
-        },
-        cancellationReason: {
-            type: String,
-            default: 'none'
+            default: null
         },
         createdAt: {
             type: Date,

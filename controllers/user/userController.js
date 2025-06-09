@@ -370,7 +370,7 @@ const resetPasswordPost = async (req, res, next) => {
 
         const user = await User.findOne({ email });
         if (!user) {
-            req.flash('message', 'User not found.');
+            req.flash('message', 'Please Login First');
             return res.redirect('/reset-password');
         }
 

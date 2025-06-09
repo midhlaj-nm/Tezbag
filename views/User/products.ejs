@@ -8,21 +8,21 @@
 <!-- Toastr CSS -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
 
-  <!-- breadcrumb -->
-  <nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-      <li class="breadcrumb-item"><a href="/">Home</a></li>
-      <% breadcrumbs.forEach((crumb, index) => { %>
-        <li class="breadcrumb-item <%= index === breadcrumbs.length - 1 ? 'active' : '' %>">
-          <% if (index !== breadcrumbs.length - 1) { %>
-            <a href="<%= crumb.url %>"><%= crumb.name %></a>
-          <% } else { %>
-            <%= crumb.name %>
-          <% } %>
-        </li>
-      <% }) %>
-    </ol>
-  </nav>
+<!-- breadcrumb -->
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="/">Home</a></li>
+    <% breadcrumbs.forEach((crumb, index) => { %>
+      <li class="breadcrumb-item <%= index === breadcrumbs.length - 1 ? 'active' : '' %>">
+        <% if (index !== breadcrumbs.length - 1) { %>
+          <a href="<%= crumb.url %>"><%= crumb.name %></a>
+        <% } else { %>
+          <%= crumb.name %>
+        <% } %>
+      </li>
+    <% }) %>
+  </ol>
+</nav>
 <div class="prdctData-wrapper">
   <div class="prdctData">
     <div class="left">
@@ -41,8 +41,8 @@
     <div class="right">
       <div class="prdctname">
         <h2 class="name"><%= product.productName %></h2>
-        <div class="stockstatus <%= product.status === 'Available' ? 'stock-available' : 'stock-out' %>">
-          <%= product.status %>
+        <div class="stockstatus <%= product.quantity > 0 ? 'stock-available' : 'stock-out' %>">
+          <%= product.quantity > 0 ? 'Available' : 'Out Of Stock' %>
         </div>
       </div>
       <div class="prdctdata">
@@ -61,13 +61,22 @@
         <span class="sku">SKU:</span><span class="skuu"><%= product.SKU %></span>
       </div>
       <div class="price-section">
-        <span class="new-price"><%= product.regularPrice.toFixed(2) %>₹</span>
-        <span class="old-price"><%= product.salePrice.toFixed(2) %>₹</span>
+        <% if (product.largestOffer && product.largestOffer > 0) { %>
+          <span class="new-price"><%= product.price.toFixed(2) %>₹</span>
+          <% if (product.price < product.regularPrice) { %>
+            <span class="old-price"><del><%= product.regularPrice.toFixed(2) %>₹</del></span>
+          <% } %>
+        <% } else { %>
+          <span class="new-price"><%= product.regularPrice.toFixed(2) %>₹</span>
+          <% if (product.salePrice !== product.regularPrice) { %>
+            <span class="old-price"><del><%= product.salePrice.toFixed(2) %>₹</del></span>
+          <% } %>
+        <% } %>
       </div>
 
       <!-- Cutting Style Dropdown (Visible only for Meat and Fish) -->
-      <% if (product.status === 'Out Of Stock') { %>
-        <div class="out-of-stock-message" style="color: red; font-weight: bold; font-size: 1.5rem; margin: 15px 0;" >
+      <% if (product.quantity <= 0) { %>
+        <div class="out-of-stock-message" style="color: red; font-weight: bold; font-size: 1.5rem; margin: 15px 0;">
           The Product is out of stock
         </div>
       <% } else { %>
@@ -181,7 +190,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
 <script>
-
   document.querySelectorAll(".subImg").forEach((img) => {
     img.addEventListener("click", function () {
       document.querySelectorAll(".subImg").forEach((el) => el.classList.remove("active"));
@@ -245,7 +253,7 @@
     };
 
     try {
-      const response = await fetch('/cart/add', {
+      const response = await fetch('/cart/add/${productId}', { 
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -256,9 +264,25 @@
       const data = await response.json();
 
       if (data.success) {
-        toastr.success('Product added to cart successfully!');
+        toastr.success(
+          'Product added to cart successfully! <br><button id="view-cart-btn" style="padding: 5px 10px; background-color: #008ae0; color: white; border: none; border-radius: 3px; cursor: pointer;">View Cart</button>',
+          '',
+          {
+            onShown: function () {
+              // Add click event to the View Cart button
+              document.getElementById('view-cart-btn').addEventListener('click', () => {
+                window.location.href = '/cart';
+              });
+            }
+          }
+        );
       } else {
-        toastr.error('Failed to add product to cart: ' + (data.message || 'Unknown error'));
+        toastr.error(data.message || 'Unknown error');
+        if (data.redirect) {
+          setTimeout(() => {
+            window.location.href = data.redirect;
+          }, data.delay || 1000); // Default to 1 second if delay is not specified
+        }
       }
     } catch (error) {
       console.error('Error adding to cart:', error);
