@@ -368,6 +368,10 @@ a {
     cursor: not-allowed;
 }
 
+.checkout-btn:disabled:hover {
+    background-color: #00B207;
+}
+
 .modal {
   display: none;
   position: fixed;

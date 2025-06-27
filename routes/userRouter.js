@@ -74,5 +74,6 @@ router.patch('/cart/increase-quantity', cartPageController.increaseQuantity);
 router.patch('/cart/decrease-quantity', cartPageController.decreaseQuantity);
 router.delete('/cart/remove-item', cartPageController.removeItem);
 router.delete('/cart/clear', cartPageController.clearCart);
+router.get('/cart/checkout', cartPageController.loadCheckout)
 
 module.exports = router

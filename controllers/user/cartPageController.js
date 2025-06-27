@@ -1,6 +1,8 @@
 const Cart = require('../../models/cartSchema');
 const Product = require('../../models/productSchema');
 const mongoose = require('mongoose');
+const User = require('../../models/userSchema')
+const Deal = require('../../models/dealSchema')
 
 // Load Cart (already correct, included for reference)
 const loadCart = async (req, res) => {
@@ -594,4 +596,115 @@ const clearCart = async (req, res) => {
     }
 };
 
-module.exports = { loadCart, addToCart, increaseQuantity, decreaseQuantity, removeItem, clearCart };
+const loadCheckout = async (req, res) => {
+    try {
+        // Check if the user is authenticated via session
+        if (!req.session.user) {
+            return res.status(401).json({
+                success: false,
+                message: 'Please log in to proceed to checkout.',
+                redirect: '/login'
+            });
+        }
+
+        const userId = req.session.user;
+
+        // 1. Fetch the user's cart
+        const cart = await Cart.findOne({ userId }).populate('items.productId');
+        if (!cart || cart.items.length === 0) {
+            return res.redirect('/shop');
+        }
+
+        // Prepare order items for the frontend
+        const orderItems = cart.items.map(item => ({
+            productId: item.productId._id.toString(),
+            name: item.productId.name,
+            quantity: item.quantity,
+            price: item.price,
+            total: item.totalPrice,
+            image: item.productId.image ,
+            cuttingStyle: item.cuttingStyle || null
+        }));
+
+        // Calculate totals
+        const subtotal = cart.total;
+        const shipping = 0;
+        const finalTotal = subtotal + shipping;
+
+        // 2. Fetch available coupons with offerType: "coupon"
+        const coupons = await Deal.find({
+            offerType: 'coupon',
+            status: 'Active',
+            expireOn: { $gte: new Date() }
+        }).lean();
+
+        console.log('These are the active coupons:', coupons);
+
+        const formattedCoupons = coupons.map(coupon => ({
+            code: coupon.name,
+            description: coupon.description || `Get ${coupon.offerPrice} off your order`,
+            offerPrice: coupon.offerPrice,
+            minPrice: coupon.minPrice,
+            maxPrice: coupon.maxPrice
+        }));
+
+        // 3. Fetch the user's saved addresses
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found. Please log in again.',
+                redirect: '/login'
+            });
+        }
+        const savedAddresses = user.addresses || [];
+
+        // Format addresses for the frontend
+        const formattedAddresses = savedAddresses.map(address => ({
+            firstName: address.firstName,
+            lastName: address.lastName,
+            company: address.company || '',
+            streetAddress: address.streetAddress,
+            city: address.city,
+            state: address.state,
+            country: address.country,
+            pinCode: address.pinCode,
+            landmark: address.landMark,
+            email: address.email,
+            phone: address.phone,
+            altPhone: address.altPhone || '',
+            isDefault: address.isDefault
+        }));
+
+        // 4. Prepare cart details for the frontend
+        const cartDetails = {
+            total: cart.total,
+            items: cart.items.map(item => ({
+                productId: item.productId._id.toString(),
+                quantity: item.quantity,
+                price: item.price,
+                totalPrice: item.totalPrice,
+                cuttingStyle: item.cuttingStyle || null
+            }))
+        };
+
+        // 6. Render the checkout page with the data
+        res.render('checkout', {
+            coupons: formattedCoupons,
+            orderItems,
+            subtotal: subtotal.toFixed(2),
+            shipping: shipping.toFixed(2),
+            finalTotal: finalTotal.toFixed(2),
+            savedAddresses: formattedAddresses,
+            cartDetails
+        });
+    } catch (error) {
+        console.error('Error in loadCheckout:', error);
+        res.status(500).json({
+            success: false,
+            message: 'An error occurred while loading the checkout page. Please try again.',
+        });
+    }
+};
+
+module.exports = { loadCart, addToCart, increaseQuantity, decreaseQuantity, removeItem, clearCart, loadCheckout };
