@@ -33,7 +33,7 @@ const loadCategory = async (req, res, next) => {
     });
   } catch (err) {
     console.error("❌ Error in loadCategories:", err.message);
-    next(err);
+    res.render('404')
   }
 };
 

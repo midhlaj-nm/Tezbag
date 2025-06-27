@@ -151,7 +151,7 @@ const loadHomepage = async (req, res, next) => {
 
     } catch (err) {
         console.error('❌ Error loading homepage:', err);
-        next(err);
+        res.render('404')
     }
 };
 

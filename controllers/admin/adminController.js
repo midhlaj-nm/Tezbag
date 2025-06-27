@@ -171,7 +171,7 @@ const verifyOtp = async (req, res) => {
 
   } catch (err) {
     console.error("OTP verification error:", err);
-    res.status(500).json({ success: false, message: "Internal server error" });
+    next(err)
   }
 };
 
@@ -258,7 +258,7 @@ const loadDashboard = async (req, res) => {
     }
   };
   
-  const storePunchout = async(req,res) => {
+  const storePunchout = async(req,res,next) => {
     try {
         
         const adminId = req.session.admin;
@@ -277,7 +277,7 @@ const loadDashboard = async (req, res) => {
         res.status(200).json({ message: "Punch-In Updated", time: updatedAdmin_out.lastLogout });
 
     } catch (error) {
-        
+        next(error)
     }
   }
 

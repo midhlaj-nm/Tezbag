@@ -210,18 +210,14 @@ const addProduct = async (req, res, next) => {
   } catch (err) {
     console.error('Error saving product:', err);
     if (req.xhr || req.headers.accept.indexOf('json') > -1) {
-      return res.status(500).json({
-        success: false,
-        message: 'Error saving product',
-        error: err.message,
-      });
+      next(err)
     } else {
       return res.redirect('/404Error');
     }
   }
 };
 
-const toggleProductStatus = async (req, res) => {
+const toggleProductStatus = async (req, res, next) => {
   console.log('req.params:', req.params);
   console.log('req.body:', req.body);
 
@@ -248,7 +244,7 @@ const toggleProductStatus = async (req, res) => {
     res.json({ success: true, product });
   } catch (error) {
     console.error('Error in toggleProductStatus:', error);
-    res.status(500).json({ success: false, message: error.message });
+    next(error)
   }
 };
 
@@ -453,11 +449,7 @@ const editProduct = async (req, res, next) => {
   } catch (error) {
     console.error('Error updating product:', error);
     if (req.xhr || req.headers.accept.indexOf('json') > -1) {
-      return res.status(500).json({
-        success: false,
-        message: 'Error updating product',
-        error: error.message,
-      });
+      next(error)
     } else {
       return res.redirect('/404Error');
     }
