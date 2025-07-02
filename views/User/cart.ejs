@@ -144,6 +144,233 @@
     </div>
 </div>
 
+<!-- Add JavaScript for cart actions -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    let currentAction = null;
+    let currentProductId = null;
+    let currentItemId = null;
+
+    // Function to show the modal
+    function showModal(action, productId = null, itemId = null) {
+        currentAction = action;
+        currentProductId = productId;
+        currentItemId = itemId;
+        document.getElementById('logout-modal').style.display = 'block';
+    }
+
+    // Handle modal "NO" button
+    document.getElementById('btn-no').addEventListener('click', () => {
+        document.getElementById('logout-modal').style.display = 'none';
+        currentAction = null;
+        currentProductId = null;
+        currentItemId = null;
+    });
+
+    // Handle modal "YES" button
+    document.getElementById('btn-yes').addEventListener('click', async () => {
+        document.getElementById('logout-modal').style.display = 'none';
+        
+        if (currentAction === 'remove') {
+            await removeItem(currentProductId, currentItemId);
+        } else if (currentAction === 'clear') {
+            await clearCart();
+        }
+
+        currentAction = null;
+        currentProductId = null;
+        currentItemId = null;
+    });
+
+    // Function to update the cart UI
+    const updateCartUI = (data) => {
+        const tbody = document.querySelector('#cart-items');
+        tbody.innerHTML = ''; // Clear existing items
+
+        const cartItems = Array.isArray(data.cartItems) ? data.cartItems : [];
+        const cartTotal = data.cartTotal || 0;
+
+        if (cartItems.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="6" style="text-align: center; padding: 20px;">
+                        <div style="font-weight: 500; font-size: 1.1rem; color: #666;">
+                            No products available in the Cart!.
+                            Continue <a href="/shop" style="color: rgb(43, 43, 43);">Shopping</a>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            document.querySelector('.checkout-btn').disabled = true;
+        } else {
+            cartItems.forEach(item => {
+                const row = document.createElement('tr');
+                row.setAttribute('data-item-id', item._id);
+                row.innerHTML = `
+                    <td class="image-column" style="padding: 20px 0px 20px 20px;">
+                        <a href="/product/${item.productId._id}">
+                            <img src="${item.product.image || '/default-product.png'}" class="product-image" alt="Product Image">
+                        </a>
+                    </td>
+                    <td class="product-column" style="padding: 20px 15px 20px 0px">
+                        <a href="/product/${item.productId._id}">
+                            <h6 class="product-name">${item.product.productName || 'Unnamed Product'}</h6>
+                        </a>
+                    </td>
+                    <td>
+                        <span class="price-text" data-price="${item.price}">${item.price.toFixed(2)}₹</span>
+                    </td>
+                    <td>
+                        <div class="quantity-selector">
+                            <button class="decrease" data-product-id="${item.productId._id}" data-item-id="${item._id}">-</button>
+                            <span class="quantity">${item.quantity}</span>
+                            <button class="increase" data-product-id="${item.productId._id}" data-item-id="${item._id}">+</button>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="price-text subtotal">${item.totalPrice.toFixed(2)}₹</span>
+                    </td>
+                    <td>
+                        <button class="remove-btn" data-product-id="${item.productId._id}" data-item-id="${item._id}">
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#ff0000"><path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z"/></svg>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+            document.querySelector('.checkout-btn').disabled = false;
+            attachEventListeners();
+        }
+
+        document.querySelector('.cart-subtotal').textContent = `${cartTotal.toFixed(2)}₹`;
+        document.querySelector('.cart-total').textContent = `${cartTotal.toFixed(2)}₹`;
+    };
+
+    // Increase quantity
+    async function increaseQuantity(productId, itemId) {
+        try {
+            const response = await fetch('/cart/increase-quantity', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ productId, itemId })
+            });
+            const data = await response.json();
+            if (data.success) {
+                updateCartUI(data);
+            } else {
+                toastr.error(data.message || 'Failed to update quantity');
+            }
+        } catch (error) {
+            console.error('Error increasing quantity:', error);
+            toastr.error('An error occurred while increasing quantity');
+        }
+    }
+
+    // Decrease quantity
+    async function decreaseQuantity(productId, itemId) {
+        try {
+            const response = await fetch('/cart/decrease-quantity', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ productId, itemId })
+            });
+            const data = await response.json();
+            if (data.success) {
+                updateCartUI(data);
+            } else {
+                toastr.error(data.message || 'Failed to update quantity');
+            }
+        } catch (error) {
+            console.error('Error decreasing quantity:', error);
+            toastr.error('An error occurred while decreasing quantity');
+        }
+    }
+
+    // Remove item
+    async function removeItem(productId, itemId) {
+        try {
+            const response = await fetch('/cart/remove-item', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ productId, itemId })
+            });
+            const data = await response.json();
+            if (data.success) {
+                updateCartUI(data);
+                toastr.success('Item removed successfully!');
+            } else {
+                toastr.error(data.message || 'Failed to remove item');
+            }
+        } catch (error) {
+            console.error('Error removing item:', error);
+            toastr.error('An error occurred while removing item');
+        }
+    }
+
+    // Clear cart
+    async function clearCart() {
+        try {
+            const response = await fetch('/cart/clear', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            const data = await response.json();
+            if (data.success) {
+                updateCartUI(data);
+                toastr.success('Cart cleared successfully!');
+            } else {
+                toastr.error(data.message || 'Failed to clear cart');
+            }
+        } catch (error) {
+            console.error('Error clearing cart:', error);
+            toastr.error('An error occurred while clearing cart');
+        }
+    }
+
+    // Proceed to checkout
+    function proceedToCheckout() {
+        window.location.href = '/cart/checkout'; // Direct navigation to checkout page
+    }
+
+    // Function to attach event listeners to buttons
+    function attachEventListeners() {
+        document.querySelectorAll('.increase').forEach(button => {
+            button.addEventListener('click', () => {
+                const productId = button.getAttribute('data-product-id');
+                const itemId = button.getAttribute('data-item-id');
+                increaseQuantity(productId, itemId);
+            });
+        });
+
+        document.querySelectorAll('.decrease').forEach(button => {
+            button.addEventListener('click', () => {
+                const productId = button.getAttribute('data-product-id');
+                const itemId = button.getAttribute('data-item-id');
+                decreaseQuantity(productId, itemId);
+            });
+        });
+
+        document.querySelectorAll('.remove-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                const productId = button.getAttribute('data-product-id');
+                const itemId = button.getAttribute('data-item-id');
+                showModal('remove', productId, itemId);
+            });
+        });
+    }
+
+    attachEventListeners();
+
+    document.querySelector('.clear-cart-btn').addEventListener('click', () => {
+        showModal('clear');
+    });
+
+    document.querySelector('.checkout-btn').addEventListener('click', () => {
+        proceedToCheckout();
+    });
+});
+</script>
+
 <%- include("../../views/Partials/user/footer") %>
 </body>
 </html>

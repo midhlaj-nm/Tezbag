@@ -60,12 +60,26 @@ const loadshop = async (req, res) => {
     }
 
     if (priceRange) {
-      const [minPrice, maxPrice] = priceRange.split('-').map(Number);
-      if (maxPrice) {
-        query.salePrice = { $gte: minPrice, $lte: maxPrice };
+      let minPrice, maxPrice;
+      console.log('Received priceRange:', priceRange); // Debug the input
+      if (priceRange === '300+') {
+        minPrice = 300;
+        maxPrice = Infinity;
       } else {
-        query.salePrice = { $gte: minPrice };
+        const [min, max] = priceRange.split('-');
+        minPrice = Number(min);
+        maxPrice = max ? Number(max) : Infinity;
+        if (isNaN(minPrice) || (max && isNaN(maxPrice))) {
+          console.warn('Invalid price range detected:', priceRange);
+          minPrice = 0;
+          maxPrice = Infinity;
+        }
       }
+      query.regularPrice = { $gte: minPrice };
+      if (maxPrice !== Infinity) {
+        query.regularPrice.$lte = maxPrice;
+      }
+      console.log('Applied price filter:', { minPrice, maxPrice, query });
     }
 
     // Pagination
@@ -75,9 +89,9 @@ const loadshop = async (req, res) => {
     // Sorting
     let sortOption = {};
     if (sort === 'price-low-to-high') {
-      sortOption.salePrice = 1;
+      sortOption.regularPrice = 1;
     } else if (sort === 'price-high-to-low') {
-      sortOption.salePrice = -1;
+      sortOption.regularPrice = -1;
     } else if (sort === 'name-a-to-z') {
       sortOption.productName = 1;
     } else if (sort === 'name-z-to-a') {
@@ -101,14 +115,12 @@ const loadshop = async (req, res) => {
       const largestOffer = Math.max(productOffer, categoryOffer);
 
       let discountPercentage = 0;
-      let finalPrice = p.regularPrice; // Main price is regularPrice
+      let finalPrice = p.regularPrice;
 
-      // If a deal applies, use the largest offer and update the price
       if (largestOffer > 0) {
         discountPercentage = largestOffer;
         finalPrice = p.regularPrice * (1 - largestOffer / 100);
       } else {
-        // If no deal applies, calculate discount using the template's logic
         const priceDifference = p.salePrice - p.regularPrice;
         discountPercentage = p.salePrice > 0 ? Math.round((priceDifference / p.salePrice) * 100) : 0;
       }
@@ -117,11 +129,11 @@ const loadshop = async (req, res) => {
         ...p,
         name: p.productName,
         image: Array.isArray(p.productImage) ? p.productImage[0] : p.productImage,
-        price: finalPrice, // Main price (regularPrice or deal-applied price)
+        price: finalPrice,
         regularPrice: p.regularPrice,
-        salePrice: p.salePrice, // Strikethrough price
+        salePrice: p.salePrice,
         largestOffer: largestOffer > 0 ? largestOffer : null,
-        discountPercentage // Add discountPercentage field
+        discountPercentage
       };
     });
 
@@ -134,7 +146,7 @@ const loadshop = async (req, res) => {
       const userId = req.session.user;
       const cart = await Cart.findOne({ userId }).lean();
       if (cart) {
-        cartTotal = cart.total || 0; // Use the total field from the cart schema
+        cartTotal = cart.total || 0;
       }
     }
 
@@ -147,7 +159,7 @@ const loadshop = async (req, res) => {
       selectedCategory: category || '',
       selectedPriceRange: priceRange || '',
       selectedSort: sort || '',
-      cartTotal // Pass the cart total to the template
+      cartTotal
     });
   } catch (err) {
     console.error('❌ Error loading products:', err);

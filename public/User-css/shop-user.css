@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined');
+
 /* General Styles */
 * {
     margin: 0;
@@ -146,7 +147,7 @@ a {
   }
   
   .cancel-icon:hover {
-    color: #313131; /* Desired hover color (red) */
+    color: #dc3545; /* Desired hover color (red) */
     text-decoration: none; /* Ensure no underline on hover */
   }
 
@@ -382,26 +383,56 @@ a {
 }
 
 /* Price Options */
-.price-options{
+.price-options {
     display: flex;
     flex-direction: column;
     gap: 8px;
 }
 
-.price-option{
+.price-option {
     display: flex;
     align-items: center;
     gap: 8px;
     font-size: 14px;
 }
 
-.price-option input{
-    margin: 0;
+.price-option input[type="radio"] {
+    appearance: none; /* Remove default browser styling for custom control */
+    width: 16px;
+    height: 16px;
+    border: 2px solid #ccc; /* Default border */
+    border-radius: 50%; /* Circular shape */
     cursor: pointer;
+    position: relative;
+    margin: 0;
+    transition: border-color 0.3s ease, background-color 0.3s ease;
 }
 
-.price-option label{
+.price-option input[type="radio"]:checked {
+    border-color: #00B207; /* Match your theme's green color */
+    background-color: #00B207; /* Filled background when checked */
+}
+
+.price-option input[type="radio"]:checked::after {
+    content: '';
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background-color: white;
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transition: transform 0.2s ease;
+}
+
+.price-option input[type="radio"]:hover {
+    border-color: #00B207; /* Highlight on hover */
+}
+
+.price-option label {
     cursor: pointer;
+    margin-left: 8px; /* Ensure label is spaced from radio button */
 }
 
 .prime-tag {
@@ -628,8 +659,6 @@ a {
         width: 100%;
     }
 }
-
-
 
 .breadcrumb {
     display: flex;

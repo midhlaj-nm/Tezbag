@@ -134,7 +134,7 @@
             <option value="" disabled hidden <%= !selectedPriceRange ? 'selected' : '' %>>Filter by Price Range</option>
             <option value="" <%= selectedPriceRange === '' ? 'selected' : '' %>>All Price Range</option>
             <option value="50-100" <%= selectedPriceRange === '50-100' ? 'selected' : '' %>>50₹ - 100₹</option>
-            <option value="100-200" <%= selectedPriceRange === '10-50' ? 'selected' : '' %>>100₹ - 200₹</option>
+            <option value="100-200" <%= selectedPriceRange === '100-200' ? 'selected' : '' %>>100₹ - 200₹</option> <!-- Fixed typo -->
             <option value="200-300" <%= selectedPriceRange === '200-300' ? 'selected' : '' %>>200₹ - 300₹</option>
             <option value="300+" <%= selectedPriceRange === '300+' ? 'selected' : '' %>>300₹+</option>
           </select>
@@ -199,29 +199,30 @@
           <div class="d-flex align-items-center justify-content-between" style="border-bottom: 1px solid #eee; margin-bottom: 8px;">
             <h3>Price Range</h3>
             <% if (selectedPriceRange) { %>
-              <a href="/shop?search=<%= searchQuery %>&category=<%= selectedCategory %>&sort=<%= selectedSort %>" class="material-symbols-outlined cancel-icon" style="cursor: pointer;">cancel</a>
+              <a href="/shop?search=<%= encodeURIComponent(searchQuery || '') %>&category=<%= encodeURIComponent(selectedCategory || '') %>&sort=<%= encodeURIComponent(selectedSort || '') %>" 
+                 class="material-symbols-outlined cancel-icon" style="cursor: pointer; color: #dc3545;" title="Clear Price Filter">cancel</a>
             <% } %>
           </div>
           <div class="price-options">
             <div class="price-option">
-              <input type="checkbox" id="price-50-100" <%= selectedPriceRange === '50-100' ? 'checked' : '' %>
-                onchange="window.location.href='/shop?priceRange=50-100&search=<%= searchQuery %>&category=<%= selectedCategory %>&sort=<%= selectedSort %>'">
-              <label for="price-0-10">50₹ - 100₹</label>
+              <input type="radio" name="priceRange" id="price-50-100" <%= selectedPriceRange === '50-100' ? 'checked' : '' %>
+                     onchange="window.location.href='/shop?priceRange=50-100&search=<%= encodeURIComponent(searchQuery || '') %>&category=<%= encodeURIComponent(selectedCategory || '') %>&sort=<%= encodeURIComponent(selectedSort || '') %>'">
+              <label for="price-50-100">50₹ - 100₹</label>
             </div>
             <div class="price-option">
-              <input type="checkbox" id="price-100-200" <%= selectedPriceRange === '100-200' ? 'checked' : '' %>
-                onchange="window.location.href='/shop?priceRange=100-200&search=<%= searchQuery %>&category=<%= selectedCategory %>&sort=<%= selectedSort %>'">
-              <label for="price-10-50">100₹ - 200₹</label>
+              <input type="radio" name="priceRange" id="price-100-200" <%= selectedPriceRange === '100-200' ? 'checked' : '' %>
+                     onchange="window.location.href='/shop?priceRange=100-200&search=<%= encodeURIComponent(searchQuery || '') %>&category=<%= encodeURIComponent(selectedCategory || '') %>&sort=<%= encodeURIComponent(selectedSort || '') %>'">
+              <label for="price-100-200">100₹ - 200₹</label>
             </div>
             <div class="price-option">
-              <input type="checkbox" id="price-200-300" <%= selectedPriceRange === '200-300' ? 'checked' : '' %>
-                onchange="window.location.href='/shop?priceRange=200-300arch=<%= searchQuery %>&category=<%= selectedCategory %>&sort=<%= selectedSort %>'">
-              <label for="price-50-100">200₹ - 300₹</label>
+              <input type="radio" name="priceRange" id="price-200-300" <%= selectedPriceRange === '200-300' ? 'checked' : '' %>
+                     onchange="window.location.href='/shop?priceRange=200-300&search=<%= encodeURIComponent(searchQuery || '') %>&category=<%= encodeURIComponent(selectedCategory || '') %>&sort=<%= encodeURIComponent(selectedSort || '') %>'">
+              <label for="price-200-300">200₹ - 300₹</label>
             </div>
             <div class="price-option">
-              <input type="checkbox" id="price-300-plus" <%= selectedPriceRange === '300+' ? 'checked' : '' %>
-                onchange="window.location.href='/shop?priceRange=300+&search=<%= searchQuery %>&category=<%= selectedCategory %>&sort=<%= selectedSort %>'">
-              <label for="price-100-plus">300₹+</label>
+              <input type="radio" name="priceRange" id="price-300-plus" <%= selectedPriceRange === '300+' ? 'checked' : '' %>
+                     onchange="window.location.href='/shop?priceRange=300+&search=<%= encodeURIComponent(searchQuery || '') %>&category=<%= encodeURIComponent(selectedCategory || '') %>&sort=<%= encodeURIComponent(selectedSort || '') %>'">
+              <label for="price-300-plus">300₹+</label>
             </div>
           </div>
         </div>

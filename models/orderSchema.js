@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const { v4: uuidv4 } = require('uuid');
-const Address = require('./addressSchema');
 const { Schema } = mongoose;
 
 const orderSchema = new Schema({
@@ -36,6 +35,10 @@ const orderSchema = new Schema({
     type: Number,
     required: true
   },
+  paymentMethod: {
+    type: String,
+    required: true
+  },
   userId: {
     type: Schema.Types.ObjectId,
     ref: 'User',
@@ -46,6 +49,10 @@ const orderSchema = new Schema({
     ref: 'Address',
     required: true
   },
+  orderNotes:{
+    type: String,
+    required: false
+  },
   invoiceDate: {
     type: Date
   },
@@ -53,11 +60,6 @@ const orderSchema = new Schema({
     type: String,
     required: true,
     enum: ['Pending', 'Processing', 'Shipped', 'Deliverd', 'Cancelled', 'Return on the process', 'Returned']
-  },
-  createdOn: {
-    type: Date,
-    default: Date.now,
-    required: true
   },
   couponApplied: {
     type: Boolean,

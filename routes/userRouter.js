@@ -3,7 +3,8 @@ const router = express.Router()
 const userController = require('../controllers/user/userController');
 const productPageController = require('../controllers/user/productPageController');
 const profileController = require('../controllers/user/profileController');
-const cartPageController = require('../controllers/user/cartPageController')
+const cartPageController = require('../controllers/user/cartPageController');
+const orderController = require('../controllers/user/orderController')
 const passport = require('passport');
 const userAuth = require('../middlewares/userAuth');
 
@@ -74,6 +75,7 @@ router.patch('/cart/increase-quantity', cartPageController.increaseQuantity);
 router.patch('/cart/decrease-quantity', cartPageController.decreaseQuantity);
 router.delete('/cart/remove-item', cartPageController.removeItem);
 router.delete('/cart/clear', cartPageController.clearCart);
-router.get('/cart/checkout', cartPageController.loadCheckout)
+router.get('/cart/checkout', orderController.loadCheckout);
+router.post('/order/place', orderController.confirmOrder)
 
 module.exports = router
