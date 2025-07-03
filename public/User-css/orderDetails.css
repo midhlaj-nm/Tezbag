@@ -1,0 +1,232 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #e8f5e8;
+    padding: 40px 20px;
+}
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+.content-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 600px;
+    min-height: 600px;
+}
+.left-section {
+    padding: 60px 50px;
+}
+.main-content {
+    flex: 1;
+}
+.button-section {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 50px;
+}
+.thank-you-heading {
+    font-size: 2.5rem;
+    color: #000000;
+    font-weight: bold;
+    margin-bottom: 25px;
+    line-height: 1.2;
+}
+.order-id {
+    font-size: 1.1rem;
+    color: #666;
+    margin-bottom: 35px;
+}
+.order-id span {
+    color: #000000;
+    font-weight: 600;
+}
+.billing-section {
+    margin-bottom: 0;
+}
+.billing-section h3 {
+    font-size: 1.4rem;
+    color: #000000;
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+.billing-info {
+    color: #555;
+    line-height: 1.6;
+}
+.billing-info div {
+    margin-bottom: 8px;
+}
+.billing-info strong {
+    color: #000000;
+    font-weight: 600;
+}
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    text-align: center;
+    display: inline-block;
+}
+.btn-primary {
+    background-color: #000000;
+    color: white;
+}
+.btn-primary:hover {
+    background-color: #1e3d1e;
+    transform: translateY(-2px);
+}
+.btn-secondary {
+    background-color: transparent;
+    color: #000000;
+    border: 2px solid #073107;
+}
+.btn-secondary:hover {
+    background-color: #000000;
+    color: white;
+    transform: translateY(-2px);
+}
+.right-section {
+    padding: 40px 30px;
+}
+.order-summary {
+    background-color: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #ccc;
+    overflow: hidden;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+.summary-header {
+    background-color: #f8f9fa;
+    padding: 25px;
+    border-bottom: 1px solid #ccc;
+}
+.summary-title {
+    font-size: 1.5rem;
+    color: #000000;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+.order-info {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    font-size: 0.9rem;
+}
+.order-info div {
+    color: #666;
+}
+.order-info strong {
+    color: #000000;
+    display: block;
+    margin-bottom: 2px;
+}
+.products-section {
+    flex: 1;
+    padding: 25px;
+    overflow-y: auto;
+}
+.products-section h4 {
+    color: #000000;
+    margin-bottom: 20px;
+    font-size: 1.1rem;
+}
+.product-item {
+    display: flex;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid #ccc;
+    gap: 15px;
+}
+.product-item:last-child {
+    border-bottom: none;
+}
+.product-image {
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #000000, #000000);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 0.8rem;
+    text-align: center;
+    flex-shrink: 0;
+}
+.product-details {
+    flex: 1;
+}
+.product-name {
+    font-weight: 600;
+    color: #000000;
+    margin-bottom: 5px;
+}
+.product-meta {
+    font-size: 0.85rem;
+    color: #666;
+    margin-bottom: 5px;
+}
+.product-price {
+    font-weight: 600;
+    color: #000000;
+    font-size: 1.1rem;
+}
+.summary-totals {
+    background-color: #f8f9fa;
+    padding: 25px;
+    border-top: 1px solid #ccc;
+}
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    color: #666;
+}
+.summary-row.total {
+    font-weight: 600;
+    color: #000000;
+    font-size: 1.2rem;
+    padding-top: 12px;
+    border-top: 2px solid #dee2e6;
+    margin-top: 10px;
+}
+@media (max-width: 768px) {
+    .content-wrapper {
+        grid-template-columns: 1fr;
+    }
+    .left-section {
+        padding: 40px 30px;
+    }
+    .right-section {
+        border-left: none;
+        border-top: 1px solid #e0e0e0;
+    }
+    .thank-you-heading {
+        font-size: 2rem;
+    }
+    .button-section {
+        flex-direction: column;
+    }
+    .btn {
+        text-align: center;
+    }
+}

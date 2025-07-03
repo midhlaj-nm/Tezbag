@@ -21,6 +21,10 @@ const orderSchema = new Schema({
     price: {
       type: Number,
       required: true
+    },
+    cuttingStyle: {
+      type: String,
+      required: false
     }
   }],
   totalPrice: {

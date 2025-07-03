@@ -75,7 +75,10 @@ router.patch('/cart/increase-quantity', cartPageController.increaseQuantity);
 router.patch('/cart/decrease-quantity', cartPageController.decreaseQuantity);
 router.delete('/cart/remove-item', cartPageController.removeItem);
 router.delete('/cart/clear', cartPageController.clearCart);
+
+//orderCOntroller
 router.get('/cart/checkout', orderController.loadCheckout);
-router.post('/order/place', orderController.confirmOrder)
+router.post('/order/place', orderController.confirmOrder);
+router.get('/order-confirmation/:orderId', orderController.loadConfirmation);
 
 module.exports = router

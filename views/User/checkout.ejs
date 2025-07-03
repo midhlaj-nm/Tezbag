@@ -15,6 +15,7 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.13/lottie.min.js"></script>
   <style>
     /* Existing styles remain unchanged, adding new modal styles */
     .confirmation-dialog {
@@ -1070,6 +1071,8 @@
     </div>
   </div>
 
+  <div id="order-success-animation" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgb(255, 255, 255); z-index: 1000;"></div>
+
   <script>
     const savedAddresses = <%- JSON.stringify(savedAddresses) %>;
     let appliedCoupon = null;
@@ -1253,7 +1256,6 @@
     }
 
     function placeOrder() {
-      // Remove validateAddressForm() since it applies to the modal form, not the selected address
       if (selectedAddressIndex === null) {
         toastr.error('Please select a delivery address.');
         return;
@@ -1266,7 +1268,7 @@
         coupon: appliedCoupon ? appliedCoupon.code : null,
         finalAmount: currentTotal
       };
-      console.log(orderData)
+      console.log(orderData);
       fetch('/order/place', {
           method: 'POST',
           headers: {
@@ -1276,12 +1278,34 @@
         })
         .then(response => response.json())
         .then(data => {
+          console.log('Response data:', data);
           if (data.success) {
-            toastr.success('Order placed successfully!');
+            const orderId = data.orderId
+            console.log('Extracted orderId:', orderId)
+            // Hide the confirm modal
             closeConfirmModal();
-            setTimeout(() => window.location.href = '/order-confirmation', 2000);
+            // Show the animation container
+            const animationContainer = document.getElementById('order-success-animation');
+            animationContainer.style.display = 'block';
+            // Initialize and play Lottie animation
+            lottie.loadAnimation({
+              container: animationContainer,
+              renderer: 'svg',
+              loop: false,
+              autoplay: true,
+              path: '/Order_success.json'
+            });
+            setTimeout(() => {
+              animationContainer.style.display = 'none';
+              window.location.href = `/order-confirmation/${orderId}`;
+            }, 4000);
           } else {
-            toastr.error(data.message || 'Failed to place order.');
+            if (data.message === "Product is out-of-stock") {
+              toastr.error(data.message);
+              setTimeout(() => window.location.href = '/shop', 2000);
+            } else {
+              toastr.error(data.message || 'Failed to place order.');
+            }
           }
         })
         .catch(() => (toastr.error('An error occurred while placing the order.'), closeConfirmModal()));
