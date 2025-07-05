@@ -4,7 +4,8 @@ const userController = require('../controllers/user/userController');
 const productPageController = require('../controllers/user/productPageController');
 const profileController = require('../controllers/user/profileController');
 const cartPageController = require('../controllers/user/cartPageController');
-const orderController = require('../controllers/user/orderController')
+const orderController = require('../controllers/user/orderController');
+const wishlistController = require('../controllers/user/wishlistPageController');
 const passport = require('passport');
 const userAuth = require('../middlewares/userAuth');
 
@@ -53,15 +54,15 @@ router.get('/reset-password', userController.loadResetPassPage);
 router.post('/reset-password', userController.resetPasswordPost);
 
 // profileController.js
-router.get('/account',  profileController.loadDashboard);
-router.get('/account-settings', profileController.loadSettings);
-router.get('/email-update-otp', profileController.emailOtpPage);
-router.post('/verify-email-otp', profileController.otpVerification);
-router.patch('/account-settings/update-profile', profileController.updateProfile);
-router.post('/account-settings/add-address', profileController.addAddress);
-router.patch('/account-settings/edit-address', profileController.editAddress);
-router.delete('/account-settings/delete-address/:index', profileController.deleteAddress);
-router.post('/account-settings/password-reset', profileController.changePassword);
+router.get('/account', userAuth, profileController.loadDashboard);
+router.get('/account-settings', userAuth, profileController.loadSettings);
+router.get('/email-update-otp', userAuth, profileController.emailOtpPage);
+router.post('/verify-email-otp', userAuth, profileController.otpVerification);
+router.patch('/account-settings/update-profile', userAuth, profileController.updateProfile);
+router.post('/account-settings/add-address', userAuth, profileController.addAddress);
+router.patch('/account-settings/edit-address', userAuth, profileController.editAddress);
+router.delete('/account-settings/delete-address/:index', userAuth, profileController.deleteAddress);
+router.post('/account-settings/password-reset', userAuth, profileController.changePassword);
 router.get('/logout', userAuth, userController.logout);
 
 //productPage
@@ -69,16 +70,23 @@ router.get('/shop', productPageController.loadshop);
 router.get('/product/:id', productPageController.loadProductDetails);
 
 //cartPageController
-router.get('/cart', cartPageController.loadCart);
-router.post('/cart/add/:productId', cartPageController.addToCart)
-router.patch('/cart/increase-quantity', cartPageController.increaseQuantity);
-router.patch('/cart/decrease-quantity', cartPageController.decreaseQuantity);
-router.delete('/cart/remove-item', cartPageController.removeItem);
-router.delete('/cart/clear', cartPageController.clearCart);
+router.get('/cart', userAuth, cartPageController.loadCart);
+router.post('/cart/add/:productId', userAuth, cartPageController.addToCart)
+router.patch('/cart/increase-quantity', userAuth, cartPageController.increaseQuantity);
+router.patch('/cart/decrease-quantity', userAuth, cartPageController.decreaseQuantity);
+router.delete('/cart/remove-item', userAuth, cartPageController.removeItem);
+router.delete('/cart/clear', userAuth, cartPageController.clearCart);
 
-//orderCOntroller
-router.get('/cart/checkout', orderController.loadCheckout);
-router.post('/order/place', orderController.confirmOrder);
-router.get('/order-confirmation/:orderId', orderController.loadConfirmation);
+//orderController
+router.get('/cart/checkout', userAuth, orderController.loadCheckout);
+router.post('/order/place', userAuth, orderController.confirmOrder);
+router.get('/order-confirmation/:orderId', userAuth, orderController.loadConfirmation);
+router.get('/order-history', orderController.loadOrderHistory)
+router.get('/order/:orderId', orderController.getOrderDetails)
+router.get('/order/cancel/:orderId',orderController.cancelOrder)
+
+//wishlist
+router.get('/wishlist', wishlistController.loadWishlist)
+router.post('/wishlist/add-or-remove', wishlistController.wishlistPrdct)
 
 module.exports = router

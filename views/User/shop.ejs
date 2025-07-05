@@ -1,312 +1,398 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tez Bag | shop</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tez Bag | shop</title>
 
-  <!-- jQuery (required for Toastr) -->
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-  <!-- Toastr CSS & JS -->
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet"/>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
-  <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-  <link rel="stylesheet" href="/User-css/shop-user.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="/User-css/shop-user.css">
 
-  <!-- Font & icon -->
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
 </head>
+<style>
+    #toast-container>.toast {
+        opacity: 1;
+    }
+
+    .toast-success {
+        background-color: #4CAF50;
+    }
+
+    .toast-error {
+        background-color: #e92e20;
+    }
+</style>
+
 <body>
-  <!-- Header Section -->
-  <header class="header">
-    <div class="container d-flex justify-content-between align-items-center">
-      <!-- Logo -->
-      <div class="logo">
-        <img src="logo.png" alt="TezBag">
-      </div>
-
-      <!-- Search Bar -->
-      <div class="search-bar">
-        <form action="/shop" method="GET" class="search-bar">
-          <div class="input-wrapper">
-            <input 
-              type="text" 
-              name="search" 
-              value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>" 
-              placeholder="Search by product name..."
-              class="search-input">
-            <% if (typeof searchQuery !== 'undefined' && searchQuery.trim() !== '') { %>
-              <a href="/shop?category=<%= selectedCategory %>&priceRange=<%= selectedPriceRange %>&sort=<%= selectedSort %>" class="clear-icon">
-                <span class="material-symbols-outlined">cancel</span>
-              </a>
-            <% } %>
-          </div>
-          <button type="submit" class="search-btn">Search</button>
-          <input type="hidden" name="category" value="<%= selectedCategory %>">
-          <input type="hidden" name="priceRange" value="<%= selectedPriceRange %>">
-          <input type="hidden" name="sort" value="<%= selectedSort %>">
-        </form>
-      </div>
-
-      <!-- Google Fonts Icons Version -->
-      <div class="cart-container">
-        <a href="" class="heart-link">
-          <div class="heart-container">
-            <span class="material-symbols-outlined icon">favorite</span>
-          </div>
-        </a>
-        <div class="divider"></div>
-        <a href="/cart" class="cart-link">
-          <div class="cart-content">
-            <span class="material-symbols-outlined icon">shopping_bag</span>
-            <div class="cart-text">
-              <p class="cart-label">Shopping cart:</p>
-              <% if (typeof cartTotal !== 'undefined' && cartTotal > 0) { %>
-                 <span class="cart-total"><%= cartTotal.toFixed(2) %>₹</span>
-              <% } else { %>
-                 <span class="cart-total">0.00₹</span>
-              <% } %>
+    <header class="header">
+        <div class="container d-flex justify-content-between align-items-center">
+            <div class="logo">
+                <img src="logo.png" alt="TezBag">
             </div>
-          </div>
-        </a>
-      </div>
-    </div>
-  </header>
 
-  <div id="middle" class="container-fluid">
-    <ul id="list">
-      <li><a href="/">Home</a></li>
-      <li><a href="/shop">Shop</a></li>
-      <li><a href="#">Pages</a></li>
-      <li><a href="#">Blog</a></li>
-      <li><a href="/account">Account</a></li>
-    </ul>        
-    <div id="right-section">
-      <div id="call">
-        <img src="/PhoneCall 1.svg">
-      </div>
-      <span id="num">
-        <p>7907700456</p>
-      </span>
-    </div>    
-  </div>
-
-  <div class="shop-wrapper">
-    <!-- breadcrumb -->
-    <nav aria-label="breadcrumb">
-      <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="/">Home</a></li>
-        <% breadcrumbs.forEach((crumb, index) => { %>
-          <li class="breadcrumb-item <%= index === breadcrumbs.length - 1 ? 'active' : '' %>">
-            <% if (index !== breadcrumbs.length - 1) { %>
-              <a href="<%= crumb.url %>"><%= crumb.name %></a>
-            <% } else { %>
-              <%= crumb.name %>
-            <% } %>
-          </li>
-        <% }) %>
-      </ol>
-    </nav>
-    <!-- Original dropdown filters -->
-    <div class="filters">
-      <div class="filters-left">
-        <form action="/shop" method="GET">
-          <select name="category" onchange="this.form.submit()">
-            <option value="" disabled hidden <%= !selectedCategory ? 'selected' : '' %>>Filter by Category</option>
-            <option value="" <%= selectedCategory === '' ? 'selected' : '' %>>All Category</option>
-            <% categories.forEach(category => { %>
-              <option value="<%= category._id %>" <%= selectedCategory === category._id.toString() ? 'selected' : '' %>>
-                <%= category.name %>
-              </option>
-            <% }) %>
-          </select>
-          <input type="hidden" name="search" value="<%= searchQuery %>">
-          <input type="hidden" name="priceRange" value="<%= selectedPriceRange %>">
-          <input type="hidden" name="sort" value="<%= selectedSort %>">
-        </form>
-
-        <form action="/shop" method="GET">
-          <select name="priceRange" onchange="this.form.submit()">
-            <option value="" disabled hidden <%= !selectedPriceRange ? 'selected' : '' %>>Filter by Price Range</option>
-            <option value="" <%= selectedPriceRange === '' ? 'selected' : '' %>>All Price Range</option>
-            <option value="50-100" <%= selectedPriceRange === '50-100' ? 'selected' : '' %>>50₹ - 100₹</option>
-            <option value="100-200" <%= selectedPriceRange === '100-200' ? 'selected' : '' %>>100₹ - 200₹</option> <!-- Fixed typo -->
-            <option value="200-300" <%= selectedPriceRange === '200-300' ? 'selected' : '' %>>200₹ - 300₹</option>
-            <option value="300+" <%= selectedPriceRange === '300+' ? 'selected' : '' %>>300₹+</option>
-          </select>
-          <input type="hidden" name="search" value="<%= searchQuery %>">
-          <input type="hidden" name="category" value="<%= selectedCategory %>">
-          <input type="hidden" name="sort" value="<%= selectedSort %>">
-        </form>
-      </div>
-
-      <div class="filters-right">
-        <form action="/shop" method="GET">
-          <select name="sort" onchange="this.form.submit()">
-            <option value="" <%= !selectedSort ? 'selected' : '' %>>Sort by Price</option>
-            <option value="price-low-to-high" <%= selectedSort === 'price-low-to-high' ? 'selected' : '' %>>Low to High</option>
-            <option value="price-high-to-low" <%= selectedSort === 'price-high-to-low' ? 'selected' : '' %>>High to Low</option>
-          </select>
-          <input type="hidden" name="search" value="<%= searchQuery %>">
-          <input type="hidden" name="category" value="<%= selectedCategory %>">
-          <input type="hidden" name="priceRange" value="<%= selectedPriceRange %>">
-        </form>
-
-        <form action="/shop" method="GET">
-          <select name="sort" onchange="this.form.submit()">
-            <option value="" <%= !selectedSort ? 'selected' : '' %>>Sort by Name</option>
-            <option value="name-a-to-z" <%= selectedSort === 'name-a-to-z' ? 'selected' : '' %>>A - Z</option>
-            <option value="name-z-to-a" <%= selectedSort === 'name-z-to-a' ? 'selected' : '' %>>Z - A</option>
-          </select>
-          <input type="hidden" name="search" value="<%= searchQuery %>">
-          <input type="hidden" name="category" value="<%= selectedCategory %>">
-          <input type="hidden" name="priceRange" value="<%= selectedPriceRange %>">
-        </form>
-      </div>
-    </div>
-
-    <!-- Shop Container with Sidebar and Main Content -->
-    <div class="shop-container">
-      <!-- Sidebar Filters -->
-      <div class="sidebar-filters">
-        <!-- Category Filter -->
-        <div class="filter-section">
-          <div class="d-flex align-items-center justify-content-between" style="border-bottom: 1px solid #eee;">
-            <h3>Category</h3>
-            <% if (selectedCategory) { %>
-              <a href="/shop?search=<%= searchQuery %>&priceRange=<%= selectedPriceRange %>&sort=<%= selectedSort %>" class="material-symbols-outlined cancel-icon" style="cursor: pointer;">cancel</a>
-            <% } else { %>
-              <span class="material-symbols-outlined cancel-icon" style="display: none; cursor: pointer;">cancel</span>
-            <% } %>
-          </div>
-          <div class="category-list">
-            <% categories.forEach(category => { %>
-              <a href="/shop?category=<%= category._id %>&search=<%= searchQuery %>&priceRange=<%= selectedPriceRange %>&sort=<%= selectedSort %>">
-                <div class="category-item <%= selectedCategory === category._id.toString() ? 'active' : '' %>">
-                  <%= category.name %>
-                </div>
-              </a>
-            <% }) %>
-          </div>
-        </div>
-
-        <!-- Price Range Filter -->
-        <div class="filter-section">
-          <div class="d-flex align-items-center justify-content-between" style="border-bottom: 1px solid #eee; margin-bottom: 8px;">
-            <h3>Price Range</h3>
-            <% if (selectedPriceRange) { %>
-              <a href="/shop?search=<%= encodeURIComponent(searchQuery || '') %>&category=<%= encodeURIComponent(selectedCategory || '') %>&sort=<%= encodeURIComponent(selectedSort || '') %>" 
-                 class="material-symbols-outlined cancel-icon" style="cursor: pointer; color: #dc3545;" title="Clear Price Filter">cancel</a>
-            <% } %>
-          </div>
-          <div class="price-options">
-            <div class="price-option">
-              <input type="radio" name="priceRange" id="price-50-100" <%= selectedPriceRange === '50-100' ? 'checked' : '' %>
-                     onchange="window.location.href='/shop?priceRange=50-100&search=<%= encodeURIComponent(searchQuery || '') %>&category=<%= encodeURIComponent(selectedCategory || '') %>&sort=<%= encodeURIComponent(selectedSort || '') %>'">
-              <label for="price-50-100">50₹ - 100₹</label>
-            </div>
-            <div class="price-option">
-              <input type="radio" name="priceRange" id="price-100-200" <%= selectedPriceRange === '100-200' ? 'checked' : '' %>
-                     onchange="window.location.href='/shop?priceRange=100-200&search=<%= encodeURIComponent(searchQuery || '') %>&category=<%= encodeURIComponent(selectedCategory || '') %>&sort=<%= encodeURIComponent(selectedSort || '') %>'">
-              <label for="price-100-200">100₹ - 200₹</label>
-            </div>
-            <div class="price-option">
-              <input type="radio" name="priceRange" id="price-200-300" <%= selectedPriceRange === '200-300' ? 'checked' : '' %>
-                     onchange="window.location.href='/shop?priceRange=200-300&search=<%= encodeURIComponent(searchQuery || '') %>&category=<%= encodeURIComponent(selectedCategory || '') %>&sort=<%= encodeURIComponent(selectedSort || '') %>'">
-              <label for="price-200-300">200₹ - 300₹</label>
-            </div>
-            <div class="price-option">
-              <input type="radio" name="priceRange" id="price-300-plus" <%= selectedPriceRange === '300+' ? 'checked' : '' %>
-                     onchange="window.location.href='/shop?priceRange=300+&search=<%= encodeURIComponent(searchQuery || '') %>&category=<%= encodeURIComponent(selectedCategory || '') %>&sort=<%= encodeURIComponent(selectedSort || '') %>'">
-              <label for="price-300-plus">300₹+</label>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Main Content -->
-      <div class="main-content">
-        <p id="prdct-count"><%= products.length %> items found</p>
-        <div class="products-grid">
-          <div class="product-grid">
-            <div class="product-list">
-              <% if (products.length > 0) { %>
-                <div class="row">
-                  <% products.forEach(product => { %>
-                    <div class="col-12 col-sm-6 col-md-3">
-                      <div class="product-card <%= product.status === 'Out Of Stock' ? 'out-of-stock' : '' %>">
-                        <span class="out-of-stock-label">
-                          <%= product.status === 'Out Of Stock' ? 'Out of Stock' : (product.discountPercentage > 0 ? `-${product.discountPercentage}% off` : '') %>
-                        </span>
-                        <a href="/product/<%= product._id %>" class="product-link">
-                          <img src="<%= product.image %>" alt="<%= product.name %>">
-                          <p class="product-name"><%= product.name %></p>
-                          <p class="price">
-                            <% if (product.largestOffer && product.largestOffer > 0) { %>
-                              <%= product.price.toFixed(2) %>
-                              <% if (product.price < product.regularPrice) { %>
-                                <del class="old-price"><%= product.regularPrice.toFixed(2) %></del>
-                              <% } %>
-                            <% } else { %>
-                              <%= product.regularPrice.toFixed(2) %>
-                              <% if (product.salePrice !== product.regularPrice) { %>
-                                <del class="old-price"><%= product.salePrice.toFixed(2) %></del>
-                              <% } %>
-                            <% } %>
-                          </p>
-                        </a>
-                        <a href="/cart/add/<%= product._id %>" <%= product.status === 'Out Of Stock' ? 'class="disabled-link"' : '' %>>
-                          <button class="cart-btn" <%= product.status === 'Out Of Stock' ? 'disabled' : '' %>>
-                            <span class="material-symbols-outlined fav-icon">favorite</span>
-                          </button>
-                        </a>
-                      </div>
+            <div class="search-bar">
+                <form action="/shop" method="GET" class="search-bar">
+                    <div class="input-wrapper">
+                        <input type="text" name="search"
+                            value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>"
+                            placeholder="Search by product name..." class="search-input">
+                        <% if (typeof searchQuery !== 'undefined' && searchQuery.trim() !== '') { %>
+                            <a href="/shop?category=<%= selectedCategory %>&priceRange=<%= selectedPriceRange %>&sort=<%= selectedSort %>"
+                                class="clear-icon">
+                                <span class="material-symbols-outlined">cancel</span>
+                            </a>
+                        <% } %>
                     </div>
-                  <% }) %>
-                </div>
-              <% } else { %>
-                <div style="
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                  font-weight: 500;
-                  font-size: 2.1rem;
-                  color: #666;
-                ">
-                  No products available for display!.
-                </div>
-              <% } %>
+                    <button type="submit" class="search-btn">Search</button>
+                    <input type="hidden" name="category" value="<%= selectedCategory %>">
+                    <input type="hidden" name="priceRange" value="<%= selectedPriceRange %>">
+                    <input type="hidden" name="sort" value="<%= selectedSort %>">
+                </form>
             </div>
-          </div>
+
+            <div class="cart-container">
+                <a href="/wishlist" class="heart-link">
+                    <div class="heart-container">
+                        <span class="material-symbols-outlined icon">favorite</span>
+                    </div>
+                </a>
+                <div class="divider"></div>
+                <a href="/cart" class="cart-link">
+                    <div class="cart-content">
+                        <span class="material-symbols-outlined icon">shopping_bag</span>
+                        <div class="cart-text">
+                            <p class="cart-label">Shopping cart:</p>
+                            <% if (typeof cartTotal !== 'undefined' && cartTotal > 0) { %>
+                                <span class="cart-total"><%= cartTotal.toFixed(2) %>₹</span>
+                            <% } else { %>
+                                <span class="cart-total">0.00₹</span>
+                            <% } %>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <div id="middle" class="container-fluid">
+        <ul id="list">
+            <li><a href="/">Home</a></li>
+            <li><a href="/shop">Shop</a></li>
+            <li><a href="#">Pages</a></li>
+            <li><a href="#">Blog</a></li>
+            <li><a href="/account">Account</a></li>
+        </ul>
+        <div id="right-section">
+            <div id="call">
+                <img src="/PhoneCall 1.svg">
+            </div>
+            <span id="num">
+                <p>7907700456</p>
+            </span>
+        </div>
+    </div>
+
+    <div class="shop-wrapper">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Home</a></li>
+                <% breadcrumbs.forEach((crumb, index) => { %>
+                    <li class="breadcrumb-item <%= index === breadcrumbs.length - 1 ? 'active' : '' %>">
+                        <% if (index !== breadcrumbs.length - 1) { %>
+                            <a href="<%= crumb.url %>"><%= crumb.name %></a>
+                        <% } else { %>
+                            <%= crumb.name %>
+                        <% } %>
+                    </li>
+                <% }) %>
+            </ol>
+        </nav>
+        <div class="filters">
+            <div class="filters-left">
+                <form action="/shop" method="GET">
+                    <select name="category" onchange="this.form.submit()">
+                        <option value="" disabled hidden <%= !selectedCategory ? 'selected' : '' %>>Filter by Category
+                        </option>
+                        <option value="" <%= selectedCategory === '' ? 'selected' : '' %>>All Category</option>
+                        <% categories.forEach(category => { %>
+                            <option value="<%= category._id %>"
+                                <%= selectedCategory === category._id.toString() ? 'selected' : '' %>>
+                                <%= category.name %>
+                            </option>
+                        <% }) %>
+                    </select>
+                    <input type="hidden" name="search" value="<%= searchQuery %>">
+                    <input type="hidden" name="priceRange" value="<%= selectedPriceRange %>">
+                    <input type="hidden" name="sort" value="<%= selectedSort %>">
+                </form>
+
+                <form action="/shop" method="GET">
+                    <select name="priceRange" onchange="this.form.submit()">
+                        <option value="" disabled hidden <%= !selectedPriceRange ? 'selected' : '' %>>Filter by Price
+                            Range</option>
+                        <option value="" <%= selectedPriceRange === '' ? 'selected' : '' %>>All Price Range</option>
+                        <option value="50-100" <%= selectedPriceRange === '50-100' ? 'selected' : '' %>>50₹ - 100₹
+                        </option>
+                        <option value="100-200" <%= selectedPriceRange === '100-200' ? 'selected' : '' %>>100₹ - 200₹
+                        </option>
+                        <option value="200-300" <%= selectedPriceRange === '200-300' ? 'selected' : '' %>>200₹ - 300₹
+                        </option>
+                        <option value="300+" <%= selectedPriceRange === '300+' ? 'selected' : '' %>>300₹+</option>
+                    </select>
+                    <input type="hidden" name="search" value="<%= searchQuery %>">
+                    <input type="hidden" name="category" value="<%= selectedCategory %>">
+                    <input type="hidden" name="sort" value="<%= selectedSort %>">
+                </form>
+            </div>
+
+            <div class="filters-right">
+                <form action="/shop" method="GET">
+                    <select name="sort" onchange="this.form.submit()">
+                        <option value="" <%= !selectedSort ? 'selected' : '' %>>Sort by Price</option>
+                        <option value="price-low-to-high" <%= selectedSort === 'price-low-to-high' ? 'selected' : '' %>>Low to High</option>
+                        <option value="price-high-to-low" <%= selectedSort === 'price-high-to-low' ? 'selected' : '' %>>High to Low</option>
+                    </select>
+                    <input type="hidden" name="search" value="<%= searchQuery %>">
+                    <input type="hidden" name="category" value="<%= selectedCategory %>">
+                    <input type="hidden" name="priceRange" value="<%= selectedPriceRange %>">
+                </form>
+
+                <form action="/shop" method="GET">
+                    <select name="sort" onchange="this.form.submit()">
+                        <option value="" <%= !selectedSort ? 'selected' : '' %>>Sort by Name</option>
+                        <option value="name-a-to-z" <%= selectedSort === 'name-a-to-z' ? 'selected' : '' %>>A - Z
+                        </option>
+                        <option value="name-z-to-a" <%= selectedSort === 'name-z-to-a' ? 'selected' : '' %>>Z - A
+                        </option>
+                    </select>
+                    <input type="hidden" name="search" value="<%= searchQuery %>">
+                    <input type="hidden" name="category" value="<%= selectedCategory %>">
+                    <input type="hidden" name="priceRange" value="<%= selectedPriceRange %>">
+                </form>
+            </div>
         </div>
 
-        <!-- Pagination -->
-        <% if (totalPages >= 1) { %>
-            <nav aria-label="Page navigation">
-              <ul class="pagination justify-content-center mt-4">
-                <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
-                  <a class="page-link" href="/shop?page=<%= currentPage - 1 %>&search=<%= searchQuery %>&category=<%= selectedCategory %>&priceRange=<%= selectedPriceRange %>&sort=<%= selectedSort %>">Previous</a>
-                </li>
-                <% for (let i = 1; i <= totalPages; i++) { %>
-                  <li class="page-item <%= currentPage === i ? 'active' : '' %>">
-                    <a class="page-link" href="/shop?page=<%= i %>&search=<%= searchQuery %>&category=<%= selectedCategory %>&priceRange=<%= selectedPriceRange %>&sort=<%= selectedSort %>"><%= i %></a>
-                  </li>
+        <div class="shop-container">
+            <div class="sidebar-filters">
+                <div class="filter-section">
+                    <div class="d-flex align-items-center justify-content-between"
+                        style="border-bottom: 1px solid #eee;">
+                        <h3>Category</h3>
+                        <% if (selectedCategory) { %>
+                            <a href="/shop?search=<%= searchQuery %>&priceRange=<%= selectedPriceRange %>&sort=<%= selectedSort %>"
+                                class="material-symbols-outlined cancel-icon" style="cursor: pointer;">cancel</a>
+                        <% } else { %>
+                            <span class="material-symbols-outlined cancel-icon"
+                                style="display: none; cursor: pointer;">cancel</span>
+                        <% } %>
+                    </div>
+                    <div class="category-list">
+                        <% categories.forEach(category => { %>
+                            <a href="/shop?category=<%= category._id %>&search=<%= searchQuery %>&priceRange=<%= selectedPriceRange %>&sort=<%= selectedSort %>">
+                                <div class="category-item <%= selectedCategory === category._id.toString() ? 'active' : '' %>">
+                                    <%= category.name %>
+                                </div>
+                            </a>
+                        <% }) %>
+                    </div>
+                </div>
+
+                <div class="filter-section">
+                    <div class="d-flex align-items-center justify-content-between"
+                        style="border-bottom: 1px solid #eee; margin-bottom: 8px;">
+                        <h3>Price Range</h3>
+                        <% if (selectedPriceRange) { %>
+                            <a href="/shop?search=<%= encodeURIComponent(searchQuery || '') %>&category=<%= encodeURIComponent(selectedCategory || '') %>&sort=<%= encodeURIComponent(selectedSort || '') %>"
+                                class="material-symbols-outlined cancel-icon"
+                                style="cursor: pointer; color: #dc3545;" title="Clear Price Filter">cancel</a>
+                        <% } %>
+                    </div>
+                    <div class="price-options">
+                        <div class="price-option">
+                            <input type="radio" name="priceRange" id="price-50-100"
+                                <%= selectedPriceRange === '50-100' ? 'checked' : '' %>
+                                onchange="window.location.href='/shop?priceRange=50-100&search=<%= encodeURIComponent(searchQuery || '') %>&category=<%= encodeURIComponent(selectedCategory || '') %>&sort=<%= encodeURIComponent(selectedSort || '') %>'">
+                            <label for="price-50-100">50₹ - 100₹</label>
+                        </div>
+                        <div class="price-option">
+                            <input type="radio" name="priceRange" id="price-100-200"
+                                <%= selectedPriceRange === '100-200' ? 'checked' : '' %>
+                                onchange="window.location.href='/shop?priceRange=100-200&search=<%= encodeURIComponent(searchQuery || '') %>&category=<%= encodeURIComponent(selectedCategory || '') %>&sort=<%= encodeURIComponent(selectedSort || '') %>'">
+                            <label for="price-100-200">100₹ - 200₹</label>
+                        </div>
+                        <div class="price-option">
+                            <input type="radio" name="priceRange" id="price-200-300"
+                                <%= selectedPriceRange === '200-300' ? 'checked' : '' %>
+                                onchange="window.location.href='/shop?priceRange=200-300&search=<%= encodeURIComponent(searchQuery || '') %>&category=<%= encodeURIComponent(selectedCategory || '') %>&sort=<%= encodeURIComponent(selectedSort || '') %>'">
+                            <label for="price-200-300">200₹ - 300₹</label>
+                        </div>
+                        <div class="price-option">
+                            <input type="radio" name="priceRange" id="price-300-plus"
+                                <%= selectedPriceRange === '300+' ? 'checked' : '' %>
+                                onchange="window.location.href='/shop?priceRange=300+&search=<%= encodeURIComponent(searchQuery || '') %>&category=<%= encodeURIComponent(selectedCategory || '') %>&sort=<%= encodeURIComponent(selectedSort || '') %>'">
+                            <label for="price-300-plus">300₹+</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="main-content">
+                <p id="prdct-count"><%= products.length %> items found</p>
+                <div class="products-grid">
+                    <div class="product-grid">
+                        <div class="product-list">
+                            <% if (products.length > 0) { %>
+                                <div class="row">
+                                    <% products.forEach(product => { %>
+                                        <div class="col-12 col-sm-6 col-md-3">
+                                            <div
+                                                class="product-card <%= product.status === 'Out Of Stock' ? 'out-of-stock' : '' %>">
+                                                <span class="out-of-stock-label">
+                                                    <%= product.status === 'Out Of Stock' ? 'Out of Stock' : (product.discountPercentage > 0 ? `-${product.discountPercentage}% off` : '') %>
+                                                </span>
+                                                <a href="/product/<%= product._id %>" class="product-link">
+                                                    <img src="<%= product.image %>" alt="<%= product.name %>">
+                                                    <p class="product-name"><%= product.name %></p>
+                                                    <p class="price">
+                                                        <% if (product.largestOffer && product.largestOffer > 0) { %>
+                                                            <%= product.price.toFixed(2) %>
+                                                            <% if (product.price < product.regularPrice) { %>
+                                                                <del class="old-price"><%= product.regularPrice.toFixed(2) %></del>
+                                                            <% } %>
+                                                        <% } else { %>
+                                                            <%= product.regularPrice.toFixed(2) %>
+                                                            <% if (product.salePrice !== product.regularPrice) { %>
+                                                                <del class="old-price"><%= product.salePrice.toFixed(2) %></del>
+                                                            <% } %>
+                                                        <% } %>
+                                                    </p>
+                                                </a>
+                                                <button id="wishlistBtn-<%= product._id %>"
+                                                    class="cart-btn <%= product.status === 'Out Of Stock' ? 'disabled' : '' %>"
+                                                    data-product-id="<%= product._id %>"
+                                                    <%= product.status === 'Out Of Stock' ? 'disabled' : '' %>>
+                                                    <span class="fav-icon-wrapper" style="color: red;">
+                                                        </span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    <% }) %>
+                                </div>
+                            <% } else { %>
+                                <div style="
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    font-weight: 500;
+                                    font-size: 2.1rem;
+                                    color: #666;
+                                ">
+                                    No products available for display!.
+                                </div>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+
+                <% if (totalPages >= 1) { %>
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center mt-4">
+                            <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
+                                <a class="page-link"
+                                    href="/shop?page=<%= currentPage - 1 %>&search=<%= searchQuery %>&category=<%= selectedCategory %>&priceRange=<%= selectedPriceRange %>&sort=<%= selectedSort %>">Previous</a>
+                            </li>
+                            <% for (let i = 1; i <= totalPages; i++) { %>
+                                <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                                    <a class="page-link"
+                                        href="/shop?page=<%= i %>&search=<%= searchQuery %>&category=<%= selectedCategory %>&priceRange=<%= selectedPriceRange %>&sort=<%= selectedSort %>"><%= i %></a>
+                                </li>
+                            <% } %>
+                            <li class="page-item <%= currentPage === totalPages || products.length === 0 ? 'disabled' : '' %>">
+                                <a class="page-link"
+                                    href="/shop?page=<%= currentPage + 1 %>&search=<%= searchQuery %>&category=<%= selectedCategory %>&priceRange=<%= selectedPriceRange %>&sort=<%= selectedSort %>">Next</a>
+                            </li>
+                        </ul>
+                    </nav>
                 <% } %>
-                <li class="page-item <%= currentPage === totalPages || products.length === 0 ? 'disabled' : '' %>">
-                  <a class="page-link" href="/shop?page=<%= currentPage + 1 %>&search=<%= searchQuery %>&category=<%= selectedCategory %>&priceRange=<%= selectedPriceRange %>&sort=<%= selectedSort %>">Next</a>
-                </li>
-              </ul>
-            </nav>
-          <% } %>
-      </div>
+            </div>
+        </div>
     </div>
-  </div>
-  <div class="footer-wrapper">
-    <%- include("../../views/Partials/user/footer") %>
-  </div>
+    <div class="footer-wrapper">
+        <%- include("../../views/Partials/user/footer") %>
+    </div>
+
+    <script>
+        // Expose wishlist array to client-side JavaScript
+        const wishlist = <%- JSON.stringify(wishlist) || '[]' %>;
+
+        // Define your SVG strings
+        const unfilledSvg = `<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#ff0000"><path d="m480-120-58-52q-101-91-167-157T150-447.5Q111-500 95.5-544T80-634q0-94 63-157t157-63q52 0 99 22t81 62q34-40 81-62t99-22q94 0 157 63t63 157q0 46-15.5 90T810-447.5Q771-395 705-329T538-172l-58 52Zm0-108q96-86 158-147.5t98-107q36-45.5 50-81t14-70.5q0-60-40-100t-100-40q-47 0-87 26.5T518-680h-76q-15-41-55-67.5T300-774q-60 0-100 40t-40 100q0 35 14 70.5t50 81q36 45.5 98 107T480-228Zm0-273Z"/></svg>`;
+        const filledSvg = `<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#ff0000"><path d="m480-120-58-52q-101-91-167-157T150-447.5Q111-500 95.5-544T80-634q0-94 63-157t157-63q52 0 99 22t81 62q34-40 81-62t99-22q94 0 157 63t63 157q0 46-15.5 90T810-447.5Q771-395 705-329T538-172l-58 52Z"/></svg>`;
+
+        console.log('Script loaded');
+        document.querySelectorAll('[id^="wishlistBtn-"]').forEach(button => {
+            const productId = button.dataset.productId;
+            console.log(`Found button with id: ${button.id}, productId: ${productId}`);
+            // Get the wrapper for the SVG
+            const wishlistIconWrapper = button.querySelector('.fav-icon-wrapper');
+
+            // Determine initial state: Check if the current product's ID is in the wishlist array
+            let inWishlist = wishlist.includes(productId.toString());
+
+            // Set initial icon state based on whether the product is in the wishlist
+            wishlistIconWrapper.innerHTML = inWishlist ? filledSvg : unfilledSvg;
+
+            button.addEventListener('click', async () => {
+                if (button.disabled) {
+                    console.log(`Button for product ${productId} is disabled`);
+                    return;
+                }
+
+                console.log(`Attempting to toggle wishlist for product ${productId}`);
+                try {
+                    const response = await fetch('/wishlist/add-or-remove', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            productId
+                        }),
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json().catch(() => ({ message: `HTTP error! status: ${response.status}` }));
+                        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    console.log('Server response:', data);
+
+                    if (data.success) {
+                        inWishlist = data.inWishlist;
+                        // Change the SVG icon accordingly
+                        wishlistIconWrapper.innerHTML = inWishlist ? filledSvg : unfilledSvg;
+                        toastr.success(inWishlist ? 'Added to wishlist!' : 'Removed from wishlist!');
+                    } else {
+                        toastr.error(data.message || 'Unknown error');
+                    }
+                } catch (error) {
+                    console.error('Error updating wishlist:', error);
+                    toastr.error(error.message || 'An error occurred while updating the wishlist.');
+                }
+            });
+        });
+    </script>
 </body>
+
 </html>

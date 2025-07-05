@@ -1,0 +1,33 @@
+.breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0 1rem 3rem;
+  background: none;
+}
+.breadcrumb-item {
+  font-size: 14px;
+  color: #6c757d;
+  display: flex;
+  align-items: center;
+}
+.breadcrumb-item+.breadcrumb-item::before {
+  content: "/";
+  color: #adb5bd;
+}
+.breadcrumb-item a {
+  all: unset;
+  cursor: pointer;
+  color: #2f2f2f;
+  font-weight: 500;
+}
+.breadcrumb-item a:hover {
+  color: #000000;
+  text-decoration: underline;
+}
+.breadcrumb-item.active {
+  color: #575757;
+  font-weight: 500;
+  pointer-events: none;
+}

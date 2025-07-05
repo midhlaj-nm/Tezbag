@@ -17,7 +17,7 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.13/lottie.min.js"></script>
   <style>
-    /* Existing styles remain unchanged, adding new modal styles */
+    /* Existing styles remain unchanged, adding new loading overlay styles */
     .confirmation-dialog {
       display: none;
       position: fixed;
@@ -738,6 +738,34 @@
       margin-top: 5px;
     }
 
+    /* New loading overlay styles */
+    .loading-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 2000; /* Above other modals */
+      justify-content: center;
+      align-items: center;
+    }
+
+    .loading-spinner {
+      border: 8px solid #f3f3f3;
+      border-top: 8px solid #00B207;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
     @media (max-width: 768px) {
       .checkout-container {
         padding: 10px;
@@ -1073,6 +1101,11 @@
 
   <div id="order-success-animation" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgb(255, 255, 255); z-index: 1000;"></div>
 
+  <!-- New loading overlay -->
+  <div id="loading-overlay" class="loading-overlay">
+    <div class="loading-spinner"></div>
+  </div>
+
   <script>
     const savedAddresses = <%- JSON.stringify(savedAddresses) %>;
     let appliedCoupon = null;
@@ -1269,6 +1302,11 @@
         finalAmount: currentTotal
       };
       console.log(orderData);
+
+      // Show loading overlay
+      const loadingOverlay = document.getElementById('loading-overlay');
+      loadingOverlay.style.display = 'flex';
+
       fetch('/order/place', {
           method: 'POST',
           headers: {
@@ -1280,8 +1318,10 @@
         .then(data => {
           console.log('Response data:', data);
           if (data.success) {
-            const orderId = data.orderId
-            console.log('Extracted orderId:', orderId)
+            const orderId = data.orderId;
+            console.log('Extracted orderId:', orderId);
+            // Hide the loading overlay
+            loadingOverlay.style.display = 'none';
             // Hide the confirm modal
             closeConfirmModal();
             // Show the animation container
@@ -1298,7 +1338,7 @@
             setTimeout(() => {
               animationContainer.style.display = 'none';
               window.location.href = `/order-confirmation/${orderId}`;
-            }, 4000);
+            }, 3700);
           } else {
             if (data.message === "Product is out-of-stock") {
               toastr.error(data.message);
@@ -1306,9 +1346,16 @@
             } else {
               toastr.error(data.message || 'Failed to place order.');
             }
+            // Hide the loading overlay on error
+            loadingOverlay.style.display = 'none';
           }
         })
-        .catch(() => (toastr.error('An error occurred while placing the order.'), closeConfirmModal()));
+        .catch(() => {
+          toastr.error('An error occurred while placing the order.');
+          // Hide the loading overlay on error
+          loadingOverlay.style.display = 'none';
+          closeConfirmModal();
+        });
     }
 
     // Handle modal button clicks

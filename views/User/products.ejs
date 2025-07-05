@@ -13,13 +13,13 @@
   <ol class="breadcrumb">
     <li class="breadcrumb-item"><a href="/">Home</a></li>
     <% breadcrumbs.forEach((crumb, index) => { %>
-      <li class="breadcrumb-item <%= index === breadcrumbs.length - 1 ? 'active' : '' %>">
-        <% if (index !== breadcrumbs.length - 1) { %>
-          <a href="<%= crumb.url %>"><%= crumb.name %></a>
-        <% } else { %>
-          <%= crumb.name %>
-        <% } %>
-      </li>
+    <li class="breadcrumb-item <%= index === breadcrumbs.length - 1 ? 'active' : '' %>">
+      <% if (index !== breadcrumbs.length - 1) { %>
+      <a href="<%= crumb.url %>"><%= crumb.name %></a>
+      <% } else { %>
+      <%= crumb.name %>
+      <% } %>
+    </li>
     <% }) %>
   </ol>
 </nav>
@@ -29,9 +29,9 @@
       <div class="subs">
         <% const images = Array.isArray(product.productImage) ? product.productImage : (product.productImage ? [product.productImage] : []); %>
         <% images.forEach((image, index) => { %>
-          <div class="subImg <%= index === 0 ? 'active' : '' %>" data-image="<%= image %>">
-            <img src="<%= image %>" alt="Product Thumbnail <%= index + 1 %>">
-          </div>
+        <div class="subImg <%= index === 0 ? 'active' : '' %>" data-image="<%= image %>">
+          <img src="<%= image %>" alt="Product Thumbnail <%= index + 1 %>">
+        </div>
         <% }) %>
       </div>
       <div class="mainImage">
@@ -48,10 +48,10 @@
       <div class="prdctdata">
         <span class="stars">
           <% if (reviews && reviews.length > 0) { %>
-            <% const averageRating = Math.round(reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length); %>
-            <%= '⭐'.repeat(averageRating) %><%= '☆'.repeat(5 - averageRating) %>
+          <% const averageRating = Math.round(reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length); %>
+          <%= '⭐'.repeat(averageRating) %><%= '☆'.repeat(5 - averageRating) %>
           <% } else { %>
-            ☆☆☆☆☆
+          ☆☆☆☆☆
           <% } %>
         </span>
         <span class="many">
@@ -62,50 +62,50 @@
       </div>
       <div class="price-section">
         <% if (product.largestOffer && product.largestOffer > 0) { %>
-          <span class="new-price"><%= product.price.toFixed(2) %>₹</span>
-          <% if (product.price < product.regularPrice) { %>
-            <span class="old-price"><del><%= product.regularPrice.toFixed(2) %>₹</del></span>
-          <% } %>
+        <span class="new-price"><%= product.price.toFixed(2) %>₹</span>
+        <% if (product.price < product.regularPrice) { %>
+        <span class="old-price"><del><%= product.regularPrice.toFixed(2) %>₹</del></span>
+        <% } %>
         <% } else { %>
-          <span class="new-price"><%= product.regularPrice.toFixed(2) %>₹</span>
-          <% if (product.salePrice !== product.regularPrice) { %>
-            <span class="old-price"><del><%= product.salePrice.toFixed(2) %>₹</del></span>
-          <% } %>
+        <span class="new-price"><%= product.regularPrice.toFixed(2) %>₹</span>
+        <% if (product.salePrice !== product.regularPrice) { %>
+        <span class="old-price"><del><%= product.salePrice.toFixed(2) %>₹</del></span>
+        <% } %>
         <% } %>
       </div>
 
       <!-- Cutting Style Dropdown (Visible only for Meat and Fish) -->
       <% if (product.quantity <= 0) { %>
-        <div class="out-of-stock-message" style="color: red; font-weight: bold; font-size: 1.5rem; margin: 15px 0;">
-          The Product is out of stock
-        </div>
+      <div class="out-of-stock-message" style="color: red; font-weight: bold; font-size: 1.5rem; margin: 15px 0;">
+        The Product is out of stock
+      </div>
       <% } else { %>
-        <% if (product.category?.name === 'Meat' || product.category?.name === 'Fish') { %>
-          <div class="cutting-style-selector">
-            <label for="cuttingStyle">Cutting Style:</label>
-            <select id="cuttingStyle" name="cuttingStyle">
-              <option value="" disabled selected>Select Cutting Style</option>
-              <% (product.cuttingStyle || []).forEach(style => { %>
-                <option value="<%= style %>"><%= style %></option>
-              <% }) %>
-            </select>
-          </div>
-        <% } %>
-      
-        <hr style="border: 1px solid #898989; margin-top: 15px;">
-        <div class="cart-containerr">
-          <div class="quantity-selector">
-            <button class="decrease">−</button>
-            <span class="quantity">1</span>
-            <button class="increase">+</button>
-          </div>
-          <button class="add-to-cart">
-            Add to Cart <span class="cart-icon material-icons">shopping_cart</span>
-          </button>
-          <div class="wishlist">
-            <span class="material-icons" id="wishlistIcon">favorite_border</span>
-          </div>
+      <% if (product.category?.name === 'Meat' || product.category?.name === 'Fish') { %>
+      <div class="cutting-style-selector">
+        <label for="cuttingStyle">Cutting Style:</label>
+        <select id="cuttingStyle" name="cuttingStyle">
+          <option value="" disabled selected>Select Cutting Style</option>
+          <% (product.cuttingStyle || []).forEach(style => { %>
+          <option value="<%= style %>"><%= style %></option>
+          <% }) %>
+        </select>
+      </div>
+      <% } %>
+
+      <hr style="border: 1px solid #898989; margin-top: 15px;">
+      <div class="cart-containerr">
+        <div class="quantity-selector">
+          <button class="decrease">−</button>
+          <span class="quantity">1</span>
+          <button class="increase">+</button>
         </div>
+        <button class="add-to-cart">
+          Add to Cart <span class="cart-icon material-icons">shopping_cart</span>
+        </button>
+        <div class="wishlist">
+          <span class="material-icons" id="wishlistIcon">favorite_border</span>
+        </div>
+      </div>
       <% } %>
       <hr style="border: 1px solid #898989; margin-top: 10px;">
       <div class="product-meta">
@@ -116,11 +116,11 @@
         <span class="stock-info" style="margin-top: 20px;">
           <strong>Stock Left:</strong>
           <% if (product.quantity > 10) { %>
-            <span style="color: green;"><%= product.quantity %> units</span>
+          <span style="color: green;"><%= product.quantity %> units</span>
           <% } else if (product.quantity > 0) { %>
-            <span style="color: orange;">Only <%= product.quantity %> units left!</span>
+          <span style="color: orange;">Only <%= product.quantity %> units left!</span>
           <% } else { %>
-            <span style="color: red;">Out of stock</span>
+          <span style="color: red;">Out of stock</span>
           <% } %>
         </span>
       </div>
@@ -147,41 +147,41 @@
   </div>
 </div>
 <% if (products.length > 0) { %>
-  <section class="featured-products">
-    <div class="container">
-      <div class="header">
-        <h2>Recommended Products</h2>
-      </div>
-      <div class="product-list">
-        <% products.slice(0, 4).forEach(product => { %>
-          <% if (product.status !== 'Out Of Stock') { %>
-            <div class="product-card <%= product.status === 'Out Of Stock' ? 'out-of-stock' : '' %>">
-              <span class="out-of-stock-label">
-                <%= product.status === 'Out Of Stock' ? 'Out of Stock' : (product.discountPercentage > 0 ? `-${product.discountPercentage}% off` : '') %>
-              </span>
-              <a href="/product/<%= product._id %>" class="product-link">
-                <img src="<%= product.image || '/default-product.png' %>" alt="<%= product.name %>">
-                <h3><%= product.name %></h3>
-                <p class="price">
-                  <% if (product.largestOffer && product.largestOffer > 0) { %>
-                    <%= product.price.toFixed(2) %>
-                    <% if (product.price < product.regularPrice) { %>
-                      <del class="old-price"><%= product.regularPrice.toFixed(2) %></del>
-                    <% } %>
-                  <% } else { %>
-                    <%= product.regularPrice.toFixed(2) %>
-                    <% if (product.salePrice !== product.regularPrice) { %>
-                      <del class="old-price"><%= product.salePrice.toFixed(2) %></del>
-                    <% } %>
-                  <% } %>
-                </p>
-              </a>
-            </div>
-          <% } %>
-        <% }) %>
-      </div>
+<section class="featured-products">
+  <div class="container">
+    <div class="header">
+      <h2>Recommended Products</h2>
     </div>
-  </section>
+    <div class="product-list">
+      <% products.slice(0, 4).forEach(product => { %>
+      <% if (product.status !== 'Out Of Stock') { %>
+      <div class="product-card <%= product.status === 'Out Of Stock' ? 'out-of-stock' : '' %>">
+        <span class="out-of-stock-label">
+          <%= product.status === 'Out Of Stock' ? 'Out of Stock' : (product.discountPercentage > 0 ? `-${product.discountPercentage}% off` : '') %>
+        </span>
+        <a href="/product/<%= product._id %>" class="product-link">
+          <img src="<%= product.image || '/default-product.png' %>" alt="<%= product.name %>">
+          <h3><%= product.name %></h3>
+          <p class="price">
+            <% if (product.largestOffer && product.largestOffer > 0) { %>
+            <%= product.price.toFixed(2) %>
+            <% if (product.price < product.regularPrice) { %>
+            <del class="old-price"><%= product.regularPrice.toFixed(2) %></del>
+            <% } %>
+            <% } else { %>
+            <%= product.regularPrice.toFixed(2) %>
+            <% if (product.salePrice !== product.regularPrice) { %>
+            <del class="old-price"><%= product.salePrice.toFixed(2) %></del>
+            <% } %>
+            <% } %>
+          </p>
+        </a>
+      </div>
+      <% } %>
+      <% }) %>
+    </div>
+  </div>
+</section>
 <% } %>
 
 <%- include("../../views/Partials/user/footer") %>
@@ -191,7 +191,7 @@
 
 <script>
   document.querySelectorAll(".subImg").forEach((img) => {
-    img.addEventListener("click", function () {
+    img.addEventListener("click", function() {
       document.querySelectorAll(".subImg").forEach((el) => el.classList.remove("active"));
       this.classList.add("active");
       const newImage = this.getAttribute("data-image");
@@ -220,7 +220,11 @@
   const wishlistIcon = document.querySelector('#wishlistIcon');
 
   let quantity = parseInt(quantitySpan.textContent);
-  let isInWishlist = false; // Track wishlist state (ideally fetch this from the server initially)
+  const wishlist = <%- JSON.stringify(wishlist) || '[]' %>; // Expose wishlist array
+  let inWishlist = wishlist.includes('<%= product._id.toString() %>'); // Set initial state from server
+
+  // Set initial icon state
+  wishlistIcon.textContent = inWishlist ? 'favorite' : 'favorite_border';
 
   decreaseBtn.addEventListener('click', () => {
     if (quantity > 1) {
@@ -249,11 +253,13 @@
     const cartData = {
       productId,
       quantity,
-      ...(cuttingStyle && { cuttingStyle }),
+      ...(cuttingStyle && {
+        cuttingStyle
+      }),
     };
 
     try {
-      const response = await fetch('/cart/add/${productId}', { 
+      const response = await fetch('/cart/add/${productId}', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -266,9 +272,8 @@
       if (data.success) {
         toastr.success(
           'Product added to cart successfully! <br><button id="view-cart-btn" style="padding: 5px 10px; background-color: #008ae0; color: white; border: none; border-radius: 3px; cursor: pointer;">View Cart</button>',
-          '',
-          {
-            onShown: function () {
+          '', {
+            onShown: function() {
               // Add click event to the View Cart button
               document.getElementById('view-cart-btn').addEventListener('click', () => {
                 window.location.href = '/cart';
@@ -290,9 +295,9 @@
     }
   });
 
-  // Add/Remove from Wishlist Logic
   wishlistBtn.addEventListener('click', async () => {
     const productId = '<%= product._id %>';
+    console.log(`Attempting to toggle wishlist for product ${productId}`);
 
     try {
       const response = await fetch('/wishlist/add-or-remove', {
@@ -300,17 +305,24 @@
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ productId }),
+        body: JSON.stringify({
+          productId
+        }),
       });
 
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
       const data = await response.json();
+      console.log('Server response:', data);
 
       if (data.success) {
-        isInWishlist = data.isInWishlist; // Update state based on backend response
-        wishlistIcon.textContent = isInWishlist ? 'favorite' : 'favorite_border';
-        toastr.success(isInWishlist ? 'Added to wishlist!' : 'Removed from wishlist!');
+        inWishlist = data.inWishlist;
+        wishlistIcon.textContent = inWishlist ? 'favorite' : 'favorite_border';
+        toastr.success(inWishlist ? 'Added to wishlist!' : 'Removed from wishlist!');
       } else {
-        toastr.error('Failed to update wishlist: ' + (data.message || 'Unknown error'));
+        toastr.error(data.message || 'Unknown error');
       }
     } catch (error) {
       console.error('Error updating wishlist:', error);

@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>East Repair Inc. Invoice</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+
+        .invoice-container {
+            margin: 0 auto;
+            background-color: white;
+            padding: 40px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 40px;
+        }
+
+        .company-info h1 {
+            font-size: 28px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .company-info p {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .divider {
+            height: 2px;
+            background-color: #333;
+            margin: 30px 0;
+        }
+
+        .invoice-details {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .section-content {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .invoice-meta {
+            text-align: right;
+        }
+
+        .invoice-meta .row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            min-width: 200px;
+        }
+
+        .invoice-meta .label {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .invoice-meta .value {
+            color: #666;
+        }
+
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+
+        .items-table th {
+            background-color: #f8f8f8;
+            padding: 15px 10px;
+            text-align: left;
+            font-weight: bold;
+            color: #333;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .items-table td {
+            padding: 15px 10px;
+            border-bottom: 1px solid #eee;
+            color: #666;
+        }
+
+        .items-table .qty-col {
+            width: 60px;
+            text-align: center;
+        }
+
+        .items-table .price-col,
+        .items-table .amount-col {
+            width: 100px;
+            text-align: right;
+        }
+
+        .totals {
+            margin-left: auto;
+            width: 300px;
+            margin-top: 20px;
+        }
+
+        .totals .row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 5px 0;
+        }
+
+        .totals .subtotal {
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+        }
+
+        .totals .total {
+            font-weight: bold;
+            font-size: 18px;
+            color: #333;
+            border-top: 2px solid #333;
+            padding-top: 10px;
+            margin-top: 10px;
+        }
+
+        .terms {
+            margin-top: 60px;
+            padding-top: 20px;
+            border-top: 2px solid #333;
+        }
+
+        .terms h3 {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .terms p {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="invoice-container">
+        <div class="header">
+            <div class="company-info">
+                <h1>TezBag</h1>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="invoice-details">
+            <div class="bill-to">
+                <div class="section-title">Billing Address</div>
+                <div class="section-content">
+                    <%=billingName%><br>
+                    <%=billingAddress%><br>
+                    <%=billingEmail%><br>
+                    <%=billingPhone%>
+                </div>
+            </div>
+
+            <div class="invoice-meta">
+                <div class="row">
+                    <span class="label">Invoice #</span>
+                    <span class="value"><%=invoiceNumber.slice(-6)%></span>
+                </div>
+                <div class="row">
+                    <span class="label">Invoice Date</span>
+                    <span class="value"><%=invoiceDate%></span>
+                </div>
+                <div class="row">
+                    <span class="label">Shipping</span>
+                    <span class="value">Free</span>
+                </div>
+                <div class="row">
+                    <span class="label">Payment Method</span>
+                    <span class="value"><%=paymentMethod%></span>
+                </div>
+            </div>
+        </div>
+
+        <table class="items-table">
+            <thead>
+                <tr>
+                    <th>Product Name</th>
+                    <th class="qty-col">QTY</th>
+                    <th class="price-col">PRICE</th>
+                    <th class="amount-col">AMOUNT</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% items.forEach((item, index) => { %>
+                    <tr>
+                        <td><%= item.productName %></td>
+                        <td class="qty-col"><%= item.quantiy %></tdclass>
+                        <td class="price-col"><%= item.price.toFixed(2) %>₹</td>
+                        <td class="amount-col"><%= item.total.toFixed(2) %>₹</td>
+                    </tr>
+                <% }) %>
+            </tbody>
+        </table>
+
+        <div class="totals">
+            <div class="row subtotal">
+                <span>Subtotal</span>
+                <span><%= totalPrice.toFixed(2) %>₹</span>
+            </div>
+            <div class="row total">
+                <span>INVOICE TOTAL</span>
+                <span><%= finalAmount.toFixed(2) %>₹</span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

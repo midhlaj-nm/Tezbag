@@ -11,7 +11,6 @@ const adminRouter = require('./routes/adminRouter')
 const errorHandler = require('./middlewares/errorHandler');
 const passport = require('./config/passport')
 const passport_login = require('./config/passport-login')
-const stateRouter = require('./routes/countryStateApi');
 const breadcrump = require('./middlewares/breadcump')
 db();
 
@@ -47,7 +46,6 @@ app.use(passport_login.session());
 app.use(breadcrump);
 app.use("/", userRouter);
 app.use('/tezgrani', adminRouter);
-app.use('/api', stateRouter);
 app.use(errorHandler);
 
 app.use((req, res) => {

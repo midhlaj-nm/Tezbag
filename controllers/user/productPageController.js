@@ -3,6 +3,7 @@ const Category = require('../../models/categorySchema');
 const Review = require('../../models/reviewSchema');
 const Deal = require('../../models/dealSchema');
 const Cart = require('../../models/cartSchema');
+const Wishlist = require('../../models/wishlistSchema');
 
 const loadshop = async (req, res) => {
   try {
@@ -95,9 +96,12 @@ const loadshop = async (req, res) => {
     const totalPages = Math.ceil(totalProducts / limit);
 
     let cartTotal = 0;
+    let wishlist = [];
     if (req.session.user) {
       const cart = await Cart.findOne({ userId: req.session.user }).lean();
       if (cart) cartTotal = cart.total || 0;
+      const wishlistDoc = await Wishlist.findOne({ userId: req.session.user }).populate('products.productId');
+      if (wishlistDoc) wishlist = wishlistDoc.products.map(p => p.productId._id.toString());
     }
 
     res.render('shop', {
@@ -109,7 +113,8 @@ const loadshop = async (req, res) => {
       selectedCategory: category || '',
       selectedPriceRange: priceRange || '',
       selectedSort: sort || '',
-      cartTotal
+      cartTotal,
+      wishlist 
     });
   } catch (err) {
     console.error('❌ Error loading products:', err);
@@ -174,10 +179,17 @@ const loadProductDetails = async (req, res) => {
       .populate('user', 'name email')
       .lean();
 
+    let wishlist = [];
+    if (req.session.user) {
+      const wishlistDoc = await Wishlist.findOne({ userId: req.session.user }).populate('products.productId');
+      if (wishlistDoc) wishlist = wishlistDoc.products.map(p => p.productId._id.toString());
+    }
+
     res.render('products', {
       product: transformedProduct,
       products: transformedRecommendedProducts,
-      reviews
+      reviews,
+      wishlist 
     });
   } catch (error) {
     console.error('❌ Error loading product details:', error);

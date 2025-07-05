@@ -1,0 +1,27 @@
+<%- include("../../views/Partials/user/header-ho") %>
+<hr style="margin: 0rem 0rem 1rem 0rem; background-color: #535353;">
+<link rel="stylesheet" href="/User-css/wishlist.css">
+<title>Document</title>
+</head>
+
+<body>
+  <!-- breadcrumb -->
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/">Home</a></li>
+      <% breadcrumbs.forEach((crumb, index) => { %>
+      <li class="breadcrumb-item <%= index === breadcrumbs.length - 1 ? 'active' : '' %>">
+        <% if (index !== breadcrumbs.length - 1) { %>
+        <a href="<%= crumb.url %>"><%= crumb.name %></a>
+        <% } else { %>
+        <%= crumb.name %>
+        <% } %>
+      </li>
+      <% }) %>
+    </ol>
+  </nav>
+
+</body>
+
+</html>
+<%- include("../../views/Partials/user/footer") %>
