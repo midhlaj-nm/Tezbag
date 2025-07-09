@@ -3,7 +3,8 @@ const Category = require('../../models/categorySchema');
 const Product = require('../../models/productSchema');
 const Gallery = require('../../models/bannerSchema');
 const Admin = require('../../models/adminSchema');
-const Deal = require('../../models/dealSchema')
+const Deal = require('../../models/dealSchema');
+const Cart = require('../../models/cartSchema')
 const env = require('dotenv').config();
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
@@ -32,6 +33,7 @@ function generateOtp() {
 // ===========================
 const loadHomepage = async (req, res, next) => {
     try {
+        console.log('Session user:', req.session.user);
         // Fetch categories and unblocked products
         const [categories, products] = await Promise.all([
             Category.find({ isListed: true }).lean(),
@@ -104,11 +106,11 @@ const loadHomepage = async (req, res, next) => {
                 ...product,
                 name: product.productName,
                 image: Array.isArray(product.productImage) ? product.productImage[0] : product.productImage,
-                price: finalPrice, // Main price (regularPrice or deal-applied price)
+                price: finalPrice,
                 regularPrice: product.regularPrice,
-                salePrice: product.salePrice, // Strikethrough price
+                salePrice: product.salePrice,
                 largestOffer: largestOffer > 0 ? largestOffer : null,
-                discountPercentage // Add discountPercentage field
+                discountPercentage
             };
         };
 
@@ -137,6 +139,26 @@ const loadHomepage = async (req, res, next) => {
             })
         );
 
+        let name = ''
+        let total = '0.00₹'
+
+        if (req.session.user) {
+            const userId = req.session.user
+            const user = await User.findById(userId).select('f_Name l_Name')
+            name = `${user.f_Name} ${user.l_Name}`
+            console.log('This is the name: ', name)
+
+            const cart = await Cart.findOne({ userId }).select('total')
+            console.log('this is cart total: ', cart)
+            if (cart) {
+                total = cart.total.toFixed(2) + '₹';
+            } else {
+                console.log('No cart found for userId:', userId);
+                total = '0.00₹'; 
+            }
+            console.log('This is cart price: ', total)
+        }
+
         const renderData = {
             category: categoriesWithData,
             products: transformedProducts,
@@ -144,6 +166,8 @@ const loadHomepage = async (req, res, next) => {
             showTodaysItems: transformedLatestProducts.length > 0,
             showFeaturedProducts: transformedProducts.length > 0,
             showTopCategories: categoriesWithData.length > 0,
+            name: name || '',
+            total: total || '0.00₹'
         };
 
         const viewName = req.session.user ? 'homepage' : 'beforelogin';
@@ -507,7 +531,7 @@ const regpost = async (req, res, next) => {
             req.flash('message', 'This email ID is already registered. Try logging in.');
             req.flash('messageType', 'error');
             return res.redirect('/login');
-        }        
+        }
 
         const findAdmin = await Admin.findOne({ email });
         if (findAdmin) {
@@ -641,7 +665,7 @@ const verifyOtp = async (req, res, next) => {
         delete req.session.userOtp;
         delete req.session.userData;
 
-        return res.status(200).json({ 
+        return res.status(200).json({
             success: true,
             redirectUrl: '/login',
             message: 'OTP Verified Successfully. Please log in.',

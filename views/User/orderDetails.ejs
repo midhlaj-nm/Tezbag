@@ -1,101 +1,295 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/User-css/orderDetails.css">
-    <title>Order Confirmation</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/User-css/orderDetails.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.css">
+  <title>Order Confirmation</title>
 </head>
+
 <body>
-    <div class="container">
-        <div class="content-wrapper">
-            <div class="left-section">
-                <div class="main-content">
-                    <h1 class="thank-you-heading">Thank you for your order!</h1>
-                    
-                    <div class="order-id">
-                        Order ID: <span><%= orderId %></span>
-                    </div>
-                    
-                    <div class="billing-section">
-                        <h3>Billing Address</h3>
-                        <div class="billing-info">
-                            <div><strong>Name:</strong> <%= billingName %></div>
-                            <div><strong>Address:</strong> <%= billingAddress %></div>
-                            <div><strong>Phone:</strong> <%= billingPhone %></div>
-                            <div><strong>Email:</strong> <%= billingEmail %></div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="button-section">
-                    <a href="/shop" class="btn btn-primary">Continue Shopping</a>
-                    <a href="/order-history" class="btn btn-secondary">View Order Details</a>
-                </div>
-                
-                <div class="full-width-button">
-                    <a href="<%= invoicePdf %>" class="btn btn-invoice" download="<%= invoiceNumber ? invoiceNumber.replace(/ /g, '_') + '.pdf' : 'invoice.pdf' %>">Download Invoice</a>
-                </div>
+  <div class="container">
+    <div class="content-wrapper">
+      <div class="left-section">
+        <div class="main-content">
+          <h1 class="thank-you-heading">Thank you for your order!</h1>
+
+          <div class="order-id">
+            Order ID: <span><%= orderId %></span>
+          </div>
+
+          <div class="billing-section">
+            <h3>Billing Address</h3>
+            <div class="billing-info">
+              <div><strong>Name:</strong> <%= billingName %></div>
+              <div><strong>Address:</strong> <%= billingAddress %></div>
+              <div><strong>Phone:</strong> <%= billingPhone %></div>
+              <div><strong>Email:</strong> <%= billingEmail %></div>
             </div>
-            
-            <div class="right-section">
-                <div class="order-summary">
-                    <div class="summary-header">
-                        <h2 class="summary-title">Order Summary</h2>
-                        <div class="order-info">
-                            <div>
-                                <strong><%= invoiceDate.toLocaleDateString() %></strong>
-                                Date
-                            </div>
-                            <div>
-                                <strong><%= invoiceNumber %></strong>
-                                Order Number
-                            </div>
-                            <div>
-                                <strong><%= paymentMethod %></strong>
-                                Payment Method
-                            </div>
-                            <div>
-                                <strong><%= shipping %></strong>
-                                Shipping
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="products-section">                        
-                        <% products.forEach(product => { %>
-                        <div class="product-item">
-                            <div class="product-image"><img src="<%= product.image %>" alt="" style="max-width: 100%; height: auto; display: block;"></div>
-                            <div class="product-details">
-                                <div class="product-name"><%= product.name %></div>
-                                <div class="product-meta">Pack: <%= product.cuttingStyle %> | Qty: <%= product.quantity %></div>
-                                <div class="product-price"><%= product.price %></div>
-                            </div>
-                        </div>
-                        <% }) %>
-                    </div>
-                    
-                    <div class="summary-totals">
-                        <div class="summary-row">
-                            <span>Sub Total</span>
-                            <span><%= subtotal %></span>
-                        </div>
-                        <div class="summary-row">
-                            <span>Shipping</span>
-                            <span>Free</span>
-                        </div>
-                        <div class="summary-row">
-                            <span>Discount</span>
-                            <span><%= discount %></span>
-                        </div>
-                        <div class="summary-row total">
-                            <span>Order Total</span>
-                            <span><%= finalAmount %></span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+          </div>
         </div>
+
+        <div class="button-section">
+          <% if (order.status === 'Cancelled') { %>
+          <button class="btn btn-cancelled" id="cancelButton" disabled>Order Cancelled</button>
+          <% } else if (order.status === 'Return Requested') { %>
+          <button class="btn btn-cancelled" id="cancelButton" disabled>Return Requested</button>
+          <% } else if (order.status === 'Pending') { %>
+          <button class="btn btn-secondary" id="cancelButton" onclick="openCancelModal('<%= orderId %>')">Cancel Order</button>
+          <% } else if (order.status === 'Delivered') { %>
+          <button class="btn btn-secondary" onclick="openReturnModal('<%= orderId %>')">Return Order</button>
+          <% } %>
+          <a href="/order-history" class="btn btn-secondary">View Order Details</a>
+        </div>
+
+        <div class="full-width-button">
+          <a href="/shop" class="btn btn-invoice">Continue Shopping</a>
+          <a href="/download-invoice?url=<%= encodeURIComponent(invoicePdf) %>&filename=<%= invoiceNumber.replace(/ /g, '_') + '.pdf' %>" class="btn btn-invoice">Download Invoice</a>
+        </div>
+      </div>
+
+      <div class="right-section">
+        <div class="order-summary">
+          <div class="summary-header">
+            <h2 class="summary-title">Order Summary</h2>
+            <div class="order-info">
+              <div>
+                <strong><%= invoiceDate.toLocaleDateString() %></strong>
+                Date
+              </div>
+              <div>
+                <strong><%= orderId.slice(0,6) %></strong>
+                Order Number
+              </div>
+              <div>
+                <strong><%= paymentMethod %></strong>
+                Payment Method
+              </div>
+              <div>
+                <strong><%= shipping %></strong>
+                Shipping
+              </div>
+            </div>
+          </div>
+
+          <div class="products-section">
+            <% products.forEach(product => { %>
+            <div class="product-item">
+              <div class="product-image"><img src="<%= product.image %>" alt="" style="max-width: 100%; height: auto; display: block;"></div>
+              <div class="product-details">
+                <div class="product-name">
+                  <span><%= product.name %></span>
+                  <% if (order.status === 'Delivered') { %>
+                  <a href="/add-review?productId=<%= product._id %>" class="add-review-link">Add Review</a>
+                  <% } %>
+                </div>
+                <div class="product-meta">Pack: <%= product.cuttingStyle %> | Qty: <%= product.quantity %></div>
+                <div class="product-price"><%= product.price %></div>
+              </div>
+            </div>
+            <% }) %>
+          </div>
+
+          <div class="summary-totals">
+            <div class="summary-row">
+              <span>Sub Total</span>
+              <span><%= subtotal %></span>
+            </div>
+            <div class="summary-row">
+              <span>Shipping</span>
+              <span>Free</span>
+            </div>
+            <div class="summary-row">
+              <span>Discount</span>
+              <span><%= discount %></span>
+            </div>
+            <div class="summary-row total">
+              <span>Order Total</span>
+              <span><%= finalAmount %></span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+
+    <!-- Cancel Modal -->
+    <div id="cancelModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          Cancel Order
+          <button class="close-x" onclick="closeModal('cancel')">×</button>
+        </div>
+        <div class="modal-body">
+          <label for="cancelReason">Select Reason for Cancellation (Optional):</label>
+          <select id="cancelReason" name="cancelReason" onchange="toggleCustomReason('cancel')">
+            <option value="">-- Select a Reason --</option>
+            <option value="changed_mind">Changed my mind</option>
+            <option value="wrong_item">Ordered the wrong item</option>
+            <option value="better_price">Found a better price elsewhere</option>
+            <option value="other">Other</option>
+          </select>
+          <div class="clarification">Refund will be processed to your wallet within 48 hours</div>
+          <div id="cancelCustomReason" class="custom-reason">
+            <input type="text" id="cancelCustomInput" placeholder="Please specify your reason">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="confirm-btn" onclick="confirmCancel('<%= orderId %>')">Confirm Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Return Modal -->
+    <div id="returnModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          Return Order
+          <button class="close-x" onclick="closeModal('return')">×</button>
+        </div>
+        <div class="modal-body">
+          <label for="returnReason">Select Reason for Return (Required):</label>
+          <select id="returnReason" name="returnReason" onchange="toggleCustomReason('return')">
+            <option value="">-- Select a Reason --</option>
+            <option value="defective">Item is defective</option>
+            <option value="wrong_item">Received the wrong item</option>
+            <option value="damaged">Item arrived damaged</option>
+            <option value="other">Other</option>
+          </select>
+          <div id="returnCustomReason" class="custom-reason">
+            <input type="text" id="returnCustomInput" placeholder="Please specify your reason">
+          </div>
+          <div id="err1" class="errr-msg">A valid reason is required for return.</div>
+          <div class="clarification">*Refund will be processed to your wallet within 48 hours</div>
+        </div>
+        <div class="modal-footer">
+          <button class="confirm-btn" onclick="event.preventDefault(); confirmReturn('<%= orderId %>')">Confirm Return</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.js"></script>
+    <script>
+      // Modal Functions (defined globally)
+      function openCancelModal(orderId) {
+        document.getElementById('cancelModal').style.display = 'block';
+      }
+
+      function openReturnModal(orderId) {
+        document.getElementById('returnModal').style.display = 'block';
+      }
+
+      function closeModal(type) {
+        document.getElementById(type === 'cancel' ? 'cancelModal' : 'returnModal').style.display = 'none';
+        // Reset custom reason visibility and error message
+        document.getElementById(`${type}CustomReason`).style.display = 'none';
+        document.getElementById(`${type}CustomInput`).value = '';
+        if (type === 'return') {
+          document.getElementById('err1').style.display = 'none';
+        }
+      }
+
+      function toggleCustomReason(type) {
+        const select = document.getElementById(type === 'cancel' ? 'cancelReason' : 'returnReason');
+        const customReason = document.getElementById(`${type}CustomReason`);
+        if (select.value === 'other') {
+          customReason.style.display = 'block';
+        } else {
+          customReason.style.display = 'none';
+          document.getElementById(`${type}CustomInput`).value = '';
+        }
+        // Hide error message when a new option is selected
+        if (type === 'return') {
+          document.getElementById('err1').style.display = 'none';
+        }
+      }
+
+      function confirmCancel(orderId) {
+        const reason = document.getElementById('cancelReason').value;
+        const customReason = document.getElementById('cancelCustomInput').value;
+        const finalReason = reason === 'other' ? customReason : reason;
+        fetch(`/cancel-order/${orderId}`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              reason: finalReason || 'No reason provided'
+            })
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              toastr.success('Order cancelled successfully!');
+              closeModal('cancel');
+              // Update button text to "Order Cancelled" without changing class
+              const cancelButton = document.getElementById('cancelButton');
+              if (cancelButton) {
+                cancelButton.textContent = 'Order Cancelled';
+                cancelButton.disabled = true;
+              }
+            } else {
+              toastr.error(data.message || 'Failed to cancel order.');
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            toastr.error('An error occurred while cancelling the order.');
+          });
+      }
+
+      function confirmReturn(orderId) {
+        const reason = document.getElementById('returnReason').value;
+        const customReason = document.getElementById('returnCustomInput').value;
+        const finalReason = reason === 'other' ? customReason : reason;
+        const errorMessage = document.getElementById('err1');
+        if (!reason || (reason === 'other' && !customReason.trim())) {
+          errorMessage.style.display = 'block';
+          errorMessage.textContent = "A valid reason is required for return.";
+          return;
+        }
+        fetch(`/return-order/${orderId}`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              reason: finalReason
+            })
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              toastr.success('Return request submitted successfully!');
+              closeModal('return');
+            } else {
+              toastr.error(data.message || 'Failed to submit return request.');
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            toastr.error('An error occurred while submitting the return request.');
+          });
+      }
+
+      // Initialize Toastr on window load
+      window.onload = function() {
+        if (typeof toastr === 'undefined') {
+          console.error('Toastr is not loaded. Check the CDN link.');
+        } else {
+          toastr.options = {
+            positionClass: "toast-top-right",
+            timeOut: 5000,
+            showDuration: 300,
+            hideDuration: 300
+          };
+        }
+      };
+    </script>
+  </div>
 </body>
+
 </html>

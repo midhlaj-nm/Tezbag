@@ -63,7 +63,7 @@ const orderSchema = new Schema({
   status: {
     type: String,
     required: true,
-    enum: ['Pending', 'Processing', 'Shipped', 'Deliverd', 'Cancelled', 'Return on the process', 'Returned']
+    enum: ['Pending', 'Processing', 'Shipped', 'Deliverd', 'Cancelled', 'Return Requested', 'Returned']
   },
   couponApplied: {
     type: Boolean,

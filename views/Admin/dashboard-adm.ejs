@@ -161,7 +161,7 @@
         <div class="date-time">
           <h3 id="greeting">Good Morning, <span style="color: #00B207;"><%= name %></span>!</h3>
           <p id="current-day-date">Friday, April 18, 2025</p>
-          <p id="current-time" style="font-size:2rem;">09:15:23 AM</p>
+          <p id="current-time" style="font-size:2rem;">09:15 AM</p>
         </div>
       
         <div class="punch-status">
@@ -241,8 +241,8 @@
             <% } else { %>
               <% recentOrders.forEach(order => { %>
                 <tr>
-                  <td>#<%= order._id.toString().slice(-4) %></td>
-                  <td><%= new Date(order.createdOn).toLocaleDateString() %></td>
+                  <td>#<%= order._id.toString().slice(0,6) %></td>
+                  <td><%= new Date(order.invoiceDate).toLocaleDateString() %></td>
                   <td><%= order.orderedItems.reduce((sum, item) => sum + item.quantity, 0) %> nos</td>
                   <td><%= order.finalAmount.toFixed(2) %> ₹</td>
                 </tr>
@@ -339,7 +339,7 @@
     const seconds = now.getSeconds().toString().padStart(2, '0');
     const ampm = hours >= 12 ? 'PM' : 'AM';
     hours = hours % 12 || 12;
-    const timeStr = `${hours}:${minutes}:${seconds} ${ampm}`;
+    const timeStr = `${hours}:${minutes} ${ampm}`;
     document.getElementById('current-time').innerText = timeStr;
   
     // Greeting

@@ -1,15 +1,17 @@
+/* Global Styles */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
-                
+
 body {
     font-family: 'Poppins', sans-serif;
     background-color: #e8f5e8;
     padding: 40px 20px;
 }
-        
+
+/* Container */
 .container {
     max-width: 1200px;
     margin: 0 auto;
@@ -18,13 +20,15 @@ body {
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
     overflow: hidden;
 }
-        
+
+/* Content Wrapper */
 .content-wrapper {
     display: grid;
     grid-template-columns: 1fr 600px;
     min-height: 600px;
 }
 
+/* Left Section */
 .left-section {
     padding: 60px 50px;
 }
@@ -33,21 +37,19 @@ body {
     flex: 1;
 }
 
-.button-section {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 50px;
-}
-
+/* Thank You Heading */
 .thank-you-heading {
-    font-size: 2.5rem;
+    font-family: 'Poppins', sans-serif;
+    font-size: 2.4rem;
     color: #000000;
-    font-weight: bold;
+    font-weight: 600;
     margin-bottom: 25px;
     line-height: 1.2;
 }
 
+/* Order ID */
 .order-id {
+    font-family: 'Poppins', sans-serif;
     font-size: 1rem;
     color: #373737;
     margin-bottom: 35px;
@@ -58,11 +60,13 @@ body {
     font-weight: 600;
 }
 
+/* Billing Section */
 .billing-section {
     margin-bottom: 0;
 }
 
 .billing-section h3 {
+    font-family: 'Poppins', sans-serif;
     font-size: 1.4rem;
     color: #000000;
     margin-bottom: 20px;
@@ -75,6 +79,7 @@ body {
 }
 
 .billing-info div {
+    font-family: 'Poppins', sans-serif;
     margin-bottom: 8px;
 }
 
@@ -83,7 +88,23 @@ body {
     font-weight: 600;
 }
 
+/* Button Section */
+.button-section {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 25px;
+}
+
+/* Full Width Button */
+.full-width-button {
+    display: grid;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+/* Button Styles */
 .btn {
+    font-family: 'Poppins', sans-serif;
     padding: 16px 20px;
     border: none;
     border-radius: 8px;
@@ -113,11 +134,13 @@ body {
     background-color: #008905;
 }
 
-.full-width-button {
-    margin-top: 15px;
+.btn-cancelled {
+    background-color: #0084049e;
+    color: #ffffff;
 }
 
 .btn-invoice {
+    font-family: 'Poppins', sans-serif;
     background-color: #008404;
     color: #ffffff;
     width: 100%;
@@ -127,10 +150,12 @@ body {
     background-color: #008905;
 }
 
+/* Right Section */
 .right-section {
     padding: 40px 30px;
 }
 
+/* Order Summary */
 .order-summary {
     background-color: #ffffff;
     border-radius: 12px;
@@ -141,6 +166,7 @@ body {
     flex-direction: column;
 }
 
+/* Summary Header */
 .summary-header {
     background-color: #f8f9fa;
     padding: 25px;
@@ -148,12 +174,14 @@ body {
 }
 
 .summary-title {
+    font-family: 'Poppins', sans-serif;
     font-size: 1.5rem;
     color: #000000;
     font-weight: 600;
     margin-bottom: 15px;
 }
 
+/* Order Info */
 .order-info {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -162,6 +190,7 @@ body {
 }
 
 .order-info div {
+    font-family: 'Poppins', sans-serif;
     color: #666;
 }
 
@@ -171,6 +200,7 @@ body {
     margin-bottom: 2px;
 }
 
+/* Products Section */
 .products-section {
     flex: 1;
     padding: 25px;
@@ -178,11 +208,13 @@ body {
 }
 
 .products-section h4 {
+    font-family: 'Poppins', sans-serif;
     color: #000000;
     margin-bottom: 20px;
     font-size: 1.1rem;
 }
 
+/* Product Item */
 .product-item {
     display: flex;
     align-items: center;
@@ -195,6 +227,7 @@ body {
     border-bottom: none;
 }
 
+/* Product Image */
 .product-image {
     width: 60px;
     height: 60px;
@@ -210,28 +243,55 @@ body {
     flex-shrink: 0;
 }
 
+/* Product Details */
 .product-details {
     flex: 1;
 }
 
+/* Product Name and Add Review */
 .product-name {
+    font-family: 'Poppins', sans-serif;
     font-weight: 600;
     color: #000000;
     margin-bottom: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
+.add-review-link {
+    font-family: 'Poppins', sans-serif;
+    color: #008404;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 500;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.add-review-link:hover {
+    background-color: #f0f8f0;
+    color: #008905;
+}
+
+/* Product Meta */
 .product-meta {
+    font-family: 'Poppins', sans-serif;
     font-size: 0.85rem;
     color: #666;
     margin-bottom: 5px;
 }
 
+/* Product Price */
 .product-price {
+    font-family: 'Poppins', sans-serif;
     font-weight: 600;
     color: #000000;
     font-size: 1.1rem;
 }
 
+/* Summary Totals */
 .summary-totals {
     background-color: #f8f9fa;
     padding: 25px;
@@ -239,6 +299,7 @@ body {
 }
 
 .summary-row {
+    font-family: 'Poppins', sans-serif;
     display: flex;
     justify-content: space-between;
     margin-bottom: 12px;
@@ -254,29 +315,166 @@ body {
     margin-top: 10px;
 }
 
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: #ffffff;
+    margin: 15% auto;
+    padding: 20px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+.modal-header {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.4rem;
+    color: #000000;
+    font-weight: 600;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 10px;
+    position: relative;
+}
+
+.close-x {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #ccc;
+    border: none;
+    background: none;
+    cursor: pointer;
+}
+
+.close-x:hover {
+    color: #acacac;
+}
+
+.modal-body {
+    margin-bottom: 20px;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 10px;
+}
+
+.modal-body select {
+    font-family: 'Poppins', sans-serif;
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    color: #555;
+    margin-bottom: 10px;
+}
+
+.custom-reason {
+    display: none;
+    margin-top: 10px;
+}
+
+.custom-reason input {
+    font-family: 'Poppins', sans-serif;
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    color: #555;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding-top: 10px;
+}
+
+.confirm-btn {
+    font-family: 'Poppins', sans-serif;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    background-color: #008404;
+    color: #ffffff;
+}
+
+.confirm-btn:hover {
+    background-color: #008905;
+}
+
+.clarification {
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.85rem;
+    color: #666;
+    text-align: left;
+    margin-bottom: 10px;
+}
+
+.errr-msg {
+    color: red;
+    font-size: 0.9rem;
+    margin-top: 5px;
+    padding-left: 2px;
+    font-weight: 500;
+    display: none;
+    text-align: left;
+}
+
+/* Media Queries */
 @media (max-width: 768px) {
     .content-wrapper {
         grid-template-columns: 1fr;
     }
-    
+
     .left-section {
         padding: 40px 30px;
     }
-    
+
     .right-section {
         border-left: none;
         border-top: 1px solid #e0e0e0;
     }
-    
+
     .thank-you-heading {
+        font-family: 'Poppins', sans-serif;
         font-size: 2rem;
     }
-    
+
     .button-section {
         flex-direction: column;
     }
-    
+
     .btn {
         text-align: center;
+    }
+
+    .product-name {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+
+    .add-review-link {
+        align-self: flex-start;
     }
 }

@@ -37,7 +37,7 @@ const loadUsersPage = async (req, res) => {
   
     } catch (error) {
       console.log("Error loading users:", error);
-      res.status(500).send("Internal Server Error");
+      res.status(404);
     }
   };
   

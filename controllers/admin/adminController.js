@@ -219,10 +219,9 @@ const loadDashboard = async (req, res) => {
     try {
       console.log("📥 Loading admin dashboard");
 
-      const recentOrders = await Order.find().sort({ date: -1 }).limit(8); // fetch from DB
-      const recentLogins = await User.find({}).sort({ createdOn: -1 }).limit(3).select('f_Name email createdOn'); // only fetch needed fields
+      const recentOrders = await Order.find().sort({ date: 1 }).limit(8); 
+      const recentLogins = await User.find({}).sort({ createdOn: -1 }).limit(3).select('f_Name email createdOn'); 
   
-      // fetch admin details using session id
       const admin = await Admin.findById(req.session.admin);
       console.log("Got it",admin)
       const name = admin?.f_Name || 'Admin';

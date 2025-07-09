@@ -79,30 +79,6 @@ a {
     border-color: #00B207;
 }
 
-.clear-icon {
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #888;
-    cursor: pointer;
-    text-decoration: none;
-}
-
-.clear-icon span {
-    padding-top: 5px;
-    font-size: 20px;
-}
-
-.clear-icon:hover {
-    color: #313131;
-    text-decoration: none;
-}
-
-.clear-icon:hover span {
-    color: #313131;
-}
-
 .search-btn {
     background: #00B207;
     color: white;
@@ -351,31 +327,37 @@ a {
     pointer-events: none;
 }
 
-.order-history-container {
+.wallet-container {
     border: 1px solid #ccc;
     background: white;
     border-radius: 10px;
     overflow: hidden;
 }
 
-.order-history-header {
+.wallet-header {
     background: #ffffff;
     padding: 20px;
     border-bottom: 1px solid #e9ecef;
 }
 
-.order-history-header h2 {
+.wallet-header h2 {
     margin: 0;
     color: #333;
     font-weight: 500;
 }
 
-.order-table {
+.wallet-header p {
+    margin: 5px 0 0;
+    color: #333;
+    font-weight: 500;
+}
+
+.wallet-table {
     width: 100%;
     margin: 0;
 }
 
-.order-table th {
+.wallet-table th {
     background: #f8f9fa;
     color: #000000;
     font-weight: 600;
@@ -384,80 +366,23 @@ a {
     text-align: center;
 }
 
-.order-table td {
+.wallet-table td {
     padding: 15px;
     border-bottom: 1px solid #e9ecef;
     vertical-align: middle;
     text-align: center;
 }
 
-/* Table row styling with alternating colors */
-.order-table tr {
-    background-color: #f5f5f5; /* Default background for all rows */
+.wallet-table tr {
+    background-color: #f5f5f5;
 }
 
-/* Even rows (2nd, 4th, 6th, etc.) */
-.order-table tbody tr:nth-child(even) {
-    background-color: #ffffff; /* White background for even rows */
+.wallet-table tbody tr:nth-child(even) {
+    background-color: #ffffff;
 }
 
-/* Odd rows (1st, 3rd, 5th, etc.) */
-.order-table tbody tr:nth-child(odd) {
-    background-color: #f9f9f9; /* Light gray background for odd rows */
-}
-
-.order-id {
-    font-weight: 400;
-    color: #000000;
-}
-
-.order-date {
-    color: #000000;
-}
-
-.order-total {
-    font-weight: 400;
-    color: #000000;
-}
-
-.order-status {
-    padding: 5px 12px;
-    font-size: 0.875rem;
-    font-weight: 500;
-    text-align: center;
-    min-width: 90px;
-    display: inline-block;
-}
-
-.status-update {
-    color: #000000;
-}
-
-.view-details-btn {
-    background: #28a745;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 4px;
-    font-size: 0.875rem;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-.view-details-btn:hover {
-    background: #218838;
-}
-
-.no-orders {
-    text-align: center;
-    padding: 50px;
-    color: #6c757d;
-}
-
-.footer-wrapper {
-    width: 100%;
-    background-color: #f8f8f8;
-    margin-top: 50px;
+.wallet-table tbody tr:nth-child(odd) {
+    background-color: #f9f9f9;
 }
 
 /* Pagination Styles */
@@ -476,6 +401,12 @@ a {
 .pagination .page-item.disabled .page-link {
     color: #ccc;
     cursor: not-allowed;
+}
+
+.footer-wrapper {
+    width: 100%;
+    background-color: #f8f8f8;
+    margin-top: 50px;
 }
 
 /* Responsive Design */

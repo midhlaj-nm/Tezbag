@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Order History</title>
 
-  <!-- jQuery -->
+  <!-- jQuery (required for Toastr) -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
   <!-- Toastr CSS & JS -->
@@ -15,313 +15,115 @@
 
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-
-  <!-- Font & Icon -->
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-  <!-- Custom CSS -->
   <link rel="stylesheet" href="/User-css/order-history.css">
 
-  <style>
-    /* Ensure Toastr container is styled */
-    #toast-container {
-      opacity: 1;
-    }
+  <!-- Font Awesome CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
-    #toast-container>.toast {
-      opacity: 1 !important;
-      /* Override any default opacity */
-      background-color: transparent !important;
-      /* Reset to allow custom backgrounds */
-      border: none !important;
-    }
+  <!-- Font & icon -->
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    #toast-container>.toast-success {
-      background-color: #4CAF50 !important;
-      /* Green for success */
-      color: white !important;
-      /* Ensure text is readable */
-    }
-
-    #toast-container>.toast-error {
-      background-color: #e92e20 !important;
-      /* Red for error */
-      color: white !important;
-      /* Ensure text is readable */
-    }
-
-    /* Custom Modal Styles */
-    .overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.5);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
-
-    .overlay.visible {
-      display: flex;
-    }
-
-    .popup {
-      background: #fff;
-      border-radius: 8px;
-      width: 90%;
-      max-width: 900px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-      overflow: hidden;
-    }
-
-    .popup-header {
-      background: #f8f9fa;
-      padding: 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid #dee2e6;
-    }
-
-    .popup-title {
-      font-size: 1.5rem;
-      font-weight: 600;
-      color: #333;
-      margin: 0;
-    }
-
-    .close-btn {
-      background: none;
-      border: none;
-      font-size: 1.5rem;
-      cursor: pointer;
-      color: #666;
-    }
-
-    .close-btn:hover {
-      color: #000;
-    }
-
-    .popup-content {
-      padding: 20px;
-      max-height: 70vh;
-      overflow-y: auto;
-    }
-
-    .order-content {
-      display: flex;
-      gap: 30px;
-    }
-
-    .order-left {
-      flex: 1;
-    }
-
-    .order-right {
-      width: 280px;
-    }
-
-    .address-section,
-    .contact-section {
-      margin-bottom: 20px;
-    }
-
-    .section-title {
-      font-size: 0.875rem;
-      color: #6c757d;
-      text-transform: uppercase;
-      font-weight: 600;
-      margin-bottom: 10px;
-    }
-
-    .address-info,
-    .contact-info {
-      color: #333;
-      line-height: 1.6;
-    }
-
-    .order-status-timeline {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin: 20px 0;
-      position: relative;
-    }
-
-    .timeline-step {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      position: relative;
-      z-index: 2;
-    }
-
-    .timeline-circle {
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-      color: white;
-      margin-bottom: 10px;
-    }
-
-    .timeline-circle.completed {
-      background: #28a745;
-    }
-
-    .timeline-circle.current {
-      background: #007bff;
-    }
-
-    .timeline-circle.pending {
-      background: #dee2e6;
-      color: #6c757d;
-    }
-
-    .timeline-label {
-      font-size: 0.875rem;
-      color: #333;
-      font-weight: 500;
-    }
-
-    .timeline-line {
-      position: absolute;
-      top: 15px;
-      left: 0;
-      right: 0;
-      height: 2px;
-      background: #dee2e6;
-      z-index: 1;
-    }
-
-    .timeline-progress {
-      height: 100%;
-      background: #28a745;
-      transition: width 0.3s ease;
-    }
-
-    .products-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-    }
-
-    .products-table th {
-      background: #f8f9fa;
-      padding: 10px;
-      text-align: left;
-      font-weight: 600;
-      color: #333;
-      border-bottom: 1px solid #dee2e6;
-    }
-
-    .products-table td {
-      padding: 10px;
-      border-bottom: 1px solid #dee2e6;
-      vertical-align: middle;
-    }
-
-    .product-image {
-      width: 50px;
-      height: 50px;
-      border-radius: 4px;
-      object-fit: cover;
-    }
-
-    .order-right {
-      background: #f8f9fa;
-      border-radius: 8px;
-      padding: 20px;
-    }
-
-    .order-summary {
-      background: white;
-      border: 1px solid #dee2e6;
-      border-radius: 8px;
-      padding: 15px;
-    }
-
-    .summary-row {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 10px;
-    }
-
-    .summary-row:last-child {
-      margin-bottom: 0;
-      padding-top: 10px;
-      border-top: 1px solid #dee2e6;
-      font-weight: 600;
-    }
-
-    .summary-label {
-      color: #6c757d;
-    }
-
-    .summary-value {
-      font-weight: 500;
-    }
-
-    .total-value {
-      color: #28a745;
-      font-size: 1.1rem;
-    }
-
-    .popup-footer {
-      background: #f8f9fa;
-      padding: 15px;
-      border-top: 1px solid #dee2e6;
-      text-align: right;
-    }
-
-    .cancel-order-btn {
-      background: #dc3545;
-      color: white;
-      border: none;
-      padding: 8px 20px;
-      border-radius: 4px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
-
-    .cancel-order-btn:hover {
-      background: #c82333;
-    }
-
-    .cancel-order-btn:disabled {
-      background: #6c757d;
-      cursor: not-allowed;
-    }
-
-    @media (max-width: 768px) {
-      .order-content {
-        flex-direction: column;
-      }
-
-      .order-right {
-        width: 100%;
-      }
-
-      .popup {
-        width: 95%;
-      }
-    }
-  </style>
 </head>
+<style>
+  /* Ensure Toastr container is styled */
+  #toast-container {
+    opacity: 1;
+  }
+
+  #toast-container>.toast {
+    opacity: 1 !important;
+    /* Override any default opacity */
+    background-color: transparent !important;
+    /* Reset to allow custom backgrounds */
+    border: none !important;
+  }
+
+  #toast-container>.toast-success {
+    background-color: #4CAF50 !important;
+    /* Green for success */
+    color: white !important;
+    /* Ensure text is readable */
+  }
+
+  #toast-container>.toast-error {
+    background-color: #e92e20 !important;
+    /* Red for error */
+    color: white !important;
+    /* Ensure text is readable */
+  }
+</style>
 
 <body>
-  <!-- Header (Included via Partial) -->
-  <%- include("../../views/Partials/user/header-ho") %>
-  <hr style="margin: 0rem 0rem 1rem 0rem;">
+
+  <!-- Header Section -->
+  <header class="header">
+    <div class="container d-flex justify-content-between align-items-center">
+
+      <!-- Logo -->
+      <div class="logo">
+        <img src="logo.png" alt="TezBag">
+      </div>
+
+      <!-- Search Bar -->
+      <div class="search-bar">
+        <form action="/order-history" method="GET">
+          <div class="input-wrapper">
+            <input type="text" name="query" placeholder="Search" value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>">
+            <% if (typeof searchQuery !== 'undefined' && searchQuery.trim() !== '') { %>
+            <a href="/order-history?page=<%= currentPage %>" class="clear-icon">
+              <span class="material-symbols-outlined">cancel</span>
+            </a>
+            <% } %>
+          </div>
+          <button type="submit" class="search-btn">Search</button>
+        </form>
+      </div>
+
+      <!-- Google Fonts Icons Version -->
+      <div class="cart-container">
+        <a href="/wishlist" class="heart-link">
+          <div class="heart-container">
+            <span class="material-symbols-outlined icon">favorite</span>
+          </div>
+        </a>
+
+        <div class="divider"></div>
+
+        <a href="/cart" class="cart-link">
+          <div class="cart-content">
+            <span class="material-symbols-outlined icon">shopping_bag</span>
+            <div class="cart-text">
+              <p class="cart-label">Shopping cart:</p>
+              <% if (typeof cartTotal !== 'undefined' && cartTotal > 0) { %>
+              <span class="cart-total"><%= cartTotal.toFixed(2) %>₹</span>
+              <% } else { %>
+              <span class="cart-total">0.00₹</span>
+              <% } %>
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <div id="middle" class="container-fluid">
+    <ul id="list">
+      <li><a href="/">Home</a></li>
+      <li><a href="/shop">Shop</a></li>
+      <li><a href="/pages">Pages</a></li>
+      <li><a href="/blog">Blog</a></li>
+      <li><a href="/account">Account</a></li>
+    </ul>
+    <div id="right-section">
+      <div id="call">
+        <img src="/PhoneCall 1.svg">
+      </div>
+      <span id="num">
+        <p>7907700456</p>
+      </span>
+    </div>
+  </div>
 
   <!-- Breadcrumb -->
   <nav aria-label="breadcrumb">
@@ -394,12 +196,12 @@
               <tr>
                 <td class="order-id">#<%= order.orderId.slice(0,6) %></td>
                 <td class="order-date"><%= new Date(order.invoiceDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) %></td>
-                <td class="order-total"><%= order.finalAmount.toFixed(2) %>₹ (<%= order.items ? order.items.length : 0 %> Product<%= order.items && order.items.length > 1 ? 's' : '' %>)</td>
+                <td class="order-total"><%= order.finalAmount.toFixed(2) %>₹ </td>
                 <td>
-                  <span class="order-status status-update <%= order.status ? order.status.toLowerCase().replace(/\s+/g, '-') : 'pending' %>"><%= order.status || 'Pending' %></span>
+                  <span class="order-status"><%= order.status %></span>
                 </td>
                 <td>
-                  <button class="view-details-btn" onclick="viewOrderDetails('<%= order.orderId %>')">View Details</button>
+                  <button class="view-details-btn" onclick="window.location.href = '/order-confirmation/<%= order.orderId %>'">View Details</button>
                 </td>
               </tr>
               <% } %>
@@ -416,115 +218,23 @@
     </div>
   </div>
 
-  <!-- Custom Order Details Modal -->
-<!-- Custom Order Details Modal -->
-<div class="overlay hidden" id="popupOverlay">
-  <div class="popup">
-    <div class="popup-header">
-      <h2 class="popup-title" id="popupTitle">Order History</h2>
-      <button class="close-btn" id="closePopup">×</button>
-    </div>
-    <div class="popup-content">
-      <div class="order-content">
-        <div class="order-left">
-          <!-- Address Section -->
-          <div class="address-section">
-            <div class="section-title">Address</div>
-            <div class="address-info" id="modalAddressInfo"></div>
-          </div>
-
-          <!-- Contact Section -->
-          <div class="contact-section">
-            <div class="section-title">Email</div>
-            <div class="contact-info" id="modalEmail"></div>
-            <div class="section-title" style="margin-top: 15px;">Phone</div>
-            <div class="contact-info" id="modalPhone"></div>
-          </div>
-
-          <!-- Order Date and Products -->
-          <div class="order-date-section">
-            <div class="section-title">Order Date</div>
-            <div class="order-date-info" id="modalOrderDate"></div>
-            <div class="section-title">Products</div>
-            <div class="order-products-info" id="modalOrderProducts"></div>
-          </div>
-
-          <!-- Order Status Timeline -->
-          <div class="order-status-timeline">
-            <div class="timeline-line">
-              <div class="timeline-progress" id="timelineProgress" style="width: 0%;"></div>
-            </div>
-            <div class="timeline-step">
-              <div class="timeline-circle completed">
-                <i class="fa-solid fa-check"></i>
-              </div>
-              <div class="timeline-label">Order received</div>
-            </div>
-            <div class="timeline-step">
-              <div class="timeline-circle pending" id="processingCircle">02</div>
-              <div class="timeline-label">Processing</div>
-            </div>
-            <div class="timeline-step">
-              <div class="timeline-circle pending" id="onTheWayCircle">03</div>
-              <div class="timeline-label">On the way</div>
-            </div>
-            <div class="timeline-step">
-              <div class="timeline-circle pending" id="deliveredCircle">04</div>
-              <div class="timeline-label">Delivered</div>
-            </div>
-          </div>
-
-          <!-- Products Table -->
-          <table class="products-table">
-            <thead>
-              <tr>
-                <th>Product</th>
-                <th>Price</th>
-                <th>Quantity</th>
-                <th>Subtotal</th>
-              </tr>
-            </thead>
-            <tbody id="modalProductsTable">
-              <!-- Products will be populated by JavaScript -->
-            </tbody>
-          </table>
-        </div>
-
-        <div class="order-right">
-          <div class="order-summary">
-            <div class="summary-row">
-              <span class="summary-label">Order ID:</span>
-              <span class="summary-value" id="modalOrderId"></span>
-            </div>
-            <div class="summary-row">
-              <span class="summary-label">Payment Method:</span>
-              <span class="summary-value" id="modalPaymentMethod"></span>
-            </div>
-            <div class="summary-row">
-              <span class="summary-label">Subtotal:</span>
-              <span class="summary-value" id="modalSubtotal"></span>
-            </div>
-            <div class="summary-row">
-              <span class="summary-label">Discount:</span>
-              <span class="summary-value" id="modalDiscount"></span>
-            </div>
-            <div class="summary-row">
-              <span class="summary-label">Shipping:</span>
-              <span class="summary-value" id="modalShipping"></span>
-            </div>
-            <div class="summary-row">
-              <span class="summary-label">Total:</span>
-              <span class="summary-value total-value" id="modalTotal"></span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="popup-footer">
-      <button type="button" class="cancel-order-btn" id="cancelOrderBtn" onclick="cancelOrder()">Cancel Order</button>
-    </div>
-  </div>
-</div>
+  <% if (totalPages >= 1) { %>
+  <nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center mt-4">
+      <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
+        <a class="page-link" href="/order-history?query=<%= encodeURIComponent(searchQuery) %>&page=<%= currentPage - 1 %>">Previous</a>
+      </li>
+      <% for (let i = 1; i <= totalPages; i++) { %>
+      <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+        <a class="page-link" href="/order-history?query=<%= encodeURIComponent(searchQuery) %>&page=<%= i %>"><%= i %></a>
+      </li>
+      <% } %>
+      <li class="page-item <%= currentPage === totalPages || orders.length === 0 ? 'disabled' : '' %>">
+        <a class="page-link" href="/order-history?query=<%= encodeURIComponent(searchQuery) %>&page=<%= currentPage + 1 %>">Next</a>
+      </li>
+    </ul>
+  </nav>
+  <% } %>
 
   <div class="footer-wrapper">
     <%- include("../../views/Partials/user/footer") %>
@@ -552,155 +262,6 @@
       "backgroundColor": "transparent",
       "textColor": "white"
     };
-
-    function viewOrderDetails(orderId) {
-      fetch(`/order/${orderId}`) 
-        .then(response => {
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-          return response.json();
-        })
-        .then(order => {
-          if (!order || typeof order !== 'object') {
-            throw new Error('Invalid order data received');
-          }
-          document.getElementById('modalOrderDate').textContent = new Date(order.invoiceDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
-          document.getElementById('modalOrderProducts').textContent = `${order.items.length} Product${order.items.length > 1 ? 's' : ''}`;
-          document.getElementById('modalOrderId').textContent = `#${order.orderId.slice(0,6)}`;
-          document.getElementById('modalSubtotal').textContent = `${order.subtotal.toFixed(2)}₹`;
-          document.getElementById('modalTotal').textContent = `${order.finalAmount.toFixed(2)}₹`;
-          document.getElementById('modalPaymentMethod').textContent = order.paymentMethod;
-          document.getElementById('modalDiscount').textContent = `-${order.discount}`;
-          document.getElementById('modalShipping').textContent = `${order.shipping}`;
-
-          // Update address and contact
-          document.getElementById('modalAddressInfo').innerHTML = `
-          <div><strong>${order.billingName}</strong></div>
-          <div>${order.billingAddress || 'Not provided'}</div>
-        `;
-          document.getElementById('modalEmail').textContent = order.billingEmail;
-          document.getElementById('modalPhone').textContent = order.billingPhone;
-
-          // Update timeline based on status
-          updateOrderTimeline(order.status);
-
-          // Update products table
-          const productsTableBody = document.getElementById('modalProductsTable');
-          productsTableBody.innerHTML = '';
-          order.items.forEach(item => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-            <td>
-              <div style="display: flex; align-items: center; gap: 10px;">
-                <img src="${item.productImage || 'https://via.placeholder.com/50x50'}" alt="${item.productName}" class="product-image">
-                <span class="product-name">${item.productName}</span>
-              </div>
-            </td>
-            <td class="product-price">${item.productPrice.toFixed(2)}₹</td>
-            <td class="product-quantity">${item.quantity}</td>
-            <td class="product-subtotal">${item.subtotal.toFixed(2)}</td>
-          `;
-            productsTableBody.appendChild(row);
-          });
-
-          // Update cancel button state
-          const cancelBtn = document.getElementById('cancelOrderBtn');
-          if (order.status === 'Completed' || order.status === 'Delivered') {
-            cancelBtn.disabled = true;
-            cancelBtn.textContent = 'Cannot Cancel';
-          } else {
-            cancelBtn.disabled = false;
-            cancelBtn.textContent = 'Cancel Order';
-          }
-
-          // Show modal
-          const overlay = document.getElementById('popupOverlay');
-          overlay.classList.add('visible');
-        })
-        .catch(error => {
-          console.error('Error fetching order details:', error);
-          toastr.error('Failed to load order details. Please try again later.');
-        });
-    }
-
-    function updateOrderTimeline(status) {
-      const processingCircle = document.getElementById('processingCircle');
-      const onTheWayCircle = document.getElementById('onTheWayCircle');
-      const deliveredCircle = document.getElementById('deliveredCircle');
-      const timelineProgress = document.getElementById('timelineProgress');
-
-      // Reset all circles
-      processingCircle.className = 'timeline-circle pending';
-      onTheWayCircle.className = 'timeline-circle pending';
-      deliveredCircle.className = 'timeline-circle pending';
-      timelineProgress.style.width = '0%';
-
-      // Update based on status
-      switch (status) {
-        case 'Processing':
-          processingCircle.className = 'timeline-circle current';
-          timelineProgress.style.width = '33.33%';
-          break;
-        case 'On the way':
-          processingCircle.className = 'timeline-circle completed';
-          onTheWayCircle.className = 'timeline-circle current';
-          timelineProgress.style.width = '66.66%';
-          break;
-        case 'Completed':
-        case 'Delivered':
-          processingCircle.className = 'timeline-circle completed';
-          onTheWayCircle.className = 'timeline-circle completed';
-          deliveredCircle.className = 'timeline-circle completed';
-          timelineProgress.style.width = '100%';
-          break;
-      }
-    }
-
-    function cancelOrder() {
-      const cancelBtn = document.getElementById('cancelOrderBtn');
-      if (!cancelBtn.disabled) {
-        const orderId = document.getElementById('modalOrderId').textContent.replace('#', '');
-        fetch(`/order/cancel/${orderId}`, { 
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          })
-          .then(response => response.json())
-          .then(data => {
-            if (data.success) {
-              toastr.success('Order cancelled successfully.');
-              cancelBtn.disabled = true;
-              cancelBtn.textContent = 'Cancelled';
-              updateOrderTimeline('Cancelled');
-              closePopup();
-            } else {
-              toastr.error(data.message || 'Failed to cancel order.');
-            }
-          })
-          .catch(error => {
-            console.error('Error cancelling order:', error);
-            toastr.error('An error occurred while cancelling the order.');
-          });
-      }
-    }
-
-    // Function to close the modal
-    function closePopup() {
-      const overlay = document.getElementById('popupOverlay');
-      overlay.classList.remove('visible');
-    }
-
-    // Close modal when clicking the close button
-    document.getElementById('closePopup').addEventListener('click', closePopup);
-
-    // Close modal when clicking outside
-    document.getElementById('popupOverlay').addEventListener('click', (e) => {
-      if (e.target === document.getElementById('popupOverlay')) {
-        closePopup();
-      }
-    });
   </script>
 </body>
 

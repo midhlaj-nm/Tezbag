@@ -1,3 +1,4 @@
+const axios = require('axios');
 const Cart = require('../../models/cartSchema');
 const Product = require('../../models/productSchema');
 const User = require('../../models/userSchema');
@@ -5,6 +6,8 @@ const Deal = require('../../models/dealSchema');
 const Address = require('../../models/addressSchema');
 const Order = require('../../models/orderSchema');
 const Invoice = require('../../models/invoiceSchema');
+const Return = require('../../models/returnSchema');
+const Wallet = require('../../models/walletSchema'); 
 const createInvoice = require('../../utils/invoiceGenerator');
 const pdfGenerator = require('../../utils/pdfGenerator');
 
@@ -14,7 +17,10 @@ const loadCheckout = async (req, res, next) => {
     const userId = req.session.user;
 
     const cart = await Cart.findOne({ userId }).populate('items.productId');
+    console.log(cart);
     if (!cart || !cart.items.length) return res.redirect('/shop');
+    const wallet = await Wallet.findOne({ user: userId }).lean()
+    console.log('This is user wallet: ',wallet)
 
     const subtotal = cart.total;
     const shipping = 0;
@@ -46,6 +52,7 @@ const loadCheckout = async (req, res, next) => {
 
     const user = await User.findById(userId);
     if (!user) return res.redirect('/');
+    const name = `${user.f_Name} ${user.l_Name}`;
 
     const savedAddresses = await Address.find({ userId }).lean();
     const formattedAddresses = savedAddresses.flatMap(address =>
@@ -81,6 +88,9 @@ const loadCheckout = async (req, res, next) => {
     };
 
     res.render('checkout', {
+      name,
+      wallet,
+      total: cartDetails.total.toFixed(2) + '₹',
       coupons: formattedCoupons,
       orderItems,
       subtotal: subtotal.toFixed(2),
@@ -148,6 +158,7 @@ const confirmOrder = async (req, res, next) => {
         return res.status(400).json({ success: false, message: 'Some products are out of stock', redirect: '/shop', delay: 2000 });
       }
       product.quantity -= item.quantity;
+      product.status = product.quantity === 0 ? 'Out Of Stock' : 'Available';
       valid.push({ ...item, product });
     }
 
@@ -172,9 +183,9 @@ const confirmOrder = async (req, res, next) => {
     await Cart.deleteOne({ userId });
 
     const invoice = await createInvoice(order, addr);
-    const pdfUrl = await pdfGenerator(invoice);
+    const pdfUrl = await pdfGenerator(invoice, order);
 
-    res.status(200).json({ success: true, message: 'Order placed successfully', orderId: order._id, pdfUrl });
+    res.status(200).json({ success: true, message: 'Order placed successfully', orderId: order.orderId, pdfUrl });
   } catch (error) {
     console.error('Error confirming order:', error);
     next(error);
@@ -191,7 +202,7 @@ const loadConfirmation = async (req, res) => {
     const user = await User.findById(userId);
     if (!user) return res.redirect('/');
 
-    const order = await Order.findById(orderId)
+    const order = await Order.findOne({ orderId })
       .populate('orderedItems.productId', 'productName productImage')
       .lean();
     console.log('This is the order: ', order);
@@ -211,6 +222,7 @@ const loadConfirmation = async (req, res) => {
     console.log('This is the invoice: ', invoice);
 
     res.render('orderDetails', {
+      order,
       orderId: order.orderId,
       billingName,
       billingAddress,
@@ -234,7 +246,29 @@ const loadConfirmation = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    res.status(404).send('Error loading confirmation');
+    res.status(404);
+  }
+};
+
+const downloadInvoice = async (req, res) => {
+  try {
+    const pdfUrl = decodeURIComponent(req.query.url); 
+    console.log('Attempting to download from URL:', pdfUrl); 
+    const response = await axios({
+      url: pdfUrl,
+      method: 'GET',
+      responseType: 'stream',
+    });
+
+    const filename = req.query.filename || 'invoice.pdf'; 
+    console.log('Using filename:', filename); 
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.setHeader('Content-Type', 'application/pdf');
+
+    response.data.pipe(res);
+  } catch (error) {
+    console.error('Error downloading invoice:', error.message);
+    res.status(500).send('Error downloading invoice');
   }
 };
 
@@ -245,122 +279,44 @@ const loadOrderHistory = async (req, res) => {
     }
 
     const userId = req.session.user;
-    const searchQuery = req.query.search || '';
-    const orderIdFilter = req.query.orderId || '';
+    const searchQuery = req.query.query || '';
+    const page = parseInt(req.query.page) || 1;
+    const limit = 10;
 
-    let orders = await Order.find({ userId })
-      .populate({
-        path: 'orderedItems.productId',
-        select: 'name image price',
-      })
+    const allOrders = await Order.find({ userId })
+      .populate('orderedItems.productId', 'productName')
       .sort({ invoiceDate: -1 });
 
-    const invoiceMap = new Map();
-    const invoices = await Invoice.find();
-    invoices.forEach(invoice => {
-      invoiceMap.set(invoice.orderId, invoice);
-    });
+    const orders = searchQuery
+      ? allOrders.filter(x =>
+          x.orderId.match(new RegExp(searchQuery, 'i')) ||
+          x.status.match(new RegExp(searchQuery, 'i')) ||
+          x.finalAmount.toString().match(new RegExp(searchQuery, 'i')) ||
+          x.orderedItems.some(item => item.productId?.productName?.match(new RegExp(searchQuery, 'i')))
+        )
+      : allOrders;
 
-    const processedOrders = orders.map(order => {
-      const invoice = invoiceMap.get(order.orderId) || {};
-      const billingDetails = invoice.billingDetails || {};
-      const invoiceDate = invoice.createdAt || order.invoiceDate;
-
-      const matchesOrderId = searchQuery
-        ? order.orderId.substring(0, 6).toLowerCase() === searchQuery.substring(0, 6).toLowerCase()
-        : true;
-      const matchesOrderIdFilter = orderIdFilter
-        ? order.orderId.substring(0, 6).toLowerCase() === orderIdFilter.substring(0, 6).toLowerCase()
-        : true;
-
-      if (!matchesOrderId || !matchesOrderIdFilter) return null;
-
-      return {
-        billingName: billingDetails.name || 'N/A',
-        billingAddress: billingDetails.address || 'N/A',
-        billingPhone: billingDetails.phone || 'N/A',
-        billingEmail: billingDetails.email || 'N/A',
-        invoiceDate,
-        orderId: order.orderId,
-        paymentMethod: order.paymentMethod || 'N/A',
-        subtotal: order.totalPrice || 0,
-        discount: order.discount || 0,
-        shipping: 'Free',
-        finalAmount: order.finalAmount || 0,
-        status: order.status || 'N/A',
-        invoiceNumber: invoice.invoiceNumber ? invoice.invoiceNumber.slice(-6) : 'N/A',
-        pdfUrl: invoice.pdfUrl || '',
-        items: order.orderedItems.map(item => ({
-          productImage: item.productId.image || '',
-          productName: item.productId.name || 'N/A',
-          productPrice: item.price || 0,
-          quantity: item.quantity || 0,
-          subtotal: item.price * item.quantity || 0,
-        })),
-      };
-    });
+    const totalOrders = orders.length;
+    const totalPages = Math.ceil(totalOrders / limit);
+    const skip = (page - 1) * limit;
+    const paginationOrders = orders.slice(skip, skip + limit);
 
     res.render('orderHistory', {
-      orders: processedOrders,
       searchQuery,
-      orderId: orderIdFilter || '',
+      orders: paginationOrders,
+      currentPage: page,
+      totalPages,
     });
   } catch (error) {
     console.error('Error loading order history:', error);
-    return res.status(404).send('Error loading order history');
+    return res.status(404);
   }
 };
 
-const getOrderDetails = async (req, res) => {
+const cancelOrder = async (req, res, next) => {
   try {
     const orderId = req.params.orderId;
-    const order = await Order.findOne({ orderId })
-      .populate({
-        path: 'orderedItems.productId',
-        select: 'productName productImage price',
-      });
-
-    if (!order) {
-      return res.status(404).json({ success: false, message: 'Order not found' });
-    }
-
-    const invoice = await Invoice.findOne({ orderId: order.orderId });
-    const billingDetails = invoice?.billingDetails || {};
-
-    const response = {
-      orderId: order.orderId,
-      billingName: billingDetails.name || 'N/A',
-      billingAddress: billingDetails.address || 'N/A',
-      billingPhone: billingDetails.phone || 'N/A',
-      billingEmail: billingDetails.email || 'N/A',
-      invoiceDate: order.invoiceDate,
-      paymentMethod: order.paymentMethod || 'N/A',
-      subtotal: order.totalPrice || 0,
-      discount: order.discount || 0,
-      shipping: 'Free',
-      finalAmount: order.finalAmount || 0,
-      status: order.status || 'N/A',
-      invoiceNumber: invoice?.invoiceNumber.slice(-6) || 'N/A',
-      pdfUrl: invoice?.pdfUrl || '',
-      items: order.orderedItems.map(item => ({
-        productImage: item.productId.image || '',
-        productName: item.productId.name || 'N/A',
-        productPrice: item.price || 0,
-        quantity: item.quantity || 0,
-        subtotal: item.price * item.quantity || 0,
-      })),
-    };
-
-    res.json(response);
-  } catch (error) {
-    console.error('Error fetching order details:', error);
-    res.status(500).json({ success: false, message: 'Error fetching order details' });
-  }
-};
-
-const cancelOrder = async (req, res) => {
-  try {
-    const orderId = req.params.orderId;
+    const userId = req.session.user;
     const order = await Order.findOne({ orderId });
 
     if (!order) {
@@ -371,11 +327,13 @@ const cancelOrder = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Cannot cancel a completed or delivered order' });
     }
 
-    // Restore product quantities
+    const refundAmount = order.finalAmount;
+
     for (const item of order.orderedItems) {
       const product = await Product.findById(item.productId);
       if (product) {
         product.quantity += item.quantity;
+        product.status = product.quantity > 0 ? 'Available' : 'Out Of Stock';
         await product.save();
       }
     }
@@ -383,11 +341,83 @@ const cancelOrder = async (req, res) => {
     order.status = 'Cancelled';
     await order.save();
 
-    res.json({ success: true, message: 'Order cancelled successfully' });
+    const reason = req.body.reason || 'No reason provided'; 
+    console.log('This is the reason:', reason);
+    const cancelRecord = new Return({
+      userId: userId,
+      orderId: order._id,
+      delivered: false, 
+      reason: reason,
+      refundedAmount: refundAmount 
+    });
+    await cancelRecord.save();
+
+    let wallet = await Wallet.findOne({ user: userId });
+    if (!wallet) {
+      wallet = new Wallet({ user: userId, balance: 0 });
+    }
+
+    if (order.paymentMethod && order.paymentMethod.toLowerCase() !== 'cod') {
+      wallet.balance += refundAmount;
+      wallet.transactions.push({
+        type: 'credit',
+        amount: refundAmount,
+        reason: `Refund from Order #${orderId.slice(0, 6)}`,
+        date: new Date()
+      });
+      await wallet.save();
+    }
+
+    res.status(200).json({ success: true, message: 'Order cancelled successfully' });
   } catch (error) {
     console.error('Error cancelling order:', error);
-    res.status(500).json({ success: false, message: 'Error cancelling order' });
+    next(error);
   }
 };
 
-module.exports = { loadCheckout, confirmOrder, loadConfirmation, loadOrderHistory, getOrderDetails, cancelOrder };
+const returnOrder = async (req, res, next) => {
+  try {
+    const { orderId } = req.params; 
+    const { reason } = req.body; 
+    const userId = req.session.user;
+
+    if (!orderId || !userId) {
+      return res.status(400).json({ success: false, message: "Something went wrong" });
+    }
+
+    const existingOrder = await Order.findOne({ orderId });
+
+    if (!existingOrder) {
+      return res.status(404).json({ success: false, message: "Order not found" });
+    }
+
+    const refundAmount = existingOrder.finalAmount
+
+    const returnRequest = new Return({
+      userId,
+      orderId: existingOrder._id, 
+      delivered: true, 
+      reason: reason || null,
+      refundedAmount: refundAmount
+    });
+
+    await returnRequest.save();
+
+    const order = await Order.findByIdAndUpdate(
+      existingOrder._id,
+      { status: "Return Requested" },
+      { new: true, runValidators: true }
+    );
+
+    if (!order) {
+      return res.status(500).json({ success: false, message: "Failed to update order status" });
+    }
+
+    res.status(200).json({ success: true, message: "request sent successfully" });
+  } catch (error) {
+    console.error('Error processing return request:', error);
+    next(error); 
+  }
+};
+
+module.exports = { loadCheckout, confirmOrder, loadConfirmation, downloadInvoice, loadOrderHistory, cancelOrder, returnOrder };

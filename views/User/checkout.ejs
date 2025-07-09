@@ -437,6 +437,18 @@
       background-color: #f0fff0;
     }
 
+    .payment-option.disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      background-color: #f8f9fa;
+      border-color: #ddd;
+    }
+
+    .payment-option.disabled:hover {
+      border-color: #ddd;
+      background-color: #f8f9fa;
+    }
+
     .payment-radio {
       margin-right: 0.3rem;
     }
@@ -747,7 +759,8 @@
       width: 100%;
       height: 100%;
       background-color: rgba(0, 0, 0, 0.5);
-      z-index: 2000; /* Above other modals */
+      z-index: 2000;
+      /* Above other modals */
       justify-content: center;
       align-items: center;
     }
@@ -762,8 +775,13 @@
     }
 
     @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
     }
 
     @media (max-width: 768px) {
@@ -979,6 +997,16 @@
                 <span class="payment-icon">💰</span>
                 <div><strong>Cash on Delivery</strong></div>
               </div>
+              <div class="payment-option" data-payment="upi">
+                <input type="radio" name="payment" value="upi" class="payment-radio">
+                <span class="payment-icon">💸</span>
+                <div><strong>UPI</strong></div>
+              </div>
+              <div class="payment-option" data-payment="wallet">
+                <input type="radio" name="payment" value="wallet" class="payment-radio">
+                <span class="payment-icon">💳</span>
+                <div><strong>Wallet</strong><br><span class="wallet-balance">Balance: <%= wallet.balance.toFixed(2) %>₹</span></div>
+              </div>
             </div>
           </div>
 
@@ -1114,6 +1142,7 @@
     let currentShipping = parseFloat('<%= shipping %>');
     let currentTotal = parseFloat('<%= finalTotal %>');
     let selectedAddressIndex = null;
+    const walletBalance = parseFloat('<%= wallet.balance %>');
 
     toastr.options = {
       timeOut: 3000,
@@ -1122,11 +1151,32 @@
 
     document.querySelectorAll('.payment-option').forEach(option => {
       option.addEventListener('click', function() {
-        document.querySelectorAll('.payment-option').forEach(opt => opt.classList.remove('selected'));
-        this.classList.add('selected');
-        this.querySelector('.payment-radio').checked = true;
+        if (!this.classList.contains('disabled')) {
+          document.querySelectorAll('.payment-option').forEach(opt => opt.classList.remove('selected'));
+          this.classList.add('selected');
+          this.querySelector('.payment-radio').checked = true;
+        }
       });
     });
+
+    // Check wallet balance and enable/disable wallet option
+    function checkWalletBalance() {
+      const walletOption = document.querySelector('.payment-option[data-payment="wallet"]');
+      const walletRadio = walletOption.querySelector('.payment-radio');
+      if (walletBalance >= currentTotal) {
+        walletOption.classList.remove('disabled');
+        walletOption.style.pointerEvents = 'auto'; // Enable clickability
+        walletRadio.disabled = false;
+      } else {
+        walletOption.classList.add('disabled');
+        walletOption.style.pointerEvents = 'none'; // Disable clickability
+        walletRadio.disabled = true;
+        if (walletOption.classList.contains('selected')) {
+          document.querySelector('.payment-option[data-payment="cod"]').classList.add('selected');
+          document.querySelector('.payment-option[data-payment="cod"] .payment-radio').checked = true;
+        }
+      }
+    }
 
     function applyCoupon(couponCode) {
       const couponItem = document.querySelector(`.coupon-item[data-coupon-code="${couponCode}"]`);
@@ -1164,6 +1214,7 @@
       if (currentTotal < 0) currentTotal = 0;
       updateTotals();
       addCouponRow(couponCode, offerPrice);
+      checkWalletBalance(); // Recheck wallet balance after coupon application
       toastr.success(`Coupon ${couponCode} applied successfully! You saved ${offerPrice}₹.`);
     }
 
@@ -1182,6 +1233,7 @@
         appliedCoupon = null;
         removeCouponRow();
         updateTotals();
+        checkWalletBalance(); // Recheck wallet balance after coupon removal
         toastr.success(`Coupon ${couponCode} removed successfully!`);
       }
     }
@@ -1204,6 +1256,7 @@
     function updateTotals() {
       document.getElementById('subtotal').textContent = `${currentSubtotal.toFixed(2)}₹`;
       document.getElementById('finalTotal').textContent = `${currentTotal.toFixed(2)}₹`;
+      checkWalletBalance(); // Recheck wallet balance after updating totals
     }
 
     function openAddressModal(index = null) {
@@ -1254,14 +1307,14 @@
       currentDeleteIndex = index;
       const modal = document.getElementById('confirm-modal');
       modal.style.display = 'block';
-      modal.dataset.action = action; // Store action type (delete or order)
+      modal.dataset.action = action;
     }
 
     function closeConfirmModal() {
       const modal = document.getElementById('confirm-modal');
       modal.style.display = 'none';
       currentDeleteIndex = null;
-      modal.dataset.action = ''; // Clear action type
+      modal.dataset.action = '';
     }
 
     function deleteAddress() {
@@ -1337,7 +1390,7 @@
             });
             setTimeout(() => {
               animationContainer.style.display = 'none';
-              window.location.href = `/order-confirmation/${orderId}`;
+              window.location.href = `/order-confirmation/${orderId}?newOrder=true`;
             }, 3700);
           } else {
             if (data.message === "Product is out-of-stock") {
@@ -1596,26 +1649,24 @@
         else document.getElementById('modalStateSelect').innerHTML = '<option value="" disabled selected hidden>Select State</option>';
       });
 
-      // Ensure address cards are clickable
       document.querySelectorAll('.address-card').forEach(card => {
         card.addEventListener('click', (e) => {
           const index = card.getAttribute('data-index');
           selectAddress(index);
-          e.preventDefault(); // Prevent any default behavior
+          e.preventDefault(); 
         });
       });
 
-      // Select default address if available
       if (savedAddresses && savedAddresses.length > 0) {
         const defaultAddress = savedAddresses.find(addr => addr.isDefault);
         if (defaultAddress) {
           const defaultIndex = savedAddresses.indexOf(defaultAddress);
           selectAddress(defaultIndex);
         } else {
-          // If no default, select the first address
           selectAddress(0);
         }
       }
+      checkWalletBalance(); 
     });
 
     function selectAddress(index) {

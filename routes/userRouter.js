@@ -6,6 +6,7 @@ const profileController = require('../controllers/user/profileController');
 const cartPageController = require('../controllers/user/cartPageController');
 const orderController = require('../controllers/user/orderController');
 const wishlistController = require('../controllers/user/wishlistPageController');
+const walletController = require('../controllers/user/walletController')
 const passport = require('passport');
 const userAuth = require('../middlewares/userAuth');
 
@@ -42,6 +43,11 @@ router.get('/auth/google/callback/login',
     failureFlash: true
   }),
   (req, res) => {
+    if(req.user){
+      req.session.user = req.user._id
+      console.log('🔐 Session user set to:', req.session.user);
+      console.log('')
+    }
     res.redirect('/');
   }
 );
@@ -81,12 +87,16 @@ router.delete('/cart/clear', userAuth, cartPageController.clearCart);
 router.get('/cart/checkout', userAuth, orderController.loadCheckout);
 router.post('/order/place', userAuth, orderController.confirmOrder);
 router.get('/order-confirmation/:orderId', userAuth, orderController.loadConfirmation);
-router.get('/order-history', orderController.loadOrderHistory)
-router.get('/order/:orderId', orderController.getOrderDetails)
-router.get('/order/cancel/:orderId',orderController.cancelOrder)
+router.get('/download-invoice/', userAuth, orderController.downloadInvoice)
+router.get('/order-history', userAuth, orderController.loadOrderHistory)
+router.post('/cancel-order/:orderId', userAuth, orderController.cancelOrder)
+router.post('/return-order/:orderId', userAuth, orderController.returnOrder)
 
 //wishlist
 router.get('/wishlist', wishlistController.loadWishlist)
 router.post('/wishlist/add-or-remove', wishlistController.wishlistPrdct)
+
+//wallet
+router.get('/wallet', walletController.loadWallet)
 
 module.exports = router

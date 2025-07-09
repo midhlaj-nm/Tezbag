@@ -2,7 +2,6 @@ const User = require('../../models/userSchema');
 const Admin = require('../../models/adminSchema')
 const Order = require('../../models/orderSchema');
 const Address = require('../../models/addressSchema');
-const Product = require('../../models/productSchema');
 const env = require('dotenv').config();
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
@@ -62,8 +61,8 @@ const loadDashboard = async (req, res) => {
 
         // Check if user exists
         if (!user) {
-            req.session.destroy(); // Clear invalid session
-            return res.redirect('/login'); // Redirect to login if user not found
+            req.session.destroy(); 
+            return res.redirect('/login'); 
         }
 
         const userName = [user?.f_Name, user?.l_Name].filter(Boolean).join(' ') || 'User';
