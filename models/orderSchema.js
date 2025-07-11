@@ -53,7 +53,7 @@ const orderSchema = new Schema({
     ref: 'Address',
     required: true
   },
-  orderNotes:{
+  orderNotes: {
     type: String,
     required: false
   },
@@ -63,12 +63,28 @@ const orderSchema = new Schema({
   status: {
     type: String,
     required: true,
-    enum: ['Pending', 'Processing', 'Shipped', 'Deliverd', 'Cancelled', 'Return Requested', 'Returned']
+    enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled', 'Return Requested', 'Returned', 'Payment Failed', 'Request Declined']
   },
   couponApplied: {
     type: Boolean,
     default: false
-  }
+  },
+  paymentStatus: {
+    type: String,
+    required: true,
+    enum: ['Not Paid', 'Paid', 'Failed'],
+    default: 'Not Paid'
+  },
+  paymentDetails: {
+    paymentId: String,
+    orderId: String,
+    signature: String,
+    method: String,
+    amount: Number,
+    date: Date,
+    transactionId: String,
+    status: String,
+  },
 });
 
 const Order = mongoose.model('Order', orderSchema);

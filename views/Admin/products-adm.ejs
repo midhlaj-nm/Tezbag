@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Product Management</title>
   <link rel="stylesheet" href="/Admin-css/product-adm.css" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
@@ -12,26 +13,22 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
 </head>
+
 <body>
-  <div id="middle" class="container-fluid">      
+  <div id="middle" class="container-fluid">
     <div class="logo">
       <img width="250" src="/Admin-css/Logo-Admins.jpg" alt="Logo">
     </div>
-    
+
     <form action="/tezgrani/product-management" method="GET" class="search-bar">
       <div class="input-wrapper">
-        <input 
-          type="text" 
-          name="search" 
-          value="<%= typeof search !== 'undefined' ? search : '' %>" 
-          placeholder="Search by product name..."
-          class="search-input">
-        
-          <% if (typeof search !== 'undefined' && search.trim() !== '') { %>
-            <a href="/tezgrani/product-management" class="clear-icon">
-              <span class="material-symbols-outlined">cancel</span>
-            </a>
-          <% } %>
+        <input type="text" name="search" value="<%= typeof search !== 'undefined' ? search : '' %>" placeholder="Search by product name..." class="search-input">
+
+        <% if (typeof search !== 'undefined' && search.trim() !== '') { %>
+        <a href="/tezgrani/product-management" class="clear-icon">
+          <span class="material-symbols-outlined">cancel</span>
+        </a>
+        <% } %>
       </div>
       <button type="submit" class="search-btn">Search</button>
     </form>
@@ -42,16 +39,18 @@
       <li>
         <a href="/tezgrani/dashboard">
           <span class="icon-svg">
-            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f"><path d="M520-600v-240h320v240H520ZM120-440v-400h320v400H120Zm400 320v-400h320v400H520Zm-400 0v-240h320v240H120Zm80-400h160v-240H200v240Zm400 320h160v-240H600v240Zm0-480h160v-80H600v80ZM200-200h160v-80H200v80Zm160-320Zm240-160Zm0 240ZM360-280Z"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f">
+              <path d="M520-600v-240h320v240H520ZM120-440v-400h320v400H120Zm400 320v-400h320v400H520Zm-400 0v-240h320v240H120Zm80-400h160v-240H200v240Zm400 320h160v-240H600v240Zm0-480h160v-80H600v80ZM200-200h160v-80H200v80Zm160-320Zm240-160Zm0 240ZM360-280Z" />
+            </svg>
           </span>
           <span>Dashboard</span>
         </a>
       </li>
       <li>
-        <a href="#">
+        <a href="/tezgrani/order-management">
           <span class="icon-svg">
             <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f">
-              <path d="M280-80q-33 0-56.5-23.5T200-160q0-33 23.5-56.5T280-240q33 0 56.5 23.5T360-160q0 33-23.5 56.5T280-80Zm400 0q-33 0-56.5-23.5T600-160q0-33 23.5-56.5T680-240q33 0 56.5 23.5T760-160q0 33-23.5 56.5T680-80ZM246-720l96 200h280l110-200H246Zm-38-80h590q23 0 35 20.5t1 41.5L692-482q-11 20-29.5 31T622-440H324l-44 80h480v80H280q-45 0-68-39.5t-2-78.5l54-98-144-304H40v-80h130l38 80Zm134 280h280-280Z"/>
+              <path d="M280-80q-33 0-56.5-23.5T200-160q0-33 23.5-56.5T280-240q33 0 56.5 23.5T360-160q0 33-23.5 56.5T280-80Zm400 0q-33 0-56.5-23.5T600-160q0-33 23.5-56.5T680-240q33 0 56.5 23.5T760-160q0 33-23.5 56.5T680-80ZM246-720l96 200h280l110-200H246Zm-38-80h590q23 0 35 20.5t1 41.5L692-482q-11 20-29.5 31T622-440H324l-44 80h480v80H280q-45 0-68-39.5t-2-78.5l54-98-144-304H40v-80h130l38 80Zm134 280h280-280Z" />
             </svg>
           </span>
           <span>Orders</span>
@@ -61,7 +60,7 @@
         <a href="/tezgrani/category-management">
           <span class="icon-svg">
             <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f">
-              <path d="m260-520 220-360 220 360H260ZM700-80q-75 0-127.5-52.5T520-260q0-75 52.5-127.5T700-440q75 0 127.5 52.5T880-260q0 75-52.5 127.5T700-80Zm-580-20v-320h320v320H120Zm580-60q42 0 71-29t29-71q0-42-29-71t-71-29q-42 0-71 29t-29 71q0 42 29 71t71 29Zm-500-20h160v-160H200v160Zm202-420h156l-78-126-78 126Zm78 0ZM360-340Zm340 80Z"/>
+              <path d="m260-520 220-360 220 360H260ZM700-80q-75 0-127.5-52.5T520-260q0-75 52.5-127.5T700-440q75 0 127.5 52.5T880-260q0 75-52.5 127.5T700-80Zm-580-20v-320h320v320H120Zm580-60q42 0 71-29t29-71q0-42-29-71t-71-29q-42 0-71 29t-29 71q0 42 29 71t71 29Zm-500-20h160v-160H200v160Zm202-420h156l-78-126-78 126Zm78 0ZM360-340Zm340 80Z" />
             </svg>
           </span>
           <span>Category</span>
@@ -71,7 +70,7 @@
         <a href="/tezgrani/product-management">
           <span class="icon-svg">
             <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f">
-              <path d="M200-80q-33 0-56.5-23.5T120-160v-451q-18-11-29-28.5T80-680v-120q0-33 23.5-56.5T160-880h640q33 0 56.5 23.5T880-800v120q0 23-11 40.5T840-611v451q0 33-23.5 56.5T760-80H200Zm0-520v440h560v-440H200Zm-40-80h640v-120H160v120Zm200 280h240v-80H360v80Zm120 20Z"/>
+              <path d="M200-80q-33 0-56.5-23.5T120-160v-451q-18-11-29-28.5T80-680v-120q0-33 23.5-56.5T160-880h640q33 0 56.5 23.5T880-800v120q0 23-11 40.5T840-611v451q0 33-23.5 56.5T760-80H200Zm0-520v440h560v-440H200Zm-40-80h640v-120H160v120Zm200 280h240v-80H360v80Zm120 20Z" />
             </svg>
           </span>
           <span>Products</span>
@@ -81,56 +80,58 @@
         <a href="/tezgrani/user-management">
           <span class="icon-svg">
             <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f">
-              <path d="M0-240v-63q0-43 44-70t116-27q13 0 25 .5t23 2.5q-14 21-21 44t-7 48v65H0Zm240 0v-65q0-32 17.5-58.5T307-410q32-20 76.5-30t96.5-10q53 0 97.5 10t76.5 30q32 20 49 46.5t17 58.5v65H240Zm540 0v-65q0-26-6.5-49T754-397q11-2 22.5-2.5t23.5-.5q72 0 116 26.5t44 70.5v63H780Zm-455-80h311q-10-20-55.5-35T480-370q-55 0-100.5 15T325-320ZM160-440q-33 0-56.5-23.5T80-520q0-34 23.5-57t56.5-23q34 0 57 23t23 57q0 33-23 56.5T160-440Zm640 0q-33 0-56.5-23.5T720-520q0-34 23.5-57t56.5-23q34 0 57 23t23 57q0 33-23 56.5T800-440Zm-320-40q-50 0-85-35t-35-85q0-51 35-85.5t85-34.5q51 0 85.5 34.5T600-600q0 50-34.5 85T480-480Zm0-80q17 0 28.5-11.5T520-600q0-17-11.5-28.5T480-640q-17 0-28.5 11.5T440-600q0 17 11.5 28.5T480-560Zm1 240Zm-1-280Z"/>
+              <path d="M0-240v-63q0-43 44-70t116-27q13 0 25 .5t23 2.5q-14 21-21 44t-7 48v65H0Zm240 0v-65q0-32 17.5-58.5T307-410q32-20 76.5-30t96.5-10q53 0 97.5 10t76.5 30q32 20 49 46.5t17 58.5v65H240Zm540 0v-65q0-26-6.5-49T754-397q11-2 22.5-2.5t23.5-.5q72 0 116 26.5t44 70.5v63H780Zm-455-80h311q-10-20-55.5-35T480-370q-55 0-100.5 15T325-320ZM160-440q-33 0-56.5-23.5T80-520q0-34 23.5-57t56.5-23q34 0 57 23t23 57q0 33-23 56.5T160-440Zm640 0q-33 0-56.5-23.5T720-520q0-34 23.5-57t56.5-23q34 0 57 23t23 57q0 33-23 56.5T800-440Zm-320-40q-50 0-85-35t-35-85q0-51 35-85.5t85-34.5q51 0 85.5 34.5T600-600q0 50-34.5 85T480-480Zm0-80q17 0 28.5-11.5T520-600q0-17-11.5-28.5T480-640q-17 0-28.5 11.5T440-600q0 17 11.5 28.5T480-560Zm1 240Zm-1-280Z" />
             </svg>
           </span>
           <span>Users</span>
         </a>
       </li>
       <li>
-      <a href="/tezgrani/deals-management">
+        <a href="/tezgrani/deals-management">
           <span class="icon-svg">
             <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f">
-              <path d="M160-280v80h640v-80H160Zm0-440h88q-5-9-6.5-19t-1.5-21q0-50 35-85t85-35q30 0 55.5 15.5T460-826l20 26 20-26q18-24 44-39t56-15q50 0 85 35t35 85q0 11-1.5 21t-6.5 19h88q33 0 56.5 23.5T880-640v440q0 33-23.5 56.5T800-120H160q-33 0-56.5-23.5T80-200v-440q0-33 23.5-56.5T160-720Zm0 320h640v-240H596l84 114-64 46-136-184-136 184-64-46 82-114H160v240Zm200-320q17 0 28.5-11.5T400-760q0-17-11.5-28.5T360-800q-17 0-28.5 11.5T320-760q0 17 11.5 28.5T360-720Zm240 0q17 0 28.5-11.5T640-760q0-17-11.5-28.5T600-800q-17 0-28.5 11.5T560-760q0 17 11.5 28.5T600-720Z"/>
+              <path d="M160-280v80h640v-80H160Zm0-440h88q-5-9-6.5-19t-1.5-21q0-50 35-85t85-35q30 0 55.5 15.5T460-826l20 26 20-26q18-24 44-39t56-15q50 0 85 35t35 85q0 11-1.5 21t-6.5 19h88q33 0 56.5 23.5T880-640v440q0 33-23.5 56.5T800-120H160q-33 0-56.5-23.5T80-200v-440q0-33 23.5-56.5T160-720Zm0 320h640v-240H596l84 114-64 46-136-184-136 184-64-46 82-114H160v240Zm200-320q17 0 28.5-11.5T400-760q0-17-11.5-28.5T360-800q-17 0-28.5 11.5T320-760q0 17 11.5 28.5T360-720Zm240 0q17 0 28.5-11.5T640-760q0-17-11.5-28.5T600-800q-17 0-28.5 11.5T560-760q0 17 11.5 28.5T600-720Z" />
             </svg>
           </span>
           <span>Deals</span>
         </a>
       </li>
       <li>
-        <a href="#">
+        <a href="/tezgrani/return-management">
           <span class="icon-svg">
             <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f">
-              <path d="M360-240 120-480l240-240 56 56-144 144h488v-160h80v240H272l144 144-56 56Z"/>
+              <path d="M360-240 120-480l240-240 56 56-144 144h488v-160h80v240H272l144 144-56 56Z" />
             </svg>
           </span>
           <span>Returns</span>
         </a>
       </li>
       <li>
-        <a href="#">
+        <a href="/tezgrani/sales-report">
           <span class="icon-svg">
             <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f">
-              <path d="M640-160v-280h160v280H640Zm-240 0v-640h160v640H400Zm-240 0v-440h160v440H160Z"/>
+              <path d="M640-160v-280h160v280H640Zm-240 0v-640h160v640H400Zm-240 0v-440h160v440H160Z" />
             </svg>
           </span>
           <span>Sales Report</span>
         </a>
       </li>
       <li>
-        <a href="#">
-            <span class="icon-svg">
-                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f">
-                  <path d="M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h640q33 0 56.5 23.5T880-720v480q0 33-23.5 56.5T800-160H160Zm0-80h640v-480H160v480Zm80-80h480L570-520 450-360l-90-120-120 160Zm-80 80v-480 480Z"/>
-                </svg>
-              </span>
-              <span>Gallery</span>
+        <a href="/tezgrani/gallery-management">
+          <span class="icon-svg">
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f">
+              <path d="M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h640q33 0 56.5 23.5T880-720v480q0 33-23.5 56.5T800-160H160Zm0-80h640v-480H160v480Zm80-80h480L570-520 450-360l-90-120-120 160Zm-80 80v-480 480Z" />
+            </svg>
+          </span>
+          <span>Gallery</span>
         </a>
       </li>
       <li>
         <a href="#" onclick="showLogoutModal()">
           <span class="icon-svg">
-            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h280v80H200v560h280v80H200Zm440-160-55-58 102-102H360v-80h327L585-622l55-58 200 200-200 200Z"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f">
+              <path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h280v80H200v560h280v80H200Zm440-160-55-58 102-102H360v-80h327L585-622l55-58 200 200-200 200Z" />
+            </svg>
           </span>
           <span>Log-out</span>
         </a>
@@ -138,7 +139,7 @@
     </ul>
     <button class="floating-toggle-btn" onclick="toggleSidebar()">
       <svg id="drawer-icon" xmlns="http://www.w3.org/2000/svg" height="28px" viewBox="0 -960 960 960" width="28px" fill="#000000">
-        <path d="M360-120v-720h80v720h-80Zm160-160v-400l200 200-200 200Z"/>
+        <path d="M360-120v-720h80v720h-80Zm160-160v-400l200 200-200 200Z" />
       </svg>
     </button>
   </div>
@@ -146,14 +147,14 @@
   <div class="content">
     <div class="table-container">
       <div class="table-wrapper">
-        
+
         <div class="table-header">
           <h2 class="table-title">Product Management</h2>
           <div class="buttons">
             <a href="#" class="add-product-btn" id="openPopupBtn">Add Product</a>
           </div>
         </div>
-  
+
         <!-- Product Table -->
         <div class="table-body">
           <table class="product-table">
@@ -172,9 +173,9 @@
             </thead>
             <tbody>
               <% if (!products || products.length === 0) { %>
-                <tr>
-                  <td colspan="9" style="padding: 1rem;">
-                    <div style="
+              <tr>
+                <td colspan="9" style="padding: 1rem;">
+                  <div style="
                       width: 105%;
                       display: flex;
                       align-items: center;
@@ -183,78 +184,67 @@
                       font-size: 1.1rem;
                       color: #666;
                     ">
-                      No Products to show right now!
-                    </div>
-                  </td>
-                </tr>
+                    No Products to show right now!
+                  </div>
+                </td>
+              </tr>
               <% } else { %>
-                <% products.forEach((product, index) => { %>
-                  <tr>
-                    <td><%= (currentPage - 1) * 6 + index + 1 %></td>
-                    <td class="product-info">
-                      <img src="<%= product.productImage[0] %>" alt="Product Image" class="product-thumbnail">
-                    </td>
-                    <td><%= product.productName %></td>
-                    <td><%= product.category?.name %></td>
-                    <td><%= product.regularPrice %>₹</td>
-                    <td><%= product.salePrice %> ₹</td>
-                    <td><%= product.quantity %></td>
-                    <td class="status <%= product.status === 'Available' ? 'active' : 'inactive' %>">
-                      <%= product.status %>
-                    </td>
-                    <td class="actions">
-                      <a href="#" class="btn edit-btn" 
-                         data-productid="<%= product._id %>"
-                         data-name="<%= product.productName %>"
-                         data-description="<%= product.description %>"
-                         data-isblocked="<%= product.isBlocked %>"
-                         data-categoryid="<%= product.category._id %>"
-                         data-price="<%= product.regularPrice %>"
-                         data-mrp="<%= product.salePrice %>"
-                         data-stock="<%= product.quantity %>"
-                         data-images='<%= JSON.stringify(product.productImage) %>'>
-                        EDIT
-                      </a>
-                      <a href="#" class="btn list-toggle" 
-                         data-productid="<%= product._id %>" 
-                         data-status="<%= product.isBlocked %>">
-                        <%= product.isBlocked ? 'UNBLOCK' : 'BLOCK' %>
-                      </a>
-                    </td>
-                  </tr>
-                <% }) %>
+              <% products.forEach((product, index) => { %>
+              <tr>
+                <td><%= (currentPage - 1) * 6 + index + 1 %></td>
+                <td class="product-info">
+                  <img src="<%= product.productImage[0] %>" alt="Product Image" class="product-thumbnail">
+                </td>
+                <td><%= product.productName %></td>
+                <td><%= product.category?.name %></td>
+                <td><%= product.regularPrice %>₹</td>
+                <td><%= product.salePrice %> ₹</td>
+                <td><%= product.quantity %></td>
+                <td class="status <%= product.status === 'Available' ? 'active' : 'inactive' %>">
+                  <%= product.status %>
+                </td>
+                <td class="actions">
+                  <a href="#" class="btn edit-btn" data-productid="<%= product._id %>" data-name="<%= product.productName %>" data-description="<%= product.description %>" data-isblocked="<%= product.isBlocked %>" data-categoryid="<%= product.category._id %>" data-price="<%= product.regularPrice %>" data-mrp="<%= product.salePrice %>" data-stock="<%= product.quantity %>" data-images='<%= JSON.stringify(product.productImage) %>'>
+                    EDIT
+                  </a>
+                  <a href="#" class="btn list-toggle" data-productid="<%= product._id %>" data-status="<%= product.isBlocked %>">
+                    <%= product.isBlocked ? 'UNBLOCK' : 'BLOCK' %>
+                  </a>
+                </td>
+              </tr>
+              <% }) %>
               <% } %>
             </tbody>
           </table>
         </div>
         <!-- End Product Table -->
-  
+
       </div>
     </div>
     <% if (totalPages >= 1) { %>
-      <nav aria-label="Admin page navigation" class="custom-pagination">
-        <ul class="pagination-list">
-          <li class="pagination-item <%= currentPage === 1 ? 'disabled' : '' %>">
-            <% if (currentPage === 1) { %>
-              <span class="pagination-link">Previous</span>
-            <% } else { %>
-              <a class="pagination-link" href="?page=<%= currentPage - 1 %><%= search ? '&search=' + encodeURIComponent(search) : '' %>">Previous</a>
-            <% } %>
-          </li>
-          <% for (let i = 1; i <= totalPages; i++) { %>
-            <li class="pagination-item <%= currentPage === i ? 'active' : '' %>">
-              <a class="pagination-link" href="?page=<%= i %><%= search ? '&search=' + encodeURIComponent(search) : '' %>"><%= i %></a>
-            </li>
+    <nav aria-label="Admin page navigation" class="custom-pagination">
+      <ul class="pagination-list">
+        <li class="pagination-item <%= currentPage === 1 ? 'disabled' : '' %>">
+          <% if (currentPage === 1) { %>
+          <span class="pagination-link">Previous</span>
+          <% } else { %>
+          <a class="pagination-link" href="?page=<%= currentPage - 1 %><%= search ? '&search=' + encodeURIComponent(search) : '' %>">Previous</a>
           <% } %>
-          <li class="pagination-item <%= currentPage === totalPages ? 'disabled' : '' %>">
-            <% if (currentPage === totalPages) { %>
-              <span class="pagination-link">Next</span>
-            <% } else { %>
-              <a class="pagination-link" href="?page=<%= currentPage + 1 %><%= search ? '&search=' + encodeURIComponent(search) : '' %>">Next</a>
-            <% } %>
-          </li>
-        </ul>
-      </nav>
+        </li>
+        <% for (let i = 1; i <= totalPages; i++) { %>
+        <li class="pagination-item <%= currentPage === i ? 'active' : '' %>">
+          <a class="pagination-link" href="?page=<%= i %><%= search ? '&search=' + encodeURIComponent(search) : '' %>"><%= i %></a>
+        </li>
+        <% } %>
+        <li class="pagination-item <%= currentPage === totalPages ? 'disabled' : '' %>">
+          <% if (currentPage === totalPages) { %>
+          <span class="pagination-link">Next</span>
+          <% } else { %>
+          <a class="pagination-link" href="?page=<%= currentPage + 1 %><%= search ? '&search=' + encodeURIComponent(search) : '' %>">Next</a>
+          <% } %>
+        </li>
+      </ul>
+    </nav>
     <% } %>
   </div>
 
@@ -272,7 +262,7 @@
           <div id="deletedImagesContainer" style="display: none;"></div>
           <div class="form-group">
             <label for="productName">Product Name</label>
-            <input type="text" id="productName" name="productName" placeholder="Enter Product Name" >
+            <input type="text" id="productName" name="productName" placeholder="Enter Product Name">
             <div id="errProductName" class="errr-msg"></div>
           </div>
           <div class="form-row">
@@ -281,21 +271,21 @@
               <select id="category" name="category">
                 <option value="" disabled selected hidden>Select Category</option>
                 <% if (typeof categories !== 'undefined') { %>
-                  <% categories.forEach(category => { %>
-                    <option value="<%= category._id %>" data-name="<%= category.name %>"><%= category.name %></option>
-                  <% }) %>
+                <% categories.forEach(category => { %>
+                <option value="<%= category._id %>" data-name="<%= category.name %>"><%= category.name %></option>
+                <% }) %>
                 <% } %>
               </select>
               <div id="errCategory" class="errr-msg"></div>
             </div>
             <div class="form-group">
               <label for="price">Price</label>
-              <input type="number" id="price" name="price" placeholder="Enter Price" step="1.00" min="0" >
+              <input type="number" id="price" name="price" placeholder="Enter Price" step="1.00" min="0">
               <div id="errPrice" class="errr-msg"></div>
             </div>
             <div class="form-group">
               <label for="mrp">MRP</label>
-              <input type="number" id="mrp" name="mrp" placeholder="Enter MRP" step="1.00" min="0" >
+              <input type="number" id="mrp" name="mrp" placeholder="Enter MRP" step="1.00" min="0">
               <div id="errMrp" class="errr-msg"></div>
             </div>
           </div>
@@ -308,12 +298,12 @@
           </div>
           <div class="form-group">
             <label for="qty">Qty</label>
-            <input type="number" id="qty" name="qty" placeholder="Enter Quantity" min="0" >
+            <input type="number" id="qty" name="qty" placeholder="Enter Quantity" min="0">
             <div id="errQty" class="errr-msg"></div>
           </div>
           <div class="form-group">
             <label for="description">Description</label>
-            <textarea id="description" name="description" placeholder="Enter Product Description" ></textarea>
+            <textarea id="description" name="description" placeholder="Enter Product Description"></textarea>
             <div id="errDescription" class="errr-msg"></div>
           </div>
           <div class="form-group">
@@ -361,7 +351,7 @@
   <!-- Logout Modal -->
   <div id="logout-modal" class="modal" style="display:none;">
     <div class="modal-content">
-    <h3 style="font-size: 1.75rem; font-weight: 500;">Are you sure?</h3>
+      <h3 style="font-size: 1.75rem; font-weight: 500;">Are you sure?</h3>
       <div class="modal-buttons">
         <button id="cancel-logout" class="btn-no">NO</button>
         <button id="confirm-logout" class="btn-yes">YES</button>
@@ -370,194 +360,116 @@
   </div>
 
   <script>
-document.addEventListener("DOMContentLoaded", function () {
-    // Define cutting styles for Meat and Fish, including "None"
-    const meatCutStyles = [
-      "None",
-      "Curry Cut",
-      "Biriyani Cut",
-      "Soup Cut",
-      "Bone Cut",
-      "Boneless Cut",
-      "Chops",
-      "Liver",
-      "Steak Cut",
-      "Heart",
-      "Keema (Minced)",
-      "Dry Fry Cut",
-      "Neck Cut",
-      "Full Chicken"
-    ];
-    const fishCutStyles = [
-      "None",
-      "Whole Fish",
-      "Sliced Cut",
-      "Steak Cut",
-      "Curry Cut",
-      "Fillet Cut",
-      "Head & Tail Removed",
-      "Butterfly Cut",
-      "Finger Cut",
-    ];
+    document.addEventListener("DOMContentLoaded", function() {
+      // Define cutting styles for Meat and Fish, including "None"
+      const meatCutStyles = [
+        "None",
+        "Curry Cut",
+        "Biriyani Cut",
+        "Soup Cut",
+        "Bone Cut",
+        "Boneless Cut",
+        "Chops",
+        "Liver",
+        "Steak Cut",
+        "Heart",
+        "Keema (Minced)",
+        "Dry Fry Cut",
+        "Neck Cut",
+        "Full Chicken"
+      ];
+      const fishCutStyles = [
+        "None",
+        "Whole Fish",
+        "Sliced Cut",
+        "Steak Cut",
+        "Curry Cut",
+        "Fillet Cut",
+        "Head & Tail Removed",
+        "Butterfly Cut",
+        "Finger Cut",
+      ];
 
-    // ==================== Sidebar Toggle ====================
-    const sidebar = document.getElementById("adminSidebar");
-    const icon = document.getElementById("drawer-icon");
-    window.toggleSidebar = function () {
-      sidebar.classList.toggle("collapsed");
-      icon.style.transform = sidebar.classList.contains("collapsed") ? "rotate(0deg)" : "rotate(180deg)";
-    };
+      // ==================== Sidebar Toggle ====================
+      const sidebar = document.getElementById("adminSidebar");
+      const icon = document.getElementById("drawer-icon");
+      window.toggleSidebar = function() {
+        sidebar.classList.toggle("collapsed");
+        icon.style.transform = sidebar.classList.contains("collapsed") ? "rotate(0deg)" : "rotate(180deg)";
+      };
 
-    // ==================== Add/Edit Product Popup Logic ====================
-    const popup = document.getElementById("popupOverlay");
-    const openPopupBtn = document.getElementById("openPopupBtn");
-    const closePopupBtn = document.getElementById("closePopup");
-    const productForm = document.getElementById("productForm");
-    const saveProductBtn = document.getElementById("saveProductBtn");
-    const popupTitle = document.getElementById("popupTitle");
-    const imageUploadContainer = document.getElementById("image-upload-container");
-    const imageCounter = document.getElementById("imageCounter");
-    const existingImagesContainer = document.getElementById("existingImagesContainer");
-    const deletedImagesContainer = document.getElementById("deletedImagesContainer");
-    const categorySelect = document.getElementById("category");
-    const cutStyleGroup = document.getElementById("cutStyleGroup");
-    const cutStylesContainer = document.getElementById("cutStylesContainer");
+      // ==================== Add/Edit Product Popup Logic ====================
+      const popup = document.getElementById("popupOverlay");
+      const openPopupBtn = document.getElementById("openPopupBtn");
+      const closePopupBtn = document.getElementById("closePopup");
+      const productForm = document.getElementById("productForm");
+      const saveProductBtn = document.getElementById("saveProductBtn");
+      const popupTitle = document.getElementById("popupTitle");
+      const imageUploadContainer = document.getElementById("image-upload-container");
+      const imageCounter = document.getElementById("imageCounter");
+      const existingImagesContainer = document.getElementById("existingImagesContainer");
+      const deletedImagesContainer = document.getElementById("deletedImagesContainer");
+      const categorySelect = document.getElementById("category");
+      const cutStyleGroup = document.getElementById("cutStyleGroup");
+      const cutStylesContainer = document.getElementById("cutStylesContainer");
 
-    let deletedImages = new Set(); // Track deleted images to avoid duplicates
+      let deletedImages = new Set(); // Track deleted images to avoid duplicates
 
-    // Function to populate Cut Styles checkboxes based on category
-    function populateCutStyles(categoryName) {
-      cutStylesContainer.innerHTML = ""; // Clear existing checkboxes
-      let styles = [];
-      if (categoryName === "Meat") {
-        styles = meatCutStyles;
-      } else if (categoryName === "Fish") {
-        styles = fishCutStyles;
-      }
+      // Function to populate Cut Styles checkboxes based on category
+      function populateCutStyles(categoryName) {
+        cutStylesContainer.innerHTML = ""; // Clear existing checkboxes
+        let styles = [];
+        if (categoryName === "Meat") {
+          styles = meatCutStyles;
+        } else if (categoryName === "Fish") {
+          styles = fishCutStyles;
+        }
 
-      styles.forEach(style => {
-        const checkboxDiv = document.createElement("div");
-        checkboxDiv.className = "checkbox-item";
+        styles.forEach(style => {
+          const checkboxDiv = document.createElement("div");
+          checkboxDiv.className = "checkbox-item";
 
-        const checkbox = document.createElement("input");
-        checkbox.type = "checkbox";
-        checkbox.name = "cutStyles";
-        checkbox.value = style;
-        checkbox.id = `cutStyle-${style.replace(/\s+/g, '-')}`; // Unique ID for each checkbox
+          const checkbox = document.createElement("input");
+          checkbox.type = "checkbox";
+          checkbox.name = "cutStyles";
+          checkbox.value = style;
+          checkbox.id = `cutStyle-${style.replace(/\s+/g, '-')}`; // Unique ID for each checkbox
 
-        const label = document.createElement("label");
-        label.htmlFor = checkbox.id;
-        label.textContent = style;
+          const label = document.createElement("label");
+          label.htmlFor = checkbox.id;
+          label.textContent = style;
 
-        checkboxDiv.appendChild(checkbox);
-        checkboxDiv.appendChild(label);
-        cutStylesContainer.appendChild(checkboxDiv);
+          checkboxDiv.appendChild(checkbox);
+          checkboxDiv.appendChild(label);
+          cutStylesContainer.appendChild(checkboxDiv);
 
-        // Add event listener for "None" checkbox
-        if (style === "None") {
-          checkbox.addEventListener("change", function () {
-            if (this.checked) {
-              // Uncheck all other checkboxes if "None" is selected
-              const otherCheckboxes = cutStylesContainer.querySelectorAll('input[name="cutStyles"]:not([value="None"])');
-              otherCheckboxes.forEach(cb => {
-                cb.checked = false;
-              });
-            }
-          });
-        } else {
-          // Uncheck "None" if any other option is selected
-          checkbox.addEventListener("change", function () {
-            if (this.checked) {
-              const noneCheckbox = cutStylesContainer.querySelector('input[value="None"]');
-              if (noneCheckbox) {
-                noneCheckbox.checked = false;
+          // Add event listener for "None" checkbox
+          if (style === "None") {
+            checkbox.addEventListener("change", function() {
+              if (this.checked) {
+                // Uncheck all other checkboxes if "None" is selected
+                const otherCheckboxes = cutStylesContainer.querySelectorAll('input[name="cutStyles"]:not([value="None"])');
+                otherCheckboxes.forEach(cb => {
+                  cb.checked = false;
+                });
               }
-            }
-          });
-        }
-      });
-    }
-
-    // Show/Hide Cut Styles checkboxes and populate options based on category
-    categorySelect.addEventListener("change", function () {
-      const selectedOption = categorySelect.options[categorySelect.selectedIndex];
-      const categoryName = selectedOption.getAttribute("data-name");
-      if (categoryName === "Meat" || categoryName === "Fish") {
-        cutStyleGroup.style.display = "block";
-        populateCutStyles(categoryName);
-      } else {
-        cutStyleGroup.style.display = "none";
-        cutStylesContainer.innerHTML = ""; // Clear checkboxes
-        document.getElementById("errCutStyles").textContent = ""; // Clear error
+            });
+          } else {
+            // Uncheck "None" if any other option is selected
+            checkbox.addEventListener("change", function() {
+              if (this.checked) {
+                const noneCheckbox = cutStylesContainer.querySelector('input[value="None"]');
+                if (noneCheckbox) {
+                  noneCheckbox.checked = false;
+                }
+              }
+            });
+          }
+        });
       }
-    });
 
-    // Open modal for adding a new product
-    openPopupBtn.addEventListener("click", () => {
-      popupTitle.textContent = "Add Product";
-      saveProductBtn.textContent = "ADD";
-      productForm.reset();
-      document.getElementById("productId").value = "";
-      existingImagesContainer.innerHTML = "";
-      deletedImagesContainer.innerHTML = "";
-      deletedImages.clear();
-      clearErrors();
-      initializePlaceholders();
-      updateImageCounter();
-      cutStyleGroup.style.display = "none"; // Reset Cut Styles visibility
-      cutStylesContainer.innerHTML = ""; // Reset Cut Styles checkboxes
-      popup.classList.remove("hidden");
-    });
-
-    // Open modal for editing a product
-    document.querySelectorAll('.edit-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        popupTitle.textContent = "Edit Product";
-        saveProductBtn.textContent = "UPDATE";
-
-        // Populate form fields with product data
-        const productId = btn.getAttribute('data-productid');
-        const name = btn.getAttribute('data-name');
-        const description = btn.getAttribute('data-description');
-        const categoryId = btn.getAttribute('data-categoryid');
-        const price = btn.getAttribute('data-price');
-        const mrp = btn.getAttribute('data-mrp');
-        const stock = btn.getAttribute('data-stock');
-        const images = JSON.parse(btn.getAttribute('data-images') || '[]');
-
-        document.getElementById('productId').value = productId;
-        document.getElementById('productName').value = name;
-        document.getElementById('description').value = description;
-        document.getElementById('category').value = categoryId;
-        document.getElementById('price').value = price;
-        document.getElementById('mrp').value = mrp;
-        document.getElementById('qty').value = stock;
-
-        // Populate existing images as hidden inputs
-        existingImagesContainer.innerHTML = "";
-        deletedImagesContainer.innerHTML = "";
-        deletedImages.clear();
-        images.forEach((url, index) => {
-          const input = document.createElement("input");
-          input.type = "hidden";
-          input.name = `existingImages[${index}]`;
-          input.value = url;
-          existingImagesContainer.appendChild(input);
-        });
-
-        // Populate images in placeholders
-        imageUploadContainer.innerHTML = "";
-        images.forEach((imageUrl, index) => {
-          createPlaceholder(index + 1, imageUrl);
-        });
-        if (images.length < 5) {
-          createPlaceholder(images.length + 1);
-        }
-        addImageChangeListeners();
-        updateImageCounter();
-
-        // Show/Hide Cut Styles checkboxes based on category
+      // Show/Hide Cut Styles checkboxes and populate options based on category
+      categorySelect.addEventListener("change", function() {
         const selectedOption = categorySelect.options[categorySelect.selectedIndex];
         const categoryName = selectedOption.getAttribute("data-name");
         if (categoryName === "Meat" || categoryName === "Fish") {
@@ -565,106 +477,186 @@ document.addEventListener("DOMContentLoaded", function () {
           populateCutStyles(categoryName);
         } else {
           cutStyleGroup.style.display = "none";
-          cutStylesContainer.innerHTML = "";
+          cutStylesContainer.innerHTML = ""; // Clear checkboxes
+          document.getElementById("errCutStyles").textContent = ""; // Clear error
         }
+      });
 
+      // Open modal for adding a new product
+      openPopupBtn.addEventListener("click", () => {
+        popupTitle.textContent = "Add Product";
+        saveProductBtn.textContent = "ADD";
+        productForm.reset();
+        document.getElementById("productId").value = "";
+        existingImagesContainer.innerHTML = "";
+        deletedImagesContainer.innerHTML = "";
+        deletedImages.clear();
+        clearErrors();
+        initializePlaceholders();
+        updateImageCounter();
+        cutStyleGroup.style.display = "none"; // Reset Cut Styles visibility
+        cutStylesContainer.innerHTML = ""; // Reset Cut Styles checkboxes
         popup.classList.remove("hidden");
       });
-    });
 
-    closePopupBtn.addEventListener("click", () => {
-      popup.classList.add("hidden");
-      productForm.reset();
-      clearErrors();
-      resetPlaceholders();
-      existingImagesContainer.innerHTML = "";
-      deletedImagesContainer.innerHTML = "";
-      deletedImages.clear();
-      cutStyleGroup.style.display = "none"; // Reset Cut Styles visibility
-      cutStylesContainer.innerHTML = ""; // Reset Cut Styles checkboxes
-      updateImageCounter();
-    });
+      // Open modal for editing a product
+      document.querySelectorAll('.edit-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          popupTitle.textContent = "Edit Product";
+          saveProductBtn.textContent = "UPDATE";
 
-    // Handle form submission
-    saveProductBtn.addEventListener("click", function(event) {
-      event.preventDefault();
-      
-      clearErrors();
-      
-      if (validateForm()) {
-        console.log("Validation passed. Submitting the form via AJAX...");
-        saveProductBtn.disabled = true;
-        saveProductBtn.textContent = productForm.productId.value ? "Updating..." : "Adding...";
+          // Populate form fields with product data
+          const productId = btn.getAttribute('data-productid');
+          const name = btn.getAttribute('data-name');
+          const description = btn.getAttribute('data-description');
+          const categoryId = btn.getAttribute('data-categoryid');
+          const price = btn.getAttribute('data-price');
+          const mrp = btn.getAttribute('data-mrp');
+          const stock = btn.getAttribute('data-stock');
+          const images = JSON.parse(btn.getAttribute('data-images') || '[]');
 
-        // Append deleted images to FormData
-        const formData = new FormData(productForm);
-        Array.from(deletedImages).forEach((url, index) => {
-          formData.append(`deletedImages[${index}]`, url);
+          document.getElementById('productId').value = productId;
+          document.getElementById('productName').value = name;
+          document.getElementById('description').value = description;
+          document.getElementById('category').value = categoryId;
+          document.getElementById('price').value = price;
+          document.getElementById('mrp').value = mrp;
+          document.getElementById('qty').value = stock;
+
+          // Populate existing images as hidden inputs
+          existingImagesContainer.innerHTML = "";
+          deletedImagesContainer.innerHTML = "";
+          deletedImages.clear();
+          images.forEach((url, index) => {
+            const input = document.createElement("input");
+            input.type = "hidden";
+            input.name = `existingImages[${index}]`;
+            input.value = url;
+            existingImagesContainer.appendChild(input);
+          });
+
+          // Populate images in placeholders
+          imageUploadContainer.innerHTML = "";
+          images.forEach((imageUrl, index) => {
+            createPlaceholder(index + 1, imageUrl);
+          });
+          if (images.length < 5) {
+            createPlaceholder(images.length + 1);
+          }
+          addImageChangeListeners();
+          updateImageCounter();
+
+          // Show/Hide Cut Styles checkboxes based on category
+          const selectedOption = categorySelect.options[categorySelect.selectedIndex];
+          const categoryName = selectedOption.getAttribute("data-name");
+          if (categoryName === "Meat" || categoryName === "Fish") {
+            cutStyleGroup.style.display = "block";
+            populateCutStyles(categoryName);
+          } else {
+            cutStyleGroup.style.display = "none";
+            cutStylesContainer.innerHTML = "";
+          }
+
+          popup.classList.remove("hidden");
         });
+      });
+
+      closePopupBtn.addEventListener("click", () => {
+        popup.classList.add("hidden");
+        productForm.reset();
+        clearErrors();
+        resetPlaceholders();
+        existingImagesContainer.innerHTML = "";
+        deletedImagesContainer.innerHTML = "";
+        deletedImages.clear();
+        cutStyleGroup.style.display = "none"; // Reset Cut Styles visibility
+        cutStylesContainer.innerHTML = ""; // Reset Cut Styles checkboxes
+        updateImageCounter();
+      });
+
+      // Handle form submission
+      saveProductBtn.addEventListener("click", function(event) {
+        event.preventDefault();
+
+        clearErrors();
+
+        if (validateForm()) {
+          console.log("Validation passed. Submitting the form via AJAX...");
+          saveProductBtn.disabled = true;
+          saveProductBtn.textContent = productForm.productId.value ? "Updating..." : "Adding...";
+
+          // Append deleted images to FormData
+          const formData = new FormData(productForm);
+          Array.from(deletedImages).forEach((url, index) => {
+            formData.append(`deletedImages[${index}]`, url);
+          });
 
 
-        const productId = document.getElementById("productId").value;
-        const url = productId ? `/tezgrani/product/edit/${productId}` : "/tezgrani/product/save";
-        const method = productId ? "PATCH" : "POST";
+          const productId = document.getElementById("productId").value;
+          const url = productId ? `/tezgrani/product/edit/${productId}` : "/tezgrani/product/save";
+          const method = productId ? "PATCH" : "POST";
 
-        $.ajax({
-          url: url,
-          type: method,
-          data: formData,
-          processData: false, 
-          contentType: false, 
-          success: function (response) {
-            toastr.success(productId ? "Product updated successfully!" : "Product added successfully!");
-            productForm.reset();
-            clearErrors();
-            resetPlaceholders();
-            existingImagesContainer.innerHTML = "";
-            deletedImagesContainer.innerHTML = "";
-            deletedImages.clear();
-            popup.classList.add("hidden");
-            saveProductBtn.disabled = false;
-            saveProductBtn.textContent = productId ? "UPDATE" : "ADD";
-            window.location.reload();
-          },
-          error: function (xhr, status, error) {
-            const errorMsg = xhr.responseJSON?.message || "Unknown error";
-            toastr.error(`Failed to ${productId ? 'update' : 'add'} product: ${errorMsg}`);
-            saveProductBtn.disabled = false;
-            saveProductBtn.textContent = productId ? "UPDATE" : "ADD";
-          },
-        });
-      } else {
-        console.log("Validation failed - errors should be displayed");
-      }
-    });
+          $.ajax({
+            url: url,
+            type: method,
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+              toastr.success(productId ? "Product updated successfully!" : "Product added successfully!");
+              productForm.reset();
+              clearErrors();
+              resetPlaceholders();
+              existingImagesContainer.innerHTML = "";
+              deletedImagesContainer.innerHTML = "";
+              deletedImages.clear();
+              popup.classList.add("hidden");
+              saveProductBtn.disabled = false;
+              saveProductBtn.textContent = productId ? "UPDATE" : "ADD";
+              window.location.reload();
+            },
+            error: function(xhr, status, error) {
+              const errorMsg = xhr.responseJSON?.message || "Unknown error";
+              toastr.error(`Failed to ${productId ? 'update' : 'add'} product: ${errorMsg}`);
+              saveProductBtn.disabled = false;
+              saveProductBtn.textContent = productId ? "UPDATE" : "ADD";
+            },
+          });
+        } else {
+          console.log("Validation failed - errors should be displayed");
+        }
+      });
 
-    // ==================== Cropping Modal Logic ====================
-    const cropModal = document.getElementById("cropModal");
-    const closeCropModalBtn = document.getElementById("closeCropModal");
-    const cropDoneBtn = document.getElementById("cropDoneBtn");
-    let cropper;
-    let currentImageInput;
-    let currentPlaceholder;
+      // ==================== Cropping Modal Logic ====================
+      const cropModal = document.getElementById("cropModal");
+      const closeCropModalBtn = document.getElementById("closeCropModal");
+      const cropDoneBtn = document.getElementById("cropDoneBtn");
+      let cropper;
+      let currentImageInput;
+      let currentPlaceholder;
 
-    closeCropModalBtn.addEventListener("click", () => {
-      cropModal.classList.add("hidden");
-      if (cropper) {
-        cropper.destroy();
-        cropper = null;
-      }
-    });
+      closeCropModalBtn.addEventListener("click", () => {
+        cropModal.classList.add("hidden");
+        if (cropper) {
+          cropper.destroy();
+          cropper = null;
+        }
+      });
 
-    cropDoneBtn.addEventListener("click", () => {
-      if (cropper) {
-        const canvas = cropper.getCroppedCanvas();
-        if (canvas) {
-          canvas.toBlob((blob) => {
-            const file = new File([blob], currentImageInput.files[0]?.name || `cropped-image-${currentImageInput.id.replace('image', '')}.jpg`, { type: "image/jpeg" });
-            const dataTransfer = new DataTransfer();
-            dataTransfer.items.add(file);
-            currentImageInput.files = dataTransfer.files;
+      cropDoneBtn.addEventListener("click", () => {
+        if (cropper) {
+          const canvas = cropper.getCroppedCanvas();
+          if (canvas) {
+            canvas.toBlob((blob) => {
+              const file = new File([blob], currentImageInput.files[0]?.name || `cropped-image-${currentImageInput.id.replace('image', '')}.jpg`, {
+                type: "image/jpeg"
+              });
+              const dataTransfer = new DataTransfer();
+              dataTransfer.items.add(file);
+              currentImageInput.files = dataTransfer.files;
 
-            currentPlaceholder.innerHTML = `
+              currentPlaceholder.innerHTML = `
               <img src="${canvas.toDataURL()}" alt="Preview" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
               <div class="image-hover-controls">
                 <button type="button" class="control-btn edit-btn" onclick="event.stopPropagation(); editImage(${currentImageInput.id.replace('image', '')})">
@@ -674,62 +666,62 @@ document.addEventListener("DOMContentLoaded", function () {
                   <span class="material-symbols-outlined">delete</span>
                 </button>
               </div>`;
-            document.getElementById("errImage").textContent = "";
-            updateImageCounter();
-          }, "image/jpeg");
+              document.getElementById("errImage").textContent = "";
+              updateImageCounter();
+            }, "image/jpeg");
+          }
+          cropper.destroy();
+          cropper = null;
+          cropModal.classList.add("hidden");
+
+          addNewPlaceholderIfNeeded();
         }
-        cropper.destroy();
-        cropper = null;
-        cropModal.classList.add("hidden");
-
-        addNewPlaceholderIfNeeded();
-      }
-    });
-
-    // ==================== Real-Time Price vs MRP Validation ====================
-    const priceInput = document.getElementById("price");
-    const mrpInput = document.getElementById("mrp");
-
-    function validatePriceVsMrp() {
-      const price = parseFloat(priceInput.value);
-      const mrp = parseFloat(mrpInput.value);
-
-      if (!isNaN(price) && !isNaN(mrp) && price > mrp) {
-        displayError("errPrice", "Price cannot be greater than MRP.");
-        displayError("errMrp", "Price cannot be greater than MRP.");
-      } else {
-        document.getElementById("errPrice").textContent = "";
-        document.getElementById("errMrp").textContent = "";
-      }
-    }
-
-    priceInput.addEventListener("input", validatePriceVsMrp);
-    mrpInput.addEventListener("input", validatePriceVsMrp);
-
-    function clearErrors() {
-      document.querySelectorAll(".errr-msg").forEach(el => {
-        el.textContent = "";
-        el.style.display = "block";
       });
-    }
 
-    function initializePlaceholders() {
-      imageUploadContainer.innerHTML = "";
-      createPlaceholder(1);
-      addImageChangeListeners();
-      updateImageCounter();
-    }
+      // ==================== Real-Time Price vs MRP Validation ====================
+      const priceInput = document.getElementById("price");
+      const mrpInput = document.getElementById("mrp");
 
-    function resetPlaceholders() {
-      initializePlaceholders();
-    }
+      function validatePriceVsMrp() {
+        const price = parseFloat(priceInput.value);
+        const mrp = parseFloat(mrpInput.value);
 
-    function createPlaceholder(index, imageUrl = null) {
-      const inputId = `image${index}`;
-      const placeholderId = `placeholder${index}`;
-      const placeholderDiv = document.createElement("div");
-      placeholderDiv.className = "image-placeholder-wrapper";
-      let placeholderContent = `
+        if (!isNaN(price) && !isNaN(mrp) && price > mrp) {
+          displayError("errPrice", "Price cannot be greater than MRP.");
+          displayError("errMrp", "Price cannot be greater than MRP.");
+        } else {
+          document.getElementById("errPrice").textContent = "";
+          document.getElementById("errMrp").textContent = "";
+        }
+      }
+
+      priceInput.addEventListener("input", validatePriceVsMrp);
+      mrpInput.addEventListener("input", validatePriceVsMrp);
+
+      function clearErrors() {
+        document.querySelectorAll(".errr-msg").forEach(el => {
+          el.textContent = "";
+          el.style.display = "block";
+        });
+      }
+
+      function initializePlaceholders() {
+        imageUploadContainer.innerHTML = "";
+        createPlaceholder(1);
+        addImageChangeListeners();
+        updateImageCounter();
+      }
+
+      function resetPlaceholders() {
+        initializePlaceholders();
+      }
+
+      function createPlaceholder(index, imageUrl = null) {
+        const inputId = `image${index}`;
+        const placeholderId = `placeholder${index}`;
+        const placeholderDiv = document.createElement("div");
+        placeholderDiv.className = "image-placeholder-wrapper";
+        let placeholderContent = `
         <input type="file" id="${inputId}" name="images" accept="image/*" class="image-input" style="display: none;">
         <div class="image-placeholder" onclick="document.getElementById('${inputId}').click()" id="${placeholderId}">
           <span class="material-icons">
@@ -739,8 +731,8 @@ document.addEventListener("DOMContentLoaded", function () {
           </span>
         </div>`;
 
-      if (imageUrl) {
-        placeholderContent = `
+        if (imageUrl) {
+          placeholderContent = `
           <input type="file" id="${inputId}" name="images" accept="image/*" class="image-input" style="display: none;">
           <div class="image-placeholder" id="${placeholderId}">
             <img src="${imageUrl}" alt="Preview" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
@@ -753,65 +745,183 @@ document.addEventListener("DOMContentLoaded", function () {
               </button>
             </div>
           </div>`;
-      }
-
-      placeholderDiv.innerHTML = placeholderContent;
-      imageUploadContainer.appendChild(placeholderDiv);
-    }
-
-    function addNewPlaceholderIfNeeded() {
-      const placeholders = document.querySelectorAll(".image-placeholder-wrapper");
-      if (placeholders.length < 5) {
-        createPlaceholder(placeholders.length + 1);
-        addImageChangeListeners();
-      }
-    }
-
-    function getImageCount() {
-      const placeholders = document.querySelectorAll(".image-placeholder");
-      let count = 0;
-      placeholders.forEach(placeholder => {
-        if (placeholder.querySelector("img")) {
-          count++;
-        }
-      });
-      return count;
-    }
-
-    function updateImageCounter() {
-      const count = getImageCount();
-      imageCounter.textContent = `${count}/5`;
-      imageCounter.style.color = count < 3 ? "red" : "green";
-    }
-
-    function addImageChangeListeners() {
-      const inputs = document.querySelectorAll(".image-input");
-      inputs.forEach(input => {
-        // Remove existing listeners to prevent duplicates
-        input.removeEventListener("change", handleImageChange);
-        input.addEventListener("change", handleImageChange);
-      });
-    }
-
-    function handleImageChange(event) {
-      const imageInput = event.target;
-      const placeholder = document.getElementById(`placeholder${imageInput.id.replace('image', '')}`);
-      
-      if (imageInput.files && imageInput.files[0]) {
-        const file = imageInput.files[0];
-        
-        if (!file.type.match('image.*')) {
-          displayError("errImage", "Please select a valid image file (e.g., JPEG, PNG).");
-          imageInput.value = '';
-          return;
         }
 
-        currentImageInput = imageInput;
-        currentPlaceholder = placeholder;
-        const reader = new FileReader();
-        reader.onload = function (e) {
+        placeholderDiv.innerHTML = placeholderContent;
+        imageUploadContainer.appendChild(placeholderDiv);
+      }
+
+      function addNewPlaceholderIfNeeded() {
+        const placeholders = document.querySelectorAll(".image-placeholder-wrapper");
+        if (placeholders.length < 5) {
+          createPlaceholder(placeholders.length + 1);
+          addImageChangeListeners();
+        }
+      }
+
+      function getImageCount() {
+        const placeholders = document.querySelectorAll(".image-placeholder");
+        let count = 0;
+        placeholders.forEach(placeholder => {
+          if (placeholder.querySelector("img")) {
+            count++;
+          }
+        });
+        return count;
+      }
+
+      function updateImageCounter() {
+        const count = getImageCount();
+        imageCounter.textContent = `${count}/5`;
+        imageCounter.style.color = count < 3 ? "red" : "green";
+      }
+
+      function addImageChangeListeners() {
+        const inputs = document.querySelectorAll(".image-input");
+        inputs.forEach(input => {
+          // Remove existing listeners to prevent duplicates
+          input.removeEventListener("change", handleImageChange);
+          input.addEventListener("change", handleImageChange);
+        });
+      }
+
+      function handleImageChange(event) {
+        const imageInput = event.target;
+        const placeholder = document.getElementById(`placeholder${imageInput.id.replace('image', '')}`);
+
+        if (imageInput.files && imageInput.files[0]) {
+          const file = imageInput.files[0];
+
+          if (!file.type.match('image.*')) {
+            displayError("errImage", "Please select a valid image file (e.g., JPEG, PNG).");
+            imageInput.value = '';
+            return;
+          }
+
+          currentImageInput = imageInput;
+          currentPlaceholder = placeholder;
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            const cropImage = document.getElementById("cropImage");
+            cropImage.src = e.target.result;
+            cropModal.classList.remove("hidden");
+
+            if (cropper) {
+              cropper.destroy();
+            }
+            cropper = new Cropper(cropImage, {
+              aspectRatio: 1,
+              viewMode: 1,
+              autoCropArea: 1,
+            });
+          };
+          reader.readAsDataURL(file);
+        }
+      }
+
+      function displayError(elementId, message) {
+        const errorElement = document.getElementById(elementId);
+        if (errorElement) {
+          errorElement.textContent = message;
+          errorElement.style.display = "block";
+          console.log(`Setting error for ${elementId}: ${message}`);
+        } else {
+          console.error(`Error element not found: ${elementId}`);
+        }
+      }
+
+      function validateForm() {
+        let isValid = true;
+
+        const productName = document.getElementById("productName");
+        const category = document.getElementById("category");
+        const price = document.getElementById("price");
+        const mrp = document.getElementById("mrp");
+        const qty = document.getElementById("qty");
+        const description = document.getElementById("description");
+        const cutStyles = Array.from(cutStylesContainer.querySelectorAll('input[name="cutStyles"]:checked')).map(cb => cb.value);
+
+        if (!productName.value.trim()) {
+          isValid = false;
+          displayError("errProductName", "Product name is required.");
+        }
+
+        if (!category.value) {
+          isValid = false;
+          displayError("errCategory", "Please select a category.");
+        }
+
+        // Validate Cut Styles if visible (i.e., category is Meat or Fish)
+        const selectedOption = category.options[category.selectedIndex];
+        const categoryName = selectedOption ? selectedOption.getAttribute("data-name") : "";
+        if (categoryName === "Meat" || categoryName === "Fish") {
+          if (cutStyles.length === 0) {
+            isValid = false;
+            displayError("errCutStyles", "Please select at least one cutting style or 'None'.");
+          } else if (cutStyles.includes("None") && cutStyles.length > 1) {
+            isValid = false;
+            displayError("errCutStyles", "If 'None' is selected, no other cutting styles should be selected.");
+          }
+        }
+
+        if (!price.value.trim()) {
+          isValid = false;
+          displayError("errPrice", "Price is required.");
+        } else if (isNaN(parseFloat(price.value)) || parseFloat(price.value) < 0) {
+          isValid = false;
+          displayError("errPrice", "Price must be a positive number.");
+        }
+
+        if (!mrp.value.trim()) {
+          isValid = false;
+          displayError("errMrp", "MRP is required.");
+        } else if (isNaN(parseFloat(mrp.value)) || parseFloat(mrp.value) < 0) {
+          isValid = false;
+          displayError("errMrp", "MRP must be a positive number.");
+        } else if (parseFloat(mrp.value) < parseFloat(price.value)) {
+          isValid = false;
+          displayError("errPrice", "Price cannot be greater than MRP.");
+          displayError("errMrp", "Price cannot be greater than MRP.");
+        }
+
+        if (!qty.value.trim()) {
+          isValid = false;
+          displayError("errQty", "Quantity is required.");
+        } else if (isNaN(parseInt(qty.value)) || parseInt(qty.value) < 0) {
+          isValid = false;
+          displayError("errQty", "Quantity must be a positive number.");
+        }
+
+        if (!description.value.trim()) {
+          isValid = false;
+          displayError("errDescription", "Description is required.");
+        }
+
+        const imageCount = getImageCount();
+        if (imageCount < 3) {
+          isValid = false;
+          displayError("errImage", `Please upload at least 3 images. Currently, you have ${imageCount}.`);
+        } else if (imageCount > 5) {
+          isValid = false;
+          displayError("errImage", `You can upload a maximum of 5 images. Currently, you have ${imageCount}.`);
+        }
+
+        return isValid;
+      }
+
+      // ==================== Image Edit and Delete Functions ====================
+      window.editImage = function(imageIndex) {
+        console.log(`Editing image ${imageIndex}`);
+        const placeholder = document.getElementById(`placeholder${imageIndex}`);
+        const imageInput = document.getElementById(`image${imageIndex}`);
+
+        const imgElement = placeholder.querySelector("img");
+        if (imgElement) {
+          currentImageInput = imageInput;
+          currentPlaceholder = placeholder;
+
           const cropImage = document.getElementById("cropImage");
-          cropImage.src = e.target.result;
+          cropImage.src = imgElement.src;
           cropModal.classList.remove("hidden");
 
           if (cropper) {
@@ -822,256 +932,143 @@ document.addEventListener("DOMContentLoaded", function () {
             viewMode: 1,
             autoCropArea: 1,
           });
-        };
-        reader.readAsDataURL(file);
-      }
-    }
-
-    function displayError(elementId, message) {
-      const errorElement = document.getElementById(elementId);
-      if (errorElement) {
-        errorElement.textContent = message;
-        errorElement.style.display = "block";
-        console.log(`Setting error for ${elementId}: ${message}`);
-      } else {
-        console.error(`Error element not found: ${elementId}`);
-      }
-    }
-
-    function validateForm() {
-      let isValid = true;
-      
-      const productName = document.getElementById("productName");
-      const category = document.getElementById("category");
-      const price = document.getElementById("price");
-      const mrp = document.getElementById("mrp");
-      const qty = document.getElementById("qty");
-      const description = document.getElementById("description");
-      const cutStyles = Array.from(cutStylesContainer.querySelectorAll('input[name="cutStyles"]:checked')).map(cb => cb.value);
-
-      if (!productName.value.trim()) {
-        isValid = false;
-        displayError("errProductName", "Product name is required.");
-      }
-
-      if (!category.value) {
-        isValid = false;
-        displayError("errCategory", "Please select a category.");
-      }
-
-      // Validate Cut Styles if visible (i.e., category is Meat or Fish)
-      const selectedOption = category.options[category.selectedIndex];
-      const categoryName = selectedOption ? selectedOption.getAttribute("data-name") : "";
-      if (categoryName === "Meat" || categoryName === "Fish") {
-        if (cutStyles.length === 0) {
-          isValid = false;
-          displayError("errCutStyles", "Please select at least one cutting style or 'None'.");
-        } else if (cutStyles.includes("None") && cutStyles.length > 1) {
-          isValid = false;
-          displayError("errCutStyles", "If 'None' is selected, no other cutting styles should be selected.");
         }
-      }
+      };
 
-      if (!price.value.trim()) {
-        isValid = false;
-        displayError("errPrice", "Price is required.");
-      } else if (isNaN(parseFloat(price.value)) || parseFloat(price.value) < 0) {
-        isValid = false;
-        displayError("errPrice", "Price must be a positive number.");
-      }
+      window.deleteImage = function(imageIndex, imageUrl = null) {
+        console.log(`Deleting image ${imageIndex}`);
+        const placeholderWrapper = document.getElementById(`placeholder${imageIndex}`).parentElement;
+        placeholderWrapper.remove();
 
-      if (!mrp.value.trim()) {
-        isValid = false;
-        displayError("errMrp", "MRP is required.");
-      } else if (isNaN(parseFloat(mrp.value)) || parseFloat(mrp.value) < 0) {
-        isValid = false;
-        displayError("errMrp", "MRP must be a positive number.");
-      } else if (parseFloat(mrp.value) < parseFloat(price.value)) {
-        isValid = false;
-        displayError("errPrice", "Price cannot be greater than MRP.");
-        displayError("errMrp", "Price cannot be greater than MRP.");
-      }
-
-      if (!qty.value.trim()) {
-        isValid = false;
-        displayError("errQty", "Quantity is required.");
-      } else if (isNaN(parseInt(qty.value)) || parseInt(qty.value) < 0) {
-        isValid = false;
-        displayError("errQty", "Quantity must be a positive number.");
-      }
-
-      if (!description.value.trim()) {
-        isValid = false;
-        displayError("errDescription", "Description is required.");
-      }
-
-      const imageCount = getImageCount();
-      if (imageCount < 3) {
-        isValid = false;
-        displayError("errImage", `Please upload at least 3 images. Currently, you have ${imageCount}.`);
-      } else if (imageCount > 5) {
-        isValid = false;
-        displayError("errImage", `You can upload a maximum of 5 images. Currently, you have ${imageCount}.`);
-      }
-
-      return isValid;
-    }
-
-    // ==================== Image Edit and Delete Functions ====================
-    window.editImage = function(imageIndex) {
-      console.log(`Editing image ${imageIndex}`);
-      const placeholder = document.getElementById(`placeholder${imageIndex}`);
-      const imageInput = document.getElementById(`image${imageIndex}`);
-      
-      const imgElement = placeholder.querySelector("img");
-      if (imgElement) {
-        currentImageInput = imageInput;
-        currentPlaceholder = placeholder;
-        
-        const cropImage = document.getElementById("cropImage");
-        cropImage.src = imgElement.src;
-        cropModal.classList.remove("hidden");
-
-        if (cropper) {
-          cropper.destroy();
+        // If this is an existing image, mark it for deletion
+        if (imageUrl) {
+          deletedImages.add(imageUrl);
         }
-        cropper = new Cropper(cropImage, {
-          aspectRatio: 1,
-          viewMode: 1,
-          autoCropArea: 1,
-        });
-      }
-    };
 
-    window.deleteImage = function(imageIndex, imageUrl = null) {
-      console.log(`Deleting image ${imageIndex}`);
-      const placeholderWrapper = document.getElementById(`placeholder${imageIndex}`).parentElement;
-      placeholderWrapper.remove();
+        // Re-index remaining placeholders
+        const remainingWrappers = document.querySelectorAll(".image-placeholder-wrapper");
+        remainingWrappers.forEach((wrapper, idx) => {
+          const newIndex = idx + 1;
+          const input = wrapper.querySelector(".image-input");
+          const placeholder = wrapper.querySelector(".image-placeholder");
+          input.id = `image${newIndex}`;
+          placeholder.id = `placeholder${newIndex}`;
+          placeholder.setAttribute("onclick", `document.getElementById('image${newIndex}').click()`);
 
-      // If this is an existing image, mark it for deletion
-      if (imageUrl) {
-        deletedImages.add(imageUrl);
-      }
-
-      // Re-index remaining placeholders
-      const remainingWrappers = document.querySelectorAll(".image-placeholder-wrapper");
-      remainingWrappers.forEach((wrapper, idx) => {
-        const newIndex = idx + 1;
-        const input = wrapper.querySelector(".image-input");
-        const placeholder = wrapper.querySelector(".image-placeholder");
-        input.id = `image${newIndex}`;
-        placeholder.id = `placeholder${newIndex}`;
-        placeholder.setAttribute("onclick", `document.getElementById('image${newIndex}').click()`);
-
-        const img = placeholder.querySelector("img");
-        if (img) {
-          const editBtn = placeholder.querySelector(".edit-btn");
-          const deleteBtn = placeholder.querySelector(".delete-btn");
-          editBtn.setAttribute("onclick", `event.stopPropagation(); editImage(${newIndex})`);
-          deleteBtn.setAttribute("onclick", `event.stopPropagation(); deleteImage(${newIndex}, '${img.src}')`);
-        }
-      });
-
-      // Add a new placeholder if none exist
-      if (remainingWrappers.length === 0) {
-        createPlaceholder(1);
-        addImageChangeListeners();
-      }
-
-      updateImageCounter();
-    };
-
-    // Initialize with 1 placeholder
-    initializePlaceholders();
-
-    // List/Unlist (Block/Unblock) button with confirmation modal
-    const confirmModal = document.getElementById('confirm-modal');
-    const cancelAction = document.getElementById('cancel-action');
-    const confirmAction = document.getElementById('confirm-action');
-
-    // Single event listeners for modal buttons
-    cancelAction.addEventListener('click', () => {
-      confirmModal.style.display = 'none';
-    });
-
-    confirmAction.addEventListener('click', async () => {
-      if (confirmModal.dataset.productId) {
-        const productId = confirmModal.dataset.productId;
-        const newStatus = confirmModal.dataset.newStatus === 'true';
-
-        confirmModal.style.display = 'none';
-        confirmModal.removeAttribute('data-productId');
-        confirmModal.removeAttribute('data-newStatus');
-
-        try {
-          console.log('Toggling productId:', productId, 'with status:', newStatus);
-          const response = await fetch(`/tezgrani/product/toggle-block/${productId}`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ isBlocked: newStatus })
-          });
-          const data = await response.json();
-          console.log('Server response:', data);
-          if (data.success) {
-            toastr.success(newStatus ? "Product blocked successfully!" : "Product unblocked successfully!");
-            window.location.reload();
-          } else {
-            toastr.error(`Failed to update product status: ${data.message || 'No message provided'}`);
+          const img = placeholder.querySelector("img");
+          if (img) {
+            const editBtn = placeholder.querySelector(".edit-btn");
+            const deleteBtn = placeholder.querySelector(".delete-btn");
+            editBtn.setAttribute("onclick", `event.stopPropagation(); editImage(${newIndex})`);
+            deleteBtn.setAttribute("onclick", `event.stopPropagation(); deleteImage(${newIndex}, '${img.src}')`);
           }
-        } catch (err) {
-          console.error('Error toggling product status:', err);
-          toastr.error(`Error occurred: ${err.message || 'Unknown error'}`);
+        });
+
+        // Add a new placeholder if none exist
+        if (remainingWrappers.length === 0) {
+          createPlaceholder(1);
+          addImageChangeListeners();
         }
-      }
-    });
 
-    document.querySelectorAll('.list-toggle').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        const productId = btn.getAttribute('data-productid');
-        const currentStatus = btn.getAttribute('data-status') === 'true';
-        const newStatus = !currentStatus;
+        updateImageCounter();
+      };
 
-        // Store data in modal dataset
-        confirmModal.dataset.productId = productId;
-        confirmModal.dataset.newStatus = newStatus;
-        confirmModal.style.display = 'block';
+      // Initialize with 1 placeholder
+      initializePlaceholders();
+
+      // List/Unlist (Block/Unblock) button with confirmation modal
+      const confirmModal = document.getElementById('confirm-modal');
+      const cancelAction = document.getElementById('cancel-action');
+      const confirmAction = document.getElementById('confirm-action');
+
+      // Single event listeners for modal buttons
+      cancelAction.addEventListener('click', () => {
+        confirmModal.style.display = 'none';
+      });
+
+      confirmAction.addEventListener('click', async () => {
+        if (confirmModal.dataset.productId) {
+          const productId = confirmModal.dataset.productId;
+          const newStatus = confirmModal.dataset.newStatus === 'true';
+
+          confirmModal.style.display = 'none';
+          confirmModal.removeAttribute('data-productId');
+          confirmModal.removeAttribute('data-newStatus');
+
+          try {
+            console.log('Toggling productId:', productId, 'with status:', newStatus);
+            const response = await fetch(`/tezgrani/product/toggle-block/${productId}`, {
+              method: 'PATCH',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                isBlocked: newStatus
+              })
+            });
+            const data = await response.json();
+            console.log('Server response:', data);
+            if (data.success) {
+              toastr.success(newStatus ? "Product blocked successfully!" : "Product unblocked successfully!");
+              window.location.reload();
+            } else {
+              toastr.error(`Failed to update product status: ${data.message || 'No message provided'}`);
+            }
+          } catch (err) {
+            console.error('Error toggling product status:', err);
+            toastr.error(`Error occurred: ${err.message || 'Unknown error'}`);
+          }
+        }
+      });
+
+      document.querySelectorAll('.list-toggle').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          const productId = btn.getAttribute('data-productid');
+          const currentStatus = btn.getAttribute('data-status') === 'true';
+          const newStatus = !currentStatus;
+
+          // Store data in modal dataset
+          confirmModal.dataset.productId = productId;
+          confirmModal.dataset.newStatus = newStatus;
+          confirmModal.style.display = 'block';
+        });
+      });
+
+      // Logout Modal Logic
+      const logoutModal = document.getElementById("logout-modal");
+      const confirmLogoutBtn = document.getElementById("confirm-logout");
+      const cancelLogoutBtn = document.getElementById("cancel-logout");
+
+      window.showLogoutModal = function() {
+        logoutModal.style.display = "flex";
+      };
+
+      confirmLogoutBtn.addEventListener("click", function() {
+        logoutModal.style.display = "none";
+        window.location.href = "/tezgrani/logout";
+      });
+
+      cancelLogoutBtn.addEventListener("click", function() {
+        logoutModal.style.display = "none";
+      });
+
+      window.addEventListener("click", function(e) {
+        if (e.target === logoutModal) {
+          logoutModal.style.display = "none";
+        }
+      });
+
+      // Add click outside handler for block/unblock modal
+      window.addEventListener("click", function(e) {
+        if (e.target === confirmModal) {
+          confirmModal.style.display = "none";
+          confirmModal.removeAttribute('data-productId');
+          confirmModal.removeAttribute('data-newStatus');
+        }
       });
     });
-
-    // Logout Modal Logic
-    const logoutModal = document.getElementById("logout-modal");
-    const confirmLogoutBtn = document.getElementById("confirm-logout");
-    const cancelLogoutBtn = document.getElementById("cancel-logout");
-
-    window.showLogoutModal = function() {
-      logoutModal.style.display = "flex";
-    };
-
-    confirmLogoutBtn.addEventListener("click", function () {
-      logoutModal.style.display = "none";
-      window.location.href = "/tezgrani/logout";
-    });
-
-    cancelLogoutBtn.addEventListener("click", function () {
-      logoutModal.style.display = "none";
-    });
-
-    window.addEventListener("click", function (e) {
-      if (e.target === logoutModal) {
-        logoutModal.style.display = "none";
-      }
-    });
-
-    // Add click outside handler for block/unblock modal
-    window.addEventListener("click", function (e) {
-      if (e.target === confirmModal) {
-        confirmModal.style.display = "none";
-        confirmModal.removeAttribute('data-productId');
-        confirmModal.removeAttribute('data-newStatus');
-      }
-    });
-});
   </script>
 </body>
+
 </html>

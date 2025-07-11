@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment Failed</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+      background-color: #e53e3e;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      background-color: white;
+      border-radius: 16px;
+      padding: 48px 40px;
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+
+    .icon {
+      width: 64px;
+      height: 64px;
+      background-color: #1a1a1a;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px;
+    }
+
+    .icon::after {
+      content: '!';
+      color: white;
+      font-size: 32px;
+      font-weight: bold;
+    }
+
+    h1 {
+      font-size: 32px;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-bottom: 24px;
+      line-height: 1.2;
+    }
+
+    p {
+      font-size: 16px;
+      color: #4a4a4a;
+      line-height: 1.5;
+      margin-bottom: 32px;
+    }
+
+    .update-button {
+      background-color: #1a1a1a;
+      color: white;
+      border: none;
+      padding: 16px 32px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-bottom: 24px;
+    }
+
+    .update-button:hover {
+      background-color: #333;
+      transform: translateY(-1px);
+    }
+
+    .support-text {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 0;
+    }
+
+    .support-link {
+      color: #4285f4;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .support-link:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        padding: 32px 24px;
+      }
+
+      h1 {
+        font-size: 28px;
+      }
+    }
+  </style>
+
+</head>
+
+<body>
+  <div class="container">
+    <div class="icon"></div>
+    <h1>Payment Failed</h1>
+    <p>Your payment could not be processed at this time. Please try again or update your payment method to continue.</p>
+    <button class="update-button">Retry Payment</button>
+    <p class="support-text">Want to view Order History? <a href="#" class="support-link">Order History</a></p>
+  </div>
+</body>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const retryButton = document.querySelector('.update-button');
+    retryButton.addEventListener('click', () => {
+      window.location.href = '/cart/checkout'; 
+    });
+
+    const orderHistoryLink = document.querySelector('.support-link');
+    orderHistoryLink.setAttribute('href', '/order-history'); 
+  });
+</script>
+
+</html>

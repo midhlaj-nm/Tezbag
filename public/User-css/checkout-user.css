@@ -1,52 +1,64 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+body {
+    font-family: 'Poppins', sans-serif;
+}
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-body {
-    font-family: 'Poppins', sans-serif;
-    background-color: #f8f9fa;
-    color: #333;
-}
-
-/* Breadcrumb */
 .breadcrumb {
     display: flex;
     flex-wrap: wrap;
     list-style: none;
-    padding: 1rem 5%;
-    margin: 0;
+    padding: 0;
+    margin: 1rem 0 1rem 3rem;
     background: none;
 }
+
 .breadcrumb-item {
     font-size: 14px;
     color: #6c757d;
     display: flex;
     align-items: center;
+    font-family: 'Poppins', sans-serif;
 }
-.breadcrumb-item + .breadcrumb-item::before {
+
+.breadcrumb-item+.breadcrumb-item::before {
     content: "/";
     color: #adb5bd;
-    margin: 0 8px;
+    font-family: 'Poppins', sans-serif;
 }
+
 .breadcrumb-item a {
+    all: unset;
+    cursor: pointer;
     color: #2f2f2f;
     font-weight: 500;
+    font-family: 'Poppins', sans-serif;
 }
+
 .breadcrumb-item a:hover {
+    color: #000000;
     text-decoration: underline;
+    font-family: 'Poppins', sans-serif;
 }
+
 .breadcrumb-item.active {
     color: #575757;
     font-weight: 500;
+    pointer-events: none;
+    font-family: 'Poppins', sans-serif;
 }
 
-/* Main Container Styling */
 .checkout-container {
-    max-width: 1200px;
+    max-width: 1090px;
     margin: 0 auto;
     padding: 20px;
+    width: 90%;
 }
 
 .checkout-title {
@@ -55,11 +67,11 @@ body {
     font-weight: 600;
     margin-bottom: 2rem;
     color: #333;
+    font-family: 'Poppins', sans-serif;
 }
 
-/* Box styling similar to cart */
-.delivery-section, .order-summary, .coupon-section, .additional-info-section {
-    border: 1px solid #Ccc;
+.delivery-section {
+    border: 1px solid #ddd;
     background: white;
     border-radius: 12px;
     padding: 30px;
@@ -74,68 +86,174 @@ body {
 }
 
 .section-title {
-    font-size: 1.5rem;
-    font-weight: 600;
+    font-size: 2rem;
+    font-weight: 500;
     color: #333;
     margin: 0 0 10px 0;
+    font-family: 'Poppins', sans-serif;
 }
 
-.change-btn {
-    background: #00B207;
-    color: white;
+.add-address-btn {
+    padding: 10px 20px;
     border: none;
-    padding: 8px 16px;
-    border-radius: 6px;
+    border-radius: 25px;
+    font-weight: 600;
+    font-size: 14px;
+    color: white;
+    background-color: #28a745;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Poppins', sans-serif;
+}
+
+.add-address-btn:hover {
+    background-color: #218838;
+}
+
+.addresses-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.address-card {
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    padding: 20px;
+    background-color: #fff;
+    position: relative;
+    cursor: pointer;
+}
+
+.address-card:hover {
+    border-color: #28a745;
+}
+
+.address-card.selected {
+    border-color: #28a745;
+    background-color: #f0fff0;
+}
+
+.default-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background-color: #28a745;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
     font-weight: 500;
-    cursor: pointer;
     font-family: 'Poppins', sans-serif;
 }
 
-.change-btn:hover {
-    background: #009006;
+.address-info h4 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+    font-family: 'Poppins', sans-serif;
 }
 
-.form-group {
-    margin-bottom: 1.5rem;
+.address-info p {
+    color: #666;
+    margin-bottom: 5px;
+    font-size: 14px;
+    line-height: 1.4;
+    font-family: 'Poppins', sans-serif;
 }
 
-.form-control {
-    border: 1px solid #ccc;
+.address-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+}
+
+.action-btn {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
     border-radius: 8px;
-    padding: 1rem;
-    font-size: 1rem;
-    font-family: 'Poppins', sans-serif;
-}
-
-.form-control:focus {
-    border-color: #00B207;
-    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
-}
-
-.form-control::placeholder {
-    color: #999;
-}
-
-.form-select {
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    padding: 10px 1rem 10px 1rem;
-    font-size: 1rem;
-    background-color: white;
+    background-color: #fff;
     cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
     font-family: 'Poppins', sans-serif;
 }
 
-.form-select:focus {
-    border-color: #00B207;
-    box-shadow: 0 0 0 0 rgba(0, 178, 7, 0.25);
+.action-btn:hover {
+    background-color: #f8f9fa;
 }
-/* Coupon Section Styles */
+
+.edit-btn:hover {
+    border-color: #28a745;
+    color: #28a745;
+    font-family: 'Poppins', sans-serif;
+}
+
+.delete-btn:hover {
+    border-color: #dc3545;
+    color: #dc3545;
+    font-family: 'Poppins', sans-serif;
+}
+
+.use-btn {
+    background-color: #00B207;
+    color: #ffffff;
+    font-family: 'Poppins', sans-serif;
+}
+
+.use-btn:hover {
+    background-color: #009006;
+}
+
+.no-address {
+    text-align: center;
+    padding: 40px 20px;
+    color: #666;
+    background-color: #f8f9fa;
+    border-radius: 12px;
+    border: 2px dashed #ddd;
+}
+
+.no-address svg {
+    font-size: 48px;
+    color: #ccc;
+    margin-bottom: 15px;
+}
+
+.no-address h3 {
+    font-size: 18px;
+    margin-bottom: 10px;
+    color: #333;
+    font-family: 'Poppins', sans-serif;
+}
+
+.no-address p {
+    margin-bottom: 20px;
+    font-family: 'Poppins', sans-serif;
+}
+
+.coupon-section {
+    border: 1px solid #ddd;
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
+    margin-bottom: 2rem;
+}
+
 .coupon-list {
     display: flex;
     flex-direction: column;
     gap: 1rem;
 }
+
 .coupon-item {
     border: 1px solid #ccc;
     border-radius: 8px;
@@ -145,26 +263,34 @@ body {
     align-items: center;
     transition: all 0.3s;
 }
+
 .coupon-item:hover {
     border-color: #00B207;
     background-color: #f8fff8;
 }
+
 .coupon-item.selected {
     border-color: #00B207;
     background-color: #f0fff0;
 }
+
 .coupon-details {
     flex: 1;
 }
+
 .coupon-code {
     font-weight: 600;
     color: #333;
     margin-bottom: 0.3rem;
+    font-family: 'Poppins', sans-serif;
 }
+
 .coupon-description {
     color: #666;
     font-size: 0.9rem;
+    font-family: 'Poppins', sans-serif;
 }
+
 .coupon-apply-btn {
     background: #00B207;
     color: white;
@@ -176,38 +302,52 @@ body {
     cursor: pointer;
     font-family: 'Poppins', sans-serif;
 }
+
 .coupon-apply-btn:hover {
     background: #009006;
 }
+
 .coupon-apply-btn:disabled {
     background: #ccc;
     cursor: not-allowed;
 }
-/* Additional Info Section */
+
+.additional-info-section {
+    border: 1px solid #ddd;
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
+    margin-bottom: 2rem;
+}
+
 .additional-info-label {
     font-size: 1rem;
     font-weight: 600;
     color: #333;
     margin-bottom: 0.8rem;
     display: block;
+    font-family: 'Poppins', sans-serif;
 }
+
 .notes-textarea {
     width: 100%;
     border: 1px solid #ccc;
     border-radius: 8px;
     padding: 1rem;
     font-size: 1rem;
-    font-family: 'Poppins', sans-serif;
     resize: vertical;
     min-height: 100px;
+    font-family: 'Poppins', sans-serif;
 }
+
 .notes-textarea:focus {
     border-color: #00B207;
-    box-shadow: 0 0 0 0 rgba(0, 178, 7, 0.25);
     outline: none;
 }
+
 .notes-textarea::placeholder {
     color: #999;
+    font-family: 'Poppins', sans-serif;
 }
 
 .payment-methods {
@@ -225,6 +365,7 @@ body {
     display: flex;
     align-items: center;
     gap: 0.6rem;
+    font-family: 'Poppins', sans-serif;
 }
 
 .payment-option:hover {
@@ -235,6 +376,19 @@ body {
 .payment-option.selected {
     border-color: #00B207;
     background-color: #f0fff0;
+}
+
+.payment-option.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background-color: #f8f9fa;
+    border-color: #ddd;
+    font-family: 'Poppins', sans-serif;
+}
+
+.payment-option.disabled:hover {
+    border-color: #ddd;
+    background-color: #f8f9fa;
 }
 
 .payment-radio {
@@ -249,6 +403,10 @@ body {
     height: fit-content;
     position: sticky;
     top: 2rem;
+    border: 1px solid #ddd;
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
 }
 
 .summary-item {
@@ -278,16 +436,19 @@ body {
     font-weight: 600;
     color: #333;
     margin-bottom: 0.3rem;
+    font-family: 'Poppins', sans-serif;
 }
 
 .item-quantity {
     color: #999;
     font-size: 0.85rem;
+    font-family: 'Poppins', sans-serif;
 }
 
 .item-total {
     font-weight: 600;
     color: #00B207;
+    font-family: 'Poppins', sans-serif;
 }
 
 .summary-totals {
@@ -300,6 +461,7 @@ body {
     display: flex;
     justify-content: space-between;
     margin-bottom: 0.8rem;
+    font-family: 'Poppins', sans-serif;
 }
 
 .total-row.final {
@@ -309,14 +471,15 @@ body {
     border-top: 1px solid #eee;
     padding-top: 0.8rem;
     margin-top: 1rem;
+    font-family: 'Poppins', sans-serif;
 }
 
 .shipping-free {
     color: #00B207;
     font-weight: 600;
+    font-family: 'Poppins', sans-serif;
 }
 
-/* Payment Method in Order Summary */
 .payment-method-section {
     margin-top: 1.5rem;
     padding-top: 1.5rem;
@@ -328,6 +491,7 @@ body {
     font-weight: 600;
     color: #333;
     margin-bottom: 1rem;
+    font-family: 'Poppins', sans-serif;
 }
 
 .place-order-btn {
@@ -355,217 +519,122 @@ body {
     transform: none;
 }
 
+.modal-backdrop {
+    background-color: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.modal-backdrop.show {
+    opacity: 1;
+}
+
 /* Modal Styles */
 .modal {
     display: none;
     position: fixed;
-    z-index: 1000;
-    left: 0;
     top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0,0,0,0.5);
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
 }
 
-.modal-content {
+.modaal-content {
+    font-family: 'Poppins', sans-serif;
     background-color: white;
-    margin: 3% auto;
-    border-radius: 12px;
-    width: 90%;
-    max-width: 600px;
-    max-height: 90vh;
-    display: flex;
-    flex-direction: column;
-    border: 1px solid #Ccc;
-}
-/* Address Selection and Add Address Modal Specific Styles */
-#address-modal .modal-content,
-#add-address-modal .modal-content {
-    height: 90vh;
-}
-/* Modal Header */
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem 2rem;
-    border-bottom: 1px solid #ccc;
-    background-color: #fff;
-    flex-shrink: 0;
-}
-
-#address-modal .modal-header,
-#add-address-modal .modal-header {
-    position: sticky;
-    top: 0;
-    z-index: 1;
-}
-.modal-header h3 {
-    margin: 0;
-    color: #333;
-}
-
-.close-btn {
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-    color: #666;
-    padding: 0;
-    width: 30px;
-    height: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.close-btn:hover {
-    color: #333;
-}
-/* Modal Body */
-.modal-body {
-    flex: 1;
-    overflow-y: auto;
-    padding: 2rem;
-}
-
-.saved-address {
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    padding: 1.5rem;
-    margin-bottom: 1rem;
-    cursor: pointer;
-    position: relative;
-}
-
-.saved-address:hover {
-    border-color: #00B207;
-    background-color: #f8fff8;
-}
-
-.saved-address.selected {
-    border-color: #00B207;
-    background-color: #f0fff0;
-}
-
-.address-header {
-    font-weight: 600;
-    color: #333;
-    margin-bottom: 0.5rem;
-}
-
-.address-details {
-    color: #666;
-    line-height: 1.4;
-}
-
-.deliver-btn {
-    position: absolute;
-    top: 50%;
-    right: 1.5rem;
-    transform: translateY(-50%);
-    background: #00B207;
-    color: white;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 6px;
-    font-size: 0.9rem;
-    transition: background 0.3s;
-    font-family: 'Poppins', sans-serif;
-}
-
-.deliver-btn:hover {
-    background: #009006;
-}
-/* Modal Footer */
-.modal-footer {
-    padding: 1rem 2rem;
-    border-top: 1px solid #ccc;
-    background-color: #fff;
-    flex-shrink: 0;
-}
-#address-modal .modal-footer,
-#add-address-modal .modal-footer {
-    position: sticky;
-    bottom: 0;
-    z-index: 1;
-    display: flex;
-    justify-content: flex-end;
-    gap: 1rem;
-}
-
-.add-address-btn {
-    border: 1px solid #00B207;
-    background: #00B207;
-    color: #ffffff;
-    padding: 0.5rem 1rem;
-    border-radius: 8px;
-    font-size: 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    font-family: 'Poppins', sans-serif;
-}
-
-.add-address-btn:hover {
-    background: #f0fff0;
+    padding: 30px;
+    border-radius: 10px;
+    text-align: center;
+    width: 30%;
+    max-width: 400px;
+    pointer-events: auto;
+    background-clip: padding-box;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 0.3rem;
+    outline: 0;
 }
 
 .modal-buttons {
     display: flex;
-    gap: 1rem;
     justify-content: center;
-}
-
-.btn-no, .btn-yes {
-    padding: 0.8rem 2rem;
-    border: none;
-    border-radius: 6px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s;
-    font-family: 'Poppins', sans-serif;
+    gap: 20px;
+    margin-top: 20px;
 }
 
 .btn-no {
-    background: #6c757d;
+    font-family: 'Poppins', sans-serif;
+    background-color: #ff0000;
     color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 20px;
+    cursor: pointer;
 }
 
 .btn-no:hover {
-    background: #5a6268;
+    background-color: #cc0000;
 }
 
 .btn-yes {
-    background: #00B207;
+    font-family: 'Poppins', sans-serif;
+    background-color: #00B207;
     color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 20px;
+    cursor: pointer;
 }
 
 .btn-yes:hover {
-    background: #009006;
+    background-color: #009006;
+}
+
+/* New loading overlay styles */
+.loading-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+}
+
+.loading-spinner {
+    border: 8px solid #f3f3f3;
+    border-top: 8px solid #00B207;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 @media (max-width: 768px) {
-    .header .container {
-        flex-direction: column;
-        gap: 1rem;
-        text-align: center;
-    }
-    
-    .nav-links {
-        gap: 1rem;
-    }
-    
     .checkout-container {
         padding: 10px;
     }
-    
+
     .checkout-title {
         font-size: 1.5rem;
+        font-family: 'Poppins', sans-serif;
     }
-    
+
     .delivery-section,
     .order-summary,
     .coupon-section,
@@ -573,42 +642,87 @@ body {
         margin-bottom: 1rem;
         padding: 20px;
     }
-    
+
     .section-header {
         flex-direction: column;
         align-items: flex-start;
         gap: 10px;
     }
-    
-    .saved-address {
-        padding: 1rem;
-    }
-    
-    .deliver-btn {
-        position: static;
-        transform: none;
-        margin-top: 1rem;
-        width: 100%;
-    }
-    
+
     .order-summary {
         position: static;
     }
-    
-    .modal-content {
-        margin: 10% auto;
-        width: 95%;
-    }
-    #address-modal .modal-content,
-    #add-address-modal .modal-content {
-        height: 90vh;
-    }
+
     .coupon-item {
         flex-direction: column;
         align-items: flex-start;
         gap: 0.5rem;
     }
+
     .coupon-apply-btn {
         width: 100%;
+        font-family: 'Poppins', sans-serif;
     }
+
+    .addresses-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .place-order-btn {
+        margin-top: 1rem;
+        padding: 0.8rem;
+    }
+}
+
+/* Address Modal Specific Styles */
+#addressModal .modal-dialog {
+  max-width: 600px;
+  margin: 1.75rem auto;
+}
+
+#addressModal .modal-content {
+  border-radius: 8px;
+  border: none;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+#addressModal .modal-header {
+  border-bottom: 1px solid #dee2e6;
+  padding: 1rem 1.5rem;
+}
+
+#addressModal .modal-body {
+  padding: 1.5rem;
+}
+
+#addressModal .form-group {
+  margin-bottom: 1rem;
+}
+
+#addressModal .form-control {
+  border-radius: 4px;
+  border: 1px solid #ced4da;
+  padding: 0.5rem 0.75rem;
+  height: auto;
+}
+
+#addressModal .form-label {
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+#addressModal .btn-close {
+  opacity: 1;
+  padding: 1rem;
+}
+
+#addressModal.show {
+  display: block;
+  background-color: rgba(0,0,0,0.5);
+}
+
+#addressModal .modal-title {
+  font-size: 1.25rem;
+  font-weight: 600;
 }

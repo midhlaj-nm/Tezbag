@@ -2,7 +2,7 @@ const User = require('../../models/userSchema');
 const Admin = require('../../models/adminSchema');
 const Order = require('../../models/orderSchema')
 const nodemailer = require('nodemailer');
-const env = require('dotenv').config();
+require('dotenv').config();
 const bcrypt = require('bcrypt');
 
 // Render login page
@@ -224,7 +224,7 @@ const loadDashboard = async (req, res) => {
   
       const admin = await Admin.findById(req.session.admin);
       console.log("Got it",admin)
-      const name = admin?.f_Name || 'Admin';
+      const name = admin?.f_Name;
       console.log(name)
       console.log(req.session)
       console.log(req.session.admin)

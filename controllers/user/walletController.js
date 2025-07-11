@@ -20,7 +20,7 @@ const loadWallet = async (req, res) => {
     };
 
     // Fetch wallet with pagination
-    const wallet = await Wallet.findOne({ user: userId }).lean();
+    const wallet = await Wallet.findOne({ user: userId }).lean().sort({date: -1});
     let transactions = [];
 
     if (wallet && wallet.transactions.length > 0) {
@@ -29,6 +29,7 @@ const loadWallet = async (req, res) => {
         (transaction.amount && transaction.amount.toString().includes(searchQuery)) ||
         (transaction.reason && transaction.reason.toLowerCase().includes(searchQuery.toLowerCase()))
       );
+      transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
     }
 
     const startIndex = (page - 1) * limit;

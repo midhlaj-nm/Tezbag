@@ -5,6 +5,7 @@ const userManageController = require('../controllers/admin/userManageController'
 const categoryManageController = require('../controllers/admin/categoryManageController');
 const productManagementController = require('../controllers/admin/productManagementController');
 const dealsManageController = require('../controllers/admin/dealsManageController');
+const orderController = require('../controllers/admin/orderController')
 const adminAuth = require('../middlewares/adminAuth');
 const upload = require('../middlewares/multer')
 
@@ -41,6 +42,9 @@ router.get('/deals-management', adminAuth, dealsManageController.loadDeals);
 router.post('/deals/save', adminAuth, dealsManageController.saveDeals);
 router.patch('/deals/edit/:dealId', adminAuth, dealsManageController.editDeals)
 router.delete('/deals/delete/:dealId', adminAuth, dealsManageController.deleteDeal)
+
+//orderController
+router.get('/order-management', orderController.loadOrder)
 
 
 module.exports = router;

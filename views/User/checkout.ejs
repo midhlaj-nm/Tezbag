@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-  <link rel="stylesheet" href="/User-css/settings.css">
+  <link rel="stylesheet" href="/User-css/checkout-user.css">
   <%- include("../../views/Partials/user/header-ho") %>
   <hr style="margin: 0rem 0rem 1rem 0rem; background-color: #535353;">
   <meta charset="UTF-8">
@@ -16,847 +16,267 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.13/lottie.min.js"></script>
-  <style>
-    /* Existing styles remain unchanged, adding new loading overlay styles */
-    .confirmation-dialog {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.5);
-      z-index: 1000;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .dialog-content {
-      background-color: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      text-align: center;
-      width: 90%;
-      max-width: 400px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    }
-
-    .dialog-content h3 {
-      margin-bottom: 20px;
-      color: #333;
-      font-weight: 600;
-    }
-
-    .dialog-buttons {
-      display: flex;
-      justify-content: center;
-      gap: 15px;
-    }
-
-    .btn-no,
-    .btn-yes {
-      padding: 10px 20px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-weight: 500;
-    }
-
-    .btn-no {
-      background-color: #dc3545;
-      color: white;
-    }
-
-    .btn-no:hover {
-      background-color: #c82333;
-    }
-
-    .btn-yes {
-      background-color: #28a745;
-      color: white;
-    }
-
-    .btn-yes:hover {
-      background-color: #218838;
-    }
-
-    /* Existing styles remain unchanged */
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
-
-    body {
-      font-family: 'Poppins', sans-serif;
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    .breadcrumb {
-      display: flex;
-      flex-wrap: wrap;
-      list-style: none;
-      padding: 0;
-      margin: 1rem 0 1rem 3rem;
-      background: none;
-    }
-
-    .breadcrumb-item {
-      font-size: 14px;
-      color: #6c757d;
-      display: flex;
-      align-items: center;
-    }
-
-    .breadcrumb-item+.breadcrumb-item::before {
-      content: "/";
-      color: #adb5bd;
-    }
-
-    .breadcrumb-item a {
-      all: unset;
-      cursor: pointer;
-      color: #2f2f2f;
-      font-weight: 500;
-    }
-
-    .breadcrumb-item a:hover {
-      color: #000000;
-      text-decoration: underline;
-    }
-
-    .breadcrumb-item.active {
-      color: #575757;
-      font-weight: 500;
-      pointer-events: none;
-    }
-
-    .checkout-container {
-      max-width: 1090px;
-      margin: 0 auto;
-      padding: 20px;
-      width: 90%;
-    }
-
-    .checkout-title {
-      text-align: center;
-      font-size: 2rem;
-      font-weight: 600;
-      margin-bottom: 2rem;
-      color: #333;
-    }
-
-    .delivery-section {
-      border: 1px solid #ddd;
-      background: white;
-      border-radius: 12px;
-      padding: 30px;
-      margin-bottom: 2rem;
-    }
-
-    .section-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1.5rem;
-    }
-
-    .section-title {
-      font-size: 2rem;
-      font-weight: 500;
-      color: #333;
-      margin: 0 0 10px 0;
-    }
-
-    .add-address-btn {
-      padding: 10px 20px;
-      border: none;
-      border-radius: 25px;
-      font-weight: 600;
-      font-size: 14px;
-      color: white;
-      background-color: #28a745;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .add-address-btn:hover {
-      background-color: #218838;
-    }
-
-    .addresses-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 20px;
-      margin-top: 20px;
-    }
-
-    .address-card {
-      border: 1px solid #ddd;
-      border-radius: 12px;
-      padding: 20px;
-      background-color: #fff;
-      position: relative;
-      cursor: pointer;
-    }
-
-    .address-card:hover {
-      border-color: #28a745;
-    }
-
-    .address-card.selected {
-      border-color: #28a745;
-      background-color: #f0fff0;
-    }
-
-    .default-badge {
-      position: absolute;
-      top: 15px;
-      right: 15px;
-      background-color: #28a745;
-      color: white;
-      padding: 4px 8px;
-      border-radius: 12px;
-      font-size: 12px;
-      font-weight: 500;
-    }
-
-    .address-info h4 {
-      font-size: 16px;
-      font-weight: 600;
-      color: #333;
-      margin-bottom: 8px;
-    }
-
-    .address-info p {
-      color: #666;
-      margin-bottom: 5px;
-      font-size: 14px;
-      line-height: 1.4;
-    }
-
-    .address-actions {
-      display: flex;
-      gap: 10px;
-      margin-top: 15px;
-      padding-top: 15px;
-      border-top: 1px solid #eee;
-    }
-
-    .action-btn {
-      padding: 8px 12px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      background-color: #fff;
-      cursor: pointer;
-      font-size: 14px;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-
-    .action-btn:hover {
-      background-color: #f8f9fa;
-    }
-
-    .edit-btn:hover {
-      border-color: #28a745;
-      color: #28a745;
-    }
-
-    .delete-btn:hover {
-      border-color: #dc3545;
-      color: #dc3545;
-    }
-
-    .use-btn {
-      background-color: #00B207;
-      color: #ffffff;
-    }
-
-    .use-btn:hover {
-      background-color: #009006;
-    }
-
-    .no-address {
-      text-align: center;
-      padding: 40px 20px;
-      color: #666;
-      background-color: #f8f9fa;
-      border-radius: 12px;
-      border: 2px dashed #ddd;
-    }
-
-    .no-address svg {
-      font-size: 48px;
-      color: #ccc;
-      margin-bottom: 15px;
-    }
-
-    .no-address h3 {
-      font-size: 18px;
-      margin-bottom: 10px;
-      color: #333;
-    }
-
-    .no-address p {
-      margin-bottom: 20px;
-    }
-
-    .coupon-section {
-      border: 1px solid #ddd;
-      background: white;
-      border-radius: 12px;
-      padding: 30px;
-      margin-bottom: 2rem;
-    }
-
-    .coupon-list {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-
-    .coupon-item {
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      padding: 1rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      transition: all 0.3s;
-    }
-
-    .coupon-item:hover {
-      border-color: #00B207;
-      background-color: #f8fff8;
-    }
-
-    .coupon-item.selected {
-      border-color: #00B207;
-      background-color: #f0fff0;
-    }
-
-    .coupon-details {
-      flex: 1;
-    }
-
-    .coupon-code {
-      font-weight: 600;
-      color: #333;
-      margin-bottom: 0.3rem;
-    }
-
-    .coupon-description {
-      color: #666;
-      font-size: 0.9rem;
-    }
-
-    .coupon-apply-btn {
-      background: #00B207;
-      color: white;
-      border: none;
-      padding: 0.5rem 1rem;
-      border-radius: 6px;
-      font-size: 0.9rem;
-      font-weight: 500;
-      cursor: pointer;
-    }
-
-    .coupon-apply-btn:hover {
-      background: #009006;
-    }
-
-    .coupon-apply-btn:disabled {
-      background: #ccc;
-      cursor: not-allowed;
-    }
-
-    .additional-info-section {
-      border: 1px solid #ddd;
-      background: white;
-      border-radius: 12px;
-      padding: 30px;
-      margin-bottom: 2rem;
-    }
-
-    .additional-info-label {
-      font-size: 1rem;
-      font-weight: 600;
-      color: #333;
-      margin-bottom: 0.8rem;
-      display: block;
-    }
-
-    .notes-textarea {
-      width: 100%;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      padding: 1rem;
-      font-size: 1rem;
-      resize: vertical;
-      min-height: 100px;
-    }
-
-    .notes-textarea:focus {
-      border-color: #00B207;
-      outline: none;
-    }
-
-    .notes-textarea::placeholder {
-      color: #999;
-    }
-
-    .payment-methods {
-      display: grid;
-      gap: 0.8rem;
-      margin-top: 1rem;
-    }
-
-    .payment-option {
-      border: 2px solid #e9ecef;
-      border-radius: 8px;
-      padding: 0.8rem;
-      cursor: pointer;
-      transition: all 0.3s;
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-    }
-
-    .payment-option:hover {
-      border-color: #00B207;
-      background-color: #f8fff8;
-    }
-
-    .payment-option.selected {
-      border-color: #00B207;
-      background-color: #f0fff0;
-    }
-
-    .payment-option.disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      background-color: #f8f9fa;
-      border-color: #ddd;
-    }
-
-    .payment-option.disabled:hover {
-      border-color: #ddd;
-      background-color: #f8f9fa;
-    }
-
-    .payment-radio {
-      margin-right: 0.3rem;
-    }
-
-    .payment-icon {
-      font-size: 1.2rem;
-    }
-
-    .order-summary {
-      height: fit-content;
-      position: sticky;
-      top: 2rem;
-      border: 1px solid #ddd;
-      background: white;
-      border-radius: 12px;
-      padding: 30px;
-    }
-
-    .summary-item {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      padding: 1rem 0;
-      border-bottom: 1px solid #eee;
-    }
-
-    .summary-item:last-child {
-      border-bottom: none;
-    }
-
-    .item-image {
-      width: 60px;
-      height: 60px;
-      object-fit: cover;
-      border-radius: 8px;
-    }
-
-    .item-details {
-      flex: 1;
-    }
-
-    .item-name {
-      font-weight: 600;
-      color: #333;
-      margin-bottom: 0.3rem;
-    }
-
-    .item-quantity {
-      color: #999;
-      font-size: 0.85rem;
-    }
-
-    .item-total {
-      font-weight: 600;
-      color: #00B207;
-    }
-
-    .summary-totals {
-      margin-top: 1.5rem;
-      padding-top: 1.5rem;
-      border-top: 2px solid #eee;
-    }
-
-    .total-row {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 0.8rem;
-    }
-
-    .total-row.final {
-      font-weight: 700;
-      font-size: 1.1rem;
-      color: #333;
-      border-top: 1px solid #eee;
-      padding-top: 0.8rem;
-      margin-top: 1rem;
-    }
-
-    .shipping-free {
-      color: #00B207;
-      font-weight: 600;
-    }
-
-    .payment-method-section {
-      margin-top: 1.5rem;
-      padding-top: 1.5rem;
-      border-top: 2px solid #eee;
-    }
-
-    .payment-method-title {
-      font-size: 1.1rem;
-      font-weight: 600;
-      color: #333;
-      margin-bottom: 1rem;
-    }
-
-    .place-order-btn {
-      width: 100%;
-      background: #00B207;
-      color: white;
-      border: none;
-      padding: 1rem;
-      border-radius: 8px;
-      font-size: 1.1rem;
-      font-weight: 600;
-      margin-top: 1.5rem;
-      transition: all 0.3s;
-    }
-
-    .place-order-btn:hover {
-      background: #009006;
-      transform: translateY(-2px);
-    }
-
-    .place-order-btn:disabled {
-      background: #ccc;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    .modal-backdrop {
-      background-color: rgba(0, 0, 0, 0.5);
-      opacity: 0;
-      transition: opacity 0.3s ease-in-out;
-    }
-
-    .modal-backdrop.show {
-      opacity: 1;
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+<style>
+  #toast-container>.toast {
+    opacity: 1;
+  }
+
+  .toast-success {
+    background-color: #4CAF50;
+  }
+
+  .toast-error {
+    background-color: #e92e20;
+  }
+
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1055;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+
+  .modal.show {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-dialog {
+    position: relative;
+    width: auto;
+    margin: 0 auto;
+    max-width: 600px;
+    pointer-events: none;
+  }
+
+  .modal-content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    pointer-events: auto;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid rgba(0, 0, 0, .125);
+    border-radius: 0.5rem;
+    outline: 0;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, .15);
+  }
+
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1rem;
+    border-bottom: 1px solid #dee2e6;
+    border-top-left-radius: calc(0.5rem - 1px);
+    border-top-right-radius: calc(0.5rem - 1px);
+  }
+
+  .modal-title {
+    margin: 0;
+    line-height: 1.5;
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+
+  .close-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #000;
+    opacity: 0.5;
+    line-height: 1;
+    padding: 0;
+    width: 1em;
+    height: 1em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .close-btn:hover {
+    opacity: 0.75;
+  }
+
+  .modal-body {
+    position: relative;
+    flex: 1 1 auto;
+    padding: 1rem;
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+
+  .modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    border-top: 1px solid #dee2e6;
+    border-bottom-right-radius: calc(0.5rem - 1px);
+    border-bottom-left-radius: calc(0.5rem - 1px);
+  }
+
+  .form-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .input-wrapper {
+    flex: 1;
+    min-width: 200px;
+  }
+
+  .input-wrapper.full-width {
+    flex: 1 1 100%;
+  }
+
+  .input-wrapper label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: #333;
+  }
+
+  .input-wrapper input,
+  .input-wrapper select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ced4da;
+    border-radius: 0.375rem;
+    font-size: 1rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  }
+
+  .input-wrapper input:focus,
+  .input-wrapper select:focus {
+    border-color: #28a745;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+  }
+
+  .optional {
+    color: #6c757d;
+    font-weight: 400;
+  }
+
+  .errr-msg {
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+    display: none;
+  }
+
+  .errr-msg.show {
+    display: block;
+  }
+
+  .default-checkbox-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .default-checkbox-wrapper input[type="checkbox"] {
+    width: 1.125rem;
+    height: 1.125rem;
+    accent-color: #28a745;
+  }
+
+  .default-checkbox-wrapper label {
+    margin: 0;
+    font-size: 0.875rem;
+    cursor: pointer;
+  }
+
+  .btn {
+    display: inline-block;
+    font-weight: 400;
+    text-align: center;
+    vertical-align: middle;
+    cursor: pointer;
+    border: 1px solid transparent;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    border-radius: 0.375rem;
+    transition: all 0.15s ease-in-out;
+    text-decoration: none;
+  }
+
+  .btn-success {
+    color: #fff;
+    background-color: #28a745;
+    border-color: #28a745;
+  }
+
+  .btn-success:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+  }
+
+  .btn-secondary {
+    color: #fff;
+    background-color: #6c757d;
+    border-color: #6c757d;
+  }
+
+  .btn-secondary:hover {
+    background-color: #5a6268;
+    border-color: #545b62;
+  }
+
+  .demo-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+
+  .demo-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin: 10px;
+  }
+
+  .demo-button:hover {
+    background-color: #0056b3;
+  }
+
+  .errr-msg {
+    color: red;
+    font-size: 0.9rem;
+    display: none;
+    margin-top: 5px;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  @media (max-width: 768px) {
+    .modal-dialog {
+      margin: 1rem;
+      max-width: calc(100% - 2rem);
     }
 
     .modal-content {
-      background-color: #fff;
-      border-radius: 12px;
-      border: 1px solid #ddd;
       width: 100%;
-      max-width: 600px;
-      height: auto;
-      max-height: 90vh;
-      margin: 3% auto;
-      z-index: 1001;
-      display: flex;
-      flex-direction: column;
     }
-
-    .modal-header {
-      background-color: #fff;
-      border-bottom: 1px solid #dee2e6;
-      padding: 20px 25px;
-      flex-shrink: 0;
-    }
-
-    .modal-header h3 {
-      margin: 0;
-      color: #333;
-      font-weight: 600;
-      font-size: 1.25rem;
-    }
-
-    .close-btn {
-      background: none;
-      border: none;
-      font-size: 20px;
-      cursor: pointer;
-      color: #666;
-      transition: color 0.2s ease;
-    }
-
-    .close-btn:hover {
-      color: #333;
-    }
-
-    .modal-body {
-      flex: 1;
-      overflow-y: auto;
-      padding: 25px;
-    }
-
-    .saved-address {
-      border: 1px solid #ddd;
-      border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 1rem;
-      cursor: pointer;
-      position: relative;
-      transition: all 0.3s;
-    }
-
-    .saved-address:hover {
-      border-color: #28a745;
-    }
-
-    .saved-address.selected {
-      border-color: #28a745;
-      background-color: #f0fff0;
-    }
-
-    .address-header {
-      font-weight: 600;
-      color: #333;
-      margin-bottom: 0.5rem;
-    }
-
-    .address-details {
-      color: #666;
-      line-height: 1.4;
-    }
-
-    .deliver-btn {
-      position: absolute;
-      top: 50%;
-      right: 1.5rem;
-      transform: translateY(-50%);
-      background: #00B207;
-      color: white;
-      border: none;
-      padding: 0.5rem 1rem;
-      border-radius: 6px;
-      font-size: 0.9rem;
-      transition: background 0.3s;
-    }
-
-    .deliver-btn:hover {
-      background: #009006;
-    }
-
-    .modal-footer {
-      border-top: 1px solid #dee2e6;
-      padding: 20px 25px;
-      background-color: #fff;
-      flex-shrink: 0;
-    }
-
-    .default-checkbox-wrapper {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin: 1rem 0;
-    }
-
-    .default-checkbox-wrapper input[type="checkbox"] {
-      width: 18px;
-      height: 18px;
-      accent-color: #28a745;
-      cursor: pointer;
-    }
-
-    .default-checkbox-wrapper label {
-      font-size: 14px;
-      font-weight: 500;
-      color: #333;
-      cursor: pointer;
-      margin: 0;
-    }
-
-    .form-group {
-      margin-bottom: 1.5rem;
-    }
-
-    .input-wrapper {
-      flex: 1;
-      margin-right: 1rem;
-    }
-
-    .input-wrapper.full-width {
-      margin-right: 0;
-    }
-
-    .input-wrapper label {
-      display: block;
-      font-weight: 500;
-      margin-bottom: 0.5rem;
-      color: #333;
-    }
-
-    .input-wrapper input,
-    .input-wrapper select {
-      width: 100%;
-      padding: 0.75rem;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 1rem;
-    }
-
-    .input-wrapper input:focus,
-    .input-wrapper select:focus {
-      border-color: #28a745;
-      outline: none;
-    }
-
-    .optional {
-      color: #666;
-      font-weight: 400;
-    }
-
-    .errr-msg {
-      color: red;
-      font-size: 0.9rem;
-      display: none;
-      margin-top: 5px;
-    }
-
-    /* New loading overlay styles */
-    .loading-overlay {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.5);
-      z-index: 2000;
-      /* Above other modals */
-      justify-content: center;
-      align-items: center;
-    }
-
-    .loading-spinner {
-      border: 8px solid #f3f3f3;
-      border-top: 8px solid #00B207;
-      border-radius: 50%;
-      width: 60px;
-      height: 60px;
-      animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-      0% {
-        transform: rotate(0deg);
-      }
-
-      100% {
-        transform: rotate(360deg);
-      }
-    }
-
-    @media (max-width: 768px) {
-      .checkout-container {
-        padding: 10px;
-      }
-
-      .checkout-title {
-        font-size: 1.5rem;
-      }
-
-      .delivery-section,
-      .order-summary,
-      .coupon-section,
-      .additional-info-section {
-        margin-bottom: 1rem;
-        padding: 20px;
-      }
-
-      .section-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
-      }
-
-      .saved-address {
-        padding: 1rem;
-      }
-
-      .deliver-btn {
-        position: static;
-        transform: none;
-        margin-top: 1rem;
-        width: 100%;
-      }
-
-      .order-summary {
-        position: static;
-      }
-
-      .modal-content {
-        margin: 10% auto;
-        width: 95%;
-        max-height: 85vh;
-      }
-
-      .coupon-item {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.5rem;
-      }
-
-      .coupon-apply-btn {
-        width: 100%;
-      }
-
-      .addresses-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .form-group {
-        flex-direction: column;
-      }
-
-      .input-wrapper {
-        margin-right: 0;
-        margin-bottom: 1rem;
-      }
-
-      .confirmation-dialog .dialog-content {
-        max-width: 300px;
-      }
-    }
-  </style>
-</head>
+  }
+</style>
 
 <body>
   <nav aria-label="breadcrumb">
@@ -903,7 +323,7 @@
                 <button class="action-btn edit-btn" onclick="editAddress('<%= index %>')">
                   <span class="material-symbols-outlined">edit</span>
                 </button>
-                <button class="action-btn delete-btn" onclick="showConfirmModal('<%= index %>', 'delete')">
+                <button class="action-btn delete-btn" onclick="showOrderConfirmModal('<%= index %>', 'delete')">
                   <span class="material-symbols-outlined">delete</span>
                 </button>
                 <button class="action-btn use-btn" onclick="selectAddress('<%= index %>')">
@@ -1010,7 +430,7 @@
             </div>
           </div>
 
-          <button class="place-order-btn" onclick="showConfirmModal(null, 'order')">Place Order</button>
+          <button class="place-order-btn" onclick="showOrderConfirmModal(null, 'order')">Place Order</button>
         </div>
       </div>
     </div>
@@ -1117,19 +537,18 @@
     </div>
   </div>
 
-  <div id="confirm-modal" class="confirmation-dialog" style="display:none;">
-    <div class="dialog-content">
+  <div id="order-confirm-modal" class="modal" style="display:none;">
+    <div class="modaal-content">
       <h3>Are you sure?</h3>
-      <div class="dialog-buttons">
-        <button id="cancel-action" class="btn-no">NO</button>
-        <button id="confirm-action" class="btn-yes">YES</button>
+      <div class="modal-buttons">
+        <button id="order-cancel" class="btn-no">NO</button>
+        <button id="order-confirm" class="btn-yes">YES</button>
       </div>
     </div>
   </div>
 
   <div id="order-success-animation" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgb(255, 255, 255); z-index: 1000;"></div>
 
-  <!-- New loading overlay -->
   <div id="loading-overlay" class="loading-overlay">
     <div class="loading-spinner"></div>
   </div>
@@ -1159,17 +578,16 @@
       });
     });
 
-    // Check wallet balance and enable/disable wallet option
     function checkWalletBalance() {
       const walletOption = document.querySelector('.payment-option[data-payment="wallet"]');
       const walletRadio = walletOption.querySelector('.payment-radio');
       if (walletBalance >= currentTotal) {
         walletOption.classList.remove('disabled');
-        walletOption.style.pointerEvents = 'auto'; // Enable clickability
+        walletOption.style.pointerEvents = 'auto';
         walletRadio.disabled = false;
       } else {
         walletOption.classList.add('disabled');
-        walletOption.style.pointerEvents = 'none'; // Disable clickability
+        walletOption.style.pointerEvents = 'none';
         walletRadio.disabled = true;
         if (walletOption.classList.contains('selected')) {
           document.querySelector('.payment-option[data-payment="cod"]').classList.add('selected');
@@ -1205,16 +623,13 @@
       const applyButton = couponItem.querySelector('.coupon-apply-btn');
       applyButton.textContent = 'Remove';
       applyButton.onclick = () => removeCoupon(couponCode);
-      appliedCoupon = {
-        code: couponCode,
-        offerPrice
-      };
+      appliedCoupon = { code: couponCode, offerPrice };
 
       currentTotal -= offerPrice;
       if (currentTotal < 0) currentTotal = 0;
       updateTotals();
       addCouponRow(couponCode, offerPrice);
-      checkWalletBalance(); // Recheck wallet balance after coupon application
+      checkWalletBalance();
       toastr.success(`Coupon ${couponCode} applied successfully! You saved ${offerPrice}₹.`);
     }
 
@@ -1233,7 +648,7 @@
         appliedCoupon = null;
         removeCouponRow();
         updateTotals();
-        checkWalletBalance(); // Recheck wallet balance after coupon removal
+        checkWalletBalance();
         toastr.success(`Coupon ${couponCode} removed successfully!`);
       }
     }
@@ -1256,20 +671,13 @@
     function updateTotals() {
       document.getElementById('subtotal').textContent = `${currentSubtotal.toFixed(2)}₹`;
       document.getElementById('finalTotal').textContent = `${currentTotal.toFixed(2)}₹`;
-      checkWalletBalance(); // Recheck wallet balance after updating totals
+      checkWalletBalance();
     }
 
     function openAddressModal(index = null) {
-      console.log('Opening modal with index:', index);
       const modalElement = document.getElementById('addressModal');
-      if (!modalElement) {
-        console.error('Modal element not found!');
-        return;
-      }
-      const modal = new bootstrap.Modal(modalElement, {
-        backdrop: true,
-        keyboard: true
-      });
+      if (!modalElement) return;
+      const modal = new bootstrap.Modal(modalElement, { backdrop: true, keyboard: true });
       const modalTitle = document.getElementById('addressModalLabel');
       const makeDefaultCheckbox = document.getElementById('makeDefaultCheckbox');
       const editIndexInput = document.getElementById('editIndex');
@@ -1303,18 +711,22 @@
       openAddressModal(index);
     }
 
-    function showConfirmModal(index, action) {
+    function showOrderConfirmModal(index = null, action = 'order') {
       currentDeleteIndex = index;
-      const modal = document.getElementById('confirm-modal');
-      modal.style.display = 'block';
-      modal.dataset.action = action;
+      const modal = document.getElementById('order-confirm-modal');
+      if (modal) {
+        modal.style.display = 'flex';
+        modal.dataset.action = action;
+      }
     }
 
-    function closeConfirmModal() {
-      const modal = document.getElementById('confirm-modal');
-      modal.style.display = 'none';
-      currentDeleteIndex = null;
-      modal.dataset.action = '';
+    function closeOrderConfirmModal() {
+      const modal = document.getElementById('order-confirm-modal');
+      if (modal) {
+        modal.style.display = 'none';
+        modal.dataset.action = '';
+        currentDeleteIndex = null;
+      }
     }
 
     function deleteAddress() {
@@ -1325,9 +737,7 @@
             'Content-Type': 'application/json',
             'Accept': 'application/json'
           },
-          body: JSON.stringify({
-            index: currentDeleteIndex
-          })
+          body: JSON.stringify({ index: currentDeleteIndex })
         })
         .then(response => response.json())
         .then(data => {
@@ -1338,7 +748,84 @@
             toastr.error(data.message || 'Failed to delete address');
           }
         })
-        .catch(() => toastr.error('An error occurred while deleting the address'));
+        .catch(error => {
+          toastr.error('An error occurred while deleting the address');
+        });
+    }
+
+    function initiateRazorpayPayment(orderId, amount, razorpayKey, razorpayOrderId) {
+      const options = {
+        key: razorpayKey,
+        amount: amount * 100,
+        currency: 'INR',
+        name: 'TezBag',
+        description: 'Order Payment',
+        order_id: razorpayOrderId,
+        handler: function(response) {
+          verifyPayment(response, orderId);
+        },
+        prefill: {
+          name: savedAddresses[selectedAddressIndex]?.firstName,
+          email: savedAddresses[selectedAddressIndex]?.email,
+          contact: savedAddresses[selectedAddressIndex]?.phone,
+        },
+        notes: {
+          orderId: orderId,
+          userId: '<%=userId%>'
+        },
+        theme: {
+          color: '#00B207'
+        },
+        modal: {
+          ondismiss: function() {
+            fetch(`/cancel-order/${orderId}`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+              })
+              .then(res => res.json())
+              .catch(err => {});
+            const loadingOverlay = document.getElementById('loading-overlay');
+            loadingOverlay.style.display = 'none';
+            setTimeout(() => {
+              window.location.href = '/retry-payment';
+            }, 100);
+          }
+        }
+      };
+
+      const rzp = new Razorpay(options);
+      rzp.open();
+    }
+
+    async function verifyPayment(paymentResponse, orderId) {
+      try {
+        const res = await fetch('/order/verify-payment', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ paymentResponse, orderId })
+        });
+        const data = await res.json();
+        if (data.success) {
+          toastr.success('Payment Successful! Redirecting...');
+          setTimeout(() => window.location.href = `/order-confirmation/${orderId}`, 2000);
+        } else {
+          fetch(`/cancel-order/${orderId}`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+            })
+            .then(res => res.json())
+            .catch(err => {});
+          toastr.error(data.message || 'Payment verification failed');
+        }
+      } catch (error) {
+        toastr.error('Something went wrong');
+      }
     }
 
     function placeOrder() {
@@ -1346,17 +833,16 @@
         toastr.error('Please select a delivery address.');
         return;
       }
+      const paymentMethod = document.querySelector('input[name="payment"]:checked')?.value || '';
       const address = savedAddresses[selectedAddressIndex];
       const orderData = {
-        paymentMethod: document.querySelector('input[name="payment"]:checked')?.value || '',
+        paymentMethod,
         orderNotes: document.getElementById('orderNotes').value || '',
         address: address,
         coupon: appliedCoupon ? appliedCoupon.code : null,
         finalAmount: currentTotal
       };
-      console.log(orderData);
 
-      // Show loading overlay
       const loadingOverlay = document.getElementById('loading-overlay');
       loadingOverlay.style.display = 'flex';
 
@@ -1369,59 +855,90 @@
         })
         .then(response => response.json())
         .then(data => {
-          console.log('Response data:', data);
           if (data.success) {
-            const orderId = data.orderId;
-            console.log('Extracted orderId:', orderId);
-            // Hide the loading overlay
             loadingOverlay.style.display = 'none';
-            // Hide the confirm modal
-            closeConfirmModal();
-            // Show the animation container
-            const animationContainer = document.getElementById('order-success-animation');
-            animationContainer.style.display = 'block';
-            // Initialize and play Lottie animation
-            lottie.loadAnimation({
-              container: animationContainer,
-              renderer: 'svg',
-              loop: false,
-              autoplay: true,
-              path: '/Order_success.json'
-            });
-            setTimeout(() => {
-              animationContainer.style.display = 'none';
-              window.location.href = `/order-confirmation/${orderId}?newOrder=true`;
-            }, 3700);
+            closeOrderConfirmModal();
+            if (paymentMethod === 'upi') {
+              initiateRazorpayPayment(data.orderId, currentTotal, data.razorpayKey, data.razorpayOrderId);
+            } else {
+              const animationContainer = document.getElementById('order-success-animation');
+              animationContainer.style.display = 'block';
+              lottie.loadAnimation({
+                container: animationContainer,
+                renderer: 'svg',
+                loop: false,
+                autoplay: true,
+                path: '/Order_success.json'
+              });
+              setTimeout(() => {
+                animationContainer.style.display = 'none';
+                window.location.href = `/order-confirmation/${data.orderId}`;
+              }, 3700);
+            }
           } else {
-            if (data.message === "Product is out-of-stock") {
+            if (data.message === 'Product is out-of-stock') {
               toastr.error(data.message);
               setTimeout(() => window.location.href = '/shop', 2000);
             } else {
               toastr.error(data.message || 'Failed to place order.');
             }
-            // Hide the loading overlay on error
             loadingOverlay.style.display = 'none';
           }
         })
-        .catch(() => {
+        .catch(error => {
           toastr.error('An error occurred while placing the order.');
-          // Hide the loading overlay on error
           loadingOverlay.style.display = 'none';
-          closeConfirmModal();
+          closeOrderConfirmModal();
         });
     }
 
-    // Handle modal button clicks
-    document.getElementById('cancel-action').addEventListener('click', closeConfirmModal);
-    document.getElementById('confirm-action').addEventListener('click', () => {
-      const action = document.getElementById('confirm-modal').dataset.action;
-      if (action === 'delete') {
-        deleteAddress();
-      } else if (action === 'order') {
-        placeOrder();
+    document.addEventListener('DOMContentLoaded', () => {
+      const cancelOrderButton = document.getElementById('order-cancel');
+      const confirmOrderButton = document.getElementById('order-confirm');
+      if (cancelOrderButton && confirmOrderButton) {
+        cancelOrderButton.addEventListener('click', () => closeOrderConfirmModal());
+        confirmOrderButton.addEventListener('click', () => {
+          const action = document.getElementById('order-confirm-modal').dataset.action;
+          if (action === 'delete') deleteAddress();
+          else if (action === 'order') placeOrder();
+          closeOrderConfirmModal();
+        });
       }
-      closeConfirmModal();
+
+      loadCountries();
+      const countrySelect = document.getElementById('modalCountrySelect');
+      countrySelect.addEventListener('change', () => {
+        const selectedCountry = countrySelect.value;
+        if (selectedCountry) loadStates(selectedCountry);
+        else document.getElementById('modalStateSelect').innerHTML = '<option value="" disabled selected hidden>Select State</option>';
+      });
+
+      document.querySelectorAll('.address-card').forEach(card => {
+        card.addEventListener('click', (e) => {
+          const index = card.getAttribute('data-index');
+          selectAddress(index);
+          e.preventDefault();
+        });
+      });
+
+      if (savedAddresses && savedAddresses.length > 0) {
+        const defaultAddress = savedAddresses.find(addr => addr.isDefault);
+        if (defaultAddress) selectAddress(savedAddresses.indexOf(defaultAddress));
+        else selectAddress(0);
+      }
+      checkWalletBalance();
     });
+
+    function selectAddress(index) {
+      if (index === null || index < 0 || index >= savedAddresses.length) {
+        selectedAddressIndex = null;
+        return;
+      }
+      selectedAddressIndex = index;
+      document.querySelectorAll('.address-card').forEach(card => card.classList.remove('selected'));
+      const selectedCard = document.querySelector(`.address-card[data-index="${index}"]`);
+      if (selectedCard) selectedCard.classList.add('selected');
+    }
 
     function validateAddressForm() {
       let isValid = true;
@@ -1553,7 +1070,9 @@
             toastr.error(data.message || 'Failed to save address');
           }
         })
-        .catch(() => toastr.error('An error occurred while saving the address'));
+        .catch(error => {
+          toastr.error('An error occurred while saving the address');
+        });
     }
 
     function populateForm(data) {
@@ -1603,7 +1122,6 @@
           countrySelect.appendChild(option);
         });
       } catch (error) {
-        console.error('🌍 Failed to fetch countries:', error);
         const countrySelect = document.getElementById('modalCountrySelect');
         countrySelect.innerHTML = '<option value="" disabled selected hidden>Select Country</option><option value="" disabled>No countries available</option>';
         toastr.error('Failed to load countries. Please try again later.');
@@ -1618,9 +1136,7 @@
             'Accept': 'application/json',
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({
-            country: countryName
-          })
+          body: JSON.stringify({ country: countryName })
         });
         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
         const data = await response.json();
@@ -1633,63 +1149,17 @@
           stateSelect.appendChild(option);
         });
       } catch (error) {
-        console.error('📍 Failed to fetch states:', error);
         const stateSelect = document.getElementById('modalStateSelect');
         stateSelect.innerHTML = '<option value="" disabled selected hidden>Select State</option><option value="" disabled>No states available</option>';
         toastr.error('Failed to load states. Please try again later.');
       }
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-      loadCountries();
-      const countrySelect = document.getElementById('modalCountrySelect');
-      countrySelect.addEventListener('change', () => {
-        const selectedCountry = countrySelect.value;
-        if (selectedCountry) loadStates(selectedCountry);
-        else document.getElementById('modalStateSelect').innerHTML = '<option value="" disabled selected hidden>Select State</option>';
-      });
-
-      document.querySelectorAll('.address-card').forEach(card => {
-        card.addEventListener('click', (e) => {
-          const index = card.getAttribute('data-index');
-          selectAddress(index);
-          e.preventDefault(); 
-        });
-      });
-
-      if (savedAddresses && savedAddresses.length > 0) {
-        const defaultAddress = savedAddresses.find(addr => addr.isDefault);
-        if (defaultAddress) {
-          const defaultIndex = savedAddresses.indexOf(defaultAddress);
-          selectAddress(defaultIndex);
-        } else {
-          selectAddress(0);
-        }
-      }
-      checkWalletBalance(); 
-    });
-
-    function selectAddress(index) {
-      if (index === null || index < 0 || index >= savedAddresses.length) {
-        console.error('Invalid address index:', index);
-        selectedAddressIndex = null;
-        return;
-      }
-      selectedAddressIndex = index;
-      document.querySelectorAll('.address-card').forEach(card => card.classList.remove('selected'));
-      const selectedCard = document.querySelector(`.address-card[data-index="${index}"]`);
-      if (selectedCard) {
-        selectedCard.classList.add('selected');
-      } else {
-        console.error('Address card not found for index:', index);
-      }
-    }
-
-    // Window click to close modal
     window.onclick = function(event) {
-      const modal = document.getElementById('confirm-modal');
-      if (event.target === modal) closeConfirmModal();
-      if (event.target === document.getElementById('addressModal')) closeAddressModal();
+      const orderModal = document.getElementById('order-confirm-modal');
+      if (event.target === orderModal) closeOrderConfirmModal();
+      const addressModal = document.getElementById('addressModal');
+      if (event.target === addressModal) closeAddressModal();
     };
   </script>
 </body>

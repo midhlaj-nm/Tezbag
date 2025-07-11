@@ -335,21 +335,29 @@ a {
 }
 
 .wallet-header {
-    background: #ffffff;
+    height: 125px;
+    background: #00C853;
     padding: 20px;
     border-bottom: 1px solid #e9ecef;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
 }
 
 .wallet-header h2 {
     margin: 0;
     color: #333;
-    font-weight: 500;
+    font-weight: 690;
+    font-size: xxx-large;
 }
 
 .wallet-header p {
     margin: 5px 0 0;
     color: #333;
-    font-weight: 500;
+    font-weight: 700;
+    font-size: large;
 }
 
 .wallet-table {

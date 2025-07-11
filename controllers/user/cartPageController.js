@@ -1,9 +1,7 @@
 const Cart = require('../../models/cartSchema');
 const Product = require('../../models/productSchema');
 const mongoose = require('mongoose');
-const User = require('../../models/userSchema');
-const Deal = require('../../models/dealSchema');
-const Address = require('../../models/addressSchema')
+const Wishlist = require('../../models/wishlistSchema')
 
 // Load Cart (already correct, included for reference)
 const loadCart = async (req, res) => {
@@ -90,7 +88,6 @@ const loadCart = async (req, res) => {
     }
 };
 
-// Add to Cart (already correct, included for reference)
 const addToCart = async (req, res) => {
     try {
         if (!req.session.user) {
@@ -142,6 +139,16 @@ const addToCart = async (req, res) => {
         const requiresCuttingStyle = categoryName === 'Meat' || categoryName === 'Fish';
         if (requiresCuttingStyle && (!cuttingStyle || cuttingStyle.trim() === '')) {
             return res.status(400).json({ success: false, message: 'Cutting style is required for this product' });
+        }
+
+        // Check if the product is in the wishlist and remove it
+        const wishlist = await Wishlist.findOne({ userId });
+        if (wishlist) {
+            const wishlistItemIndex = wishlist.products.findIndex(item => item.productId.toString() === productId);
+            if (wishlistItemIndex > -1) {
+                wishlist.products.splice(wishlistItemIndex, 1);
+                await wishlist.save();
+            }
         }
 
         let cart = await Cart.findOne({ userId });

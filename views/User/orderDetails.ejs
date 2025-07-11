@@ -15,7 +15,11 @@
     <div class="content-wrapper">
       <div class="left-section">
         <div class="main-content">
+          <% if (order.status === 'Payment Failed') { %>
+          <h1 class="thank-you-heading">Sorry! Payment Failed</h1>
+          <% } else { %>
           <h1 class="thank-you-heading">Thank you for your order!</h1>
+          <% } %>
 
           <div class="order-id">
             Order ID: <span><%= orderId %></span>
@@ -37,6 +41,8 @@
           <button class="btn btn-cancelled" id="cancelButton" disabled>Order Cancelled</button>
           <% } else if (order.status === 'Return Requested') { %>
           <button class="btn btn-cancelled" id="cancelButton" disabled>Return Requested</button>
+          <% } else if (order.status === 'Payment Failed') { %>
+          <button class="btn btn-cancelled" id="cancelButton" disabled>Cancel Order</button>
           <% } else if (order.status === 'Pending') { %>
           <button class="btn btn-secondary" id="cancelButton" onclick="openCancelModal('<%= orderId %>')">Cancel Order</button>
           <% } else if (order.status === 'Delivered') { %>
@@ -47,7 +53,11 @@
 
         <div class="full-width-button">
           <a href="/shop" class="btn btn-invoice">Continue Shopping</a>
+          <% if (order.status === 'Payment Failed') { %>
+          <button class="btn btn-cancelled" disabled>Download Invoice</button>
+          <% } else { %>
           <a href="/download-invoice?url=<%= encodeURIComponent(invoicePdf) %>&filename=<%= invoiceNumber.replace(/ /g, '_') + '.pdf' %>" class="btn btn-invoice">Download Invoice</a>
+          <% } %>
         </div>
       </div>
 
@@ -78,15 +88,15 @@
           <div class="products-section">
             <% products.forEach(product => { %>
             <div class="product-item">
-              <div class="product-image"><img src="<%= product.image %>" alt="" style="max-width: 100%; height: auto; display: block;"></div>
+              <div class="product-image"><img src="<%= product.productId.productImage[0] %>" alt="" style="max-width: 100%; height: auto; display: block;"></div>
               <div class="product-details">
                 <div class="product-name">
-                  <span><%= product.name %></span>
+                  <span><%= product.productId.productName %></span>
                   <% if (order.status === 'Delivered') { %>
                   <a href="/add-review?productId=<%= product._id %>" class="add-review-link">Add Review</a>
                   <% } %>
                 </div>
-                <div class="product-meta">Pack: <%= product.cuttingStyle %> | Qty: <%= product.quantity %></div>
+                <div class="product-meta">Pack: <%= product.cuttingStyle || '' %> | Qty: <%= product.quantity %></div>
                 <div class="product-price"><%= product.price %></div>
               </div>
             </div>
