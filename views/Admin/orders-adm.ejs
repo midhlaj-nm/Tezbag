@@ -13,6 +13,19 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 </head>
+<style>
+  #toast-container>.toast {
+    opacity: 1;
+  }
+
+  .toast-success {
+    background-color: #4CAF50;
+  }
+
+  .toast-error {
+    background-color: #e92e20;
+  }
+</style>
 
 <body>
   <div id="middle" class="container-fluid">
@@ -23,6 +36,14 @@
     <form action="/tezgrani/order-management" method="GET" class="search-bar">
       <div class="input-wrapper">
         <input type="text" name="search" placeholder="Search by order ID or user name..." class="search-input" value="<%= searchQuery ? searchQuery : '' %>">
+        <input type="hidden" name="page" value="<%= currentPage %>">
+        <input type="hidden" name="filter" value="<%= filterStatus || 'all' %>">
+        <input type="hidden" name="sortDate" value="<%= sortDate || '' %>">
+        <% if (searchQuery && searchQuery.trim() !== '') { %>
+        <a href="/tezgrani/order-management?page=<%= currentPage %>&filter=<%= filterStatus || 'all' %>&sortDate=<%= sortDate || '' %>" class="clear-icon">
+          <span class="material-symbols-outlined">cancel</span>
+        </a>
+        <% } %>
       </div>
       <button type="submit" class="search-btn">Search</button>
     </form>
@@ -146,6 +167,11 @@
           <h2 class="table-title">Orders Management</h2>
           <div class="buttons">
             <button class="sort-btn" id="sortByDateBtn"><%= sortDate ? new Date(sortDate).toLocaleDateString('en-GB') : 'Sort by Date' %></button>
+            <% if (sortDate && sortDate.trim() !== '') { %>
+            <a href="/tezgrani/order-management?page=<%= currentPage %>&search=<%= searchQuery || '' %>&filter=<%= filterStatus || 'all' %>" class="clear-sort-icon">
+              <span class="material-symbols-outlined">cancel</span>
+            </a>
+            <% } %>
             <select class="filter-btn" onchange="filterTable(this.value)">
               <option value="all" <%= !filterStatus ? 'selected' : '' %>>All Statuses</option>
               <option value="Pending" <%= filterStatus === 'Pending' ? 'selected' : '' %>>Pending</option>
@@ -183,11 +209,15 @@
                 <td><%= new Date(order.invoiceDate).toISOString().split('T')[0] %></td>
                 <td><%= order.finalAmount.toFixed(2) %>₹</td>
                 <td>
-                  <select class="status-dropdown" onchange="updateStatus(this, '<%= order.orderId %>')">
-                    <% ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'].forEach(status => { %>
-                    <option value="<%= status %>" <%= order.status === status ? 'selected' : '' %>><%= status %></option>
-                    <% }) %>
-                  </select>
+                  <% if (order.status === 'Cancelled') { %>
+                    <span class="status-text"><%= order.status %></span>
+                  <% } else { %>
+                    <select class="status-dropdown" onchange="updateStatus(this, '<%= order.orderId %>')">
+                      <% ['Pending', 'Processing', 'Shipped', 'Delivered'].forEach(status => { %>
+                        <option value="<%= status %>" <%= order.status === status ? 'selected' : '' %>><%= status %></option>
+                      <% }) %>
+                    </select>
+                  <% } %>
                 </td>
                 <td class="actions">
                   <a href="/tezgrani/order-details/<%= order.orderId %>" class="btn view-btn">View</a>
@@ -302,13 +332,12 @@
       confirmAction.addEventListener('click', () => {
         const orderId = confirmModal.dataset.orderId;
         const newStatus = confirmModal.dataset.newStatus;
-        fetch(`/tezgrani/update-order-status`, {
+        fetch(`/tezgrani/update-status/${orderId}`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              orderId,
               status: newStatus
             }),
           })
@@ -344,13 +373,15 @@
           datePicker = flatpickr(sortBtn, {
             onChange: function(selectedDates, dateStr, instance) {
               if (selectedDates.length > 0) {
-                const date = selectedDates[0].toISOString().split('T')[0];
-                window.location.href = `/tezgrani/order-management?sortDate=${date}&search=<%= searchQuery || '' %>&filter=<%= filterStatus || 'all' %>`;
+                const selectedDate = selectedDates[0].toLocaleDateString('en-CA'); // YYYY-MM-DD in local time (IST)
+                console.log('Selected Date from Picker:', selectedDate); // Debug log
+                window.location.href = `/tezgrani/order-management?sortDate=${selectedDate}&search=<%= searchQuery || '' %>&filter=<%= filterStatus || 'all' %>`;
               }
             },
             dateFormat: 'Y-m-d',
             maxDate: 'today',
-            defaultDate: new Date()
+            defaultDate: new Date(),
+            enableTime: false // Disable time to avoid timezone shifts
           });
         }
         datePicker.open();

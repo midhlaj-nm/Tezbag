@@ -408,12 +408,45 @@ const cancelOrder = async (req, res, next) => {
     }
 
     if (order.paymentStatus === 'Paid') {
-      console.log('Order already paid, cannot cancel:', orderId);
-      return res.status(400).json({ success: false, message: 'Order already paid, cannot cancel' });
-    }
+      console.log('Order is paid, processing refund to wallet for orderId:', orderId);
 
-    // If payment is not yet processed (e.g., UPI dismissal), mark as Payment Failed
-    if (order.paymentStatus === 'Not Paid') {
+      // Update order status to Cancelled
+      order.status = 'Cancelled';
+      await order.save();
+      console.log('Order status updated to Cancelled:', order);
+
+      // Find or create wallet for the user
+      let userWallet = await Wallet.findOne({ user: order.userId });
+      if (!userWallet) {
+        userWallet = new Wallet({ user: order.userId, balance: 0 });
+        console.log('Created new wallet for user:', order.userId);
+      }
+
+      // Add refunded amount to wallet
+      const refundAmount = order.finalAmount;
+      userWallet.balance += refundAmount;
+      userWallet.transactions.push({
+        type: 'credit',
+        amount: refundAmount,
+        reason: `Refund for cancelled order (Order ID: ${order.orderId.slice(0, 6)})`,
+        date: new Date()
+      });
+      console.log('Wallet transaction added:', userWallet.transactions[userWallet.transactions.length - 1]);
+      await userWallet.save();
+      console.log('Wallet updated with balance:', userWallet.balance);
+
+      // Revert product quantities
+      for (const item of order.orderedItems) {
+        const product = await Product.findById(item.productId);
+        if (product) {
+          product.quantity += item.quantity;
+          product.status = product.quantity > 0 ? 'Available' : 'Out Of Stock';
+          await product.save();
+          console.log('Reverted quantity for product:', item.productId);
+        }
+      }
+    } else if (order.paymentStatus === 'Not Paid') {
+      console.log('Order not paid, marking as Payment Failed:', orderId);
       order.status = 'Payment Failed';
       order.paymentStatus = 'Failed';
       order.paymentDetails = order.paymentDetails || {};
@@ -421,6 +454,7 @@ const cancelOrder = async (req, res, next) => {
       await order.save();
       console.log('Order marked as Payment Failed:', order);
     } else {
+      console.log('Order already processed or in invalid state, reverting quantities:', orderId);
       // Revert product quantities only if not already processed
       for (const item of order.orderedItems) {
         const product = await Product.findById(item.productId);
@@ -435,7 +469,7 @@ const cancelOrder = async (req, res, next) => {
       console.log('Order cancelled and deleted:', orderId);
     }
 
-    res.status(200).json({ success: true, message: 'Order processed as failed or cancelled successfully' });
+    res.status(200).json({ success: true, message: 'Order processed as failed, cancelled, or refunded successfully' });
   } catch (error) {
     console.error('Error in cancelOrder:', error);
     next(error);

@@ -80,6 +80,9 @@ body {
 }
 
 .clear-icon {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   position: absolute;
   right: 10px;
   top: 50%;
@@ -111,16 +114,20 @@ body {
 
 /* Custom Pagination Styling */
 .custom-pagination {
-  margin-top: 1.5rem; /* Equivalent to Bootstrap's mt-4 */
-  text-align: center; /* Center the pagination */
+  margin-top: 1.5rem;
+  /* Equivalent to Bootstrap's mt-4 */
+  text-align: center;
+  /* Center the pagination */
 }
 
 .pagination-list {
-  display: inline-flex; /* Display items in a row */
+  display: inline-flex;
+  /* Display items in a row */
   list-style: none;
   padding: 0;
   margin: 0;
-  gap: 5px; /* Space between items */
+  gap: 5px;
+  /* Space between items */
 }
 
 .pagination-item {
@@ -129,35 +136,48 @@ body {
 
 .pagination-link {
   display: inline-block;
-  padding: 8px 12px; /* Padding for clickable area */
+  padding: 8px 12px;
+  /* Padding for clickable area */
   text-decoration: none;
-  color: #333; /* Default text color */
-  background-color: #f8f9fa; /* Light gray background */
-  border: 1px solid #ddd; /* Light border */
-  border-radius: 5px; /* Rounded corners */
+  color: #333;
+  /* Default text color */
+  background-color: #f8f9fa;
+  /* Light gray background */
+  border: 1px solid #ddd;
+  /* Light border */
+  border-radius: 5px;
+  /* Rounded corners */
   font-size: 14px;
-  transition: background-color 0.2s, color 0.2s; /* Smooth transition */
+  transition: background-color 0.2s, color 0.2s;
+  /* Smooth transition */
 }
 
 /* Active Page */
 .pagination-item.active .pagination-link {
-  background-color: #00B207; /* Green background for active page */
+  background-color: #00B207;
+  /* Green background for active page */
   border-color: #00B207;
-  color: white; /* White text for contrast */
+  color: white;
+  /* White text for contrast */
 }
 
 /* Disabled State */
 .pagination-item.disabled .pagination-link {
-  color: #aaa; /* Grayed-out text */
-  background-color: #f1f1f1; /* Slightly different background */
+  color: #aaa;
+  /* Grayed-out text */
+  background-color: #f1f1f1;
+  /* Slightly different background */
   border-color: #ddd;
-  cursor: not-allowed; /* Indicate it's not clickable */
+  cursor: not-allowed;
+  /* Indicate it's not clickable */
 }
 
 /* Hover Effect for Non-Active, Non-Disabled Links */
 .pagination-item:not(.active):not(.disabled) .pagination-link:hover {
-  background-color: #e6f7e8; /* Light green background on hover */
-  color: #00B207; /* Green text on hover */
+  background-color: #e6f7e8;
+  /* Light green background on hover */
+  color: #00B207;
+  /* Green text on hover */
   border-color: #00B207;
 }
 
@@ -294,17 +314,22 @@ body {
 .content {
   margin-top: 60px;
   margin-left: 240px;
-  margin-right: 20px; /* Added right margin */
+  margin-right: 20px;
+  /* Added right margin */
   padding: 8px 5px 5px 15px;
   flex: 1;
-  transition: margin-left 0.3s ease, margin-right 0.3s ease; /* Updated transition */
-  width: calc(100% - 260px); /* Updated calculation to account for right margin */
+  transition: margin-left 0.3s ease, margin-right 0.3s ease;
+  /* Updated transition */
+  width: calc(100% - 260px);
+  /* Updated calculation to account for right margin */
 }
 
-.sidebar.collapsed ~ .content {
+.sidebar.collapsed~.content {
   margin-left: 80px;
-  margin-right: 20px; /* Added right margin */
-  width: calc(100% - 100px); /* Updated calculation */
+  margin-right: 20px;
+  /* Added right margin */
+  width: calc(100% - 100px);
+  /* Updated calculation */
 }
 
 /* Table header styling */
@@ -375,7 +400,8 @@ body {
   background-color: #f5f5f5;
 }
 
-.product-table th, .product-table td {
+.product-table th,
+.product-table td {
   padding: 12px 16px;
   text-align: center;
   font-size: 14px;
@@ -395,33 +421,42 @@ body {
 
 /* Column Widths */
 .product-table th:nth-child(1),
-.product-table td:nth-child(1), /* SI. NO. */
+.product-table td:nth-child(1),
+/* SI. NO. */
 .product-table th:nth-child(5),
-.product-table td:nth-child(5), /* PRICE */
+.product-table td:nth-child(5),
+/* PRICE */
 .product-table th:nth-child(6),
-.product-table td:nth-child(6), /* MRP */
+.product-table td:nth-child(6),
+/* MRP */
 .product-table th:nth-child(7),
-.product-table td:nth-child(7), /* STOCK */
+.product-table td:nth-child(7),
+/* STOCK */
 .product-table th:nth-child(8),
-.product-table td:nth-child(8) { /* STATUS */
+.product-table td:nth-child(8) {
+  /* STATUS */
   width: 10%;
   padding-left: 0 !important;
 }
 
 .product-table th:nth-child(2),
-.product-table td:nth-child(2) { /* IMAGES */
+.product-table td:nth-child(2) {
+  /* IMAGES */
   width: 10%;
 }
 
 .product-table th:nth-child(3),
-.product-table td:nth-child(3), /* NAME */
+.product-table td:nth-child(3),
+/* NAME */
 .product-table th:nth-child(4),
-.product-table td:nth-child(4) { /* CATEGORY */
+.product-table td:nth-child(4) {
+  /* CATEGORY */
   width: 15%;
 }
 
 .product-table th:nth-child(9),
-.product-table td:nth-child(9) { /* ACTION */
+.product-table td:nth-child(9) {
+  /* ACTION */
   width: 20%;
   text-align: center;
 }
@@ -597,7 +632,9 @@ label {
   font-size: 14px;
 }
 
-input, select, textarea {
+input,
+select,
+textarea {
   width: 100%;
   padding: 10px 12px;
   border: 1px solid #ccc;
@@ -608,7 +645,9 @@ input, select, textarea {
   box-sizing: border-box;
 }
 
-input:focus, select:focus, textarea:focus {
+input:focus,
+select:focus,
+textarea:focus {
   outline: none;
   border-color: #00B207;
 }
@@ -820,24 +859,25 @@ textarea {
   .content {
     width: calc(100% - 100px);
     margin-left: 80px;
-    margin-right: 20px; /* Added right margin for responsive design */
+    margin-right: 20px;
+    /* Added right margin for responsive design */
     padding: 15px 10px;
   }
-  
+
   .sidebar {
     width: 60px;
     padding: 16px 6px;
   }
-  
+
   .sidebar .sidebar-links li span:not(.icon-svg) {
     display: none;
   }
-  
+
   .sidebar .sidebar-links li a {
     justify-content: center;
     padding: 10px 0;
   }
-  
+
   .sidebar .sidebar-links li .icon-svg {
     margin-right: 0;
   }
@@ -848,16 +888,16 @@ textarea {
     height: auto;
     max-height: 80vh;
   }
-  
+
   .form-row {
     flex-direction: column;
     gap: 10px;
   }
-  
+
   .modal-content {
     width: 90%;
   }
-  
+
   .search-bar {
     width: 50%;
   }
@@ -867,20 +907,21 @@ textarea {
   .product-table {
     font-size: 12px;
   }
-  
-  .product-table th, .product-table td {
+
+  .product-table th,
+  .product-table td {
     padding: 8px 5px;
   }
-  
+
   .btn {
     padding: 5px 10px;
     font-size: 12px;
   }
-  
+
   .table-title {
     font-size: 20px;
   }
-  
+
   .search-bar {
     width: 60%;
   }
@@ -890,12 +931,12 @@ textarea {
   .search-bar {
     display: none;
   }
-  
+
   .popup {
     width: 95%;
     height: 90vh;
   }
-  
+
   .image-upload-container {
     justify-content: center;
   }
@@ -919,10 +960,13 @@ textarea {
 .checkbox-item input[type="checkbox"] {
   grid-column: 1;
   justify-self: start;
-  margin-left: 20px; /* Adjust this value as needed */
+  margin-left: 20px;
+  /* Adjust this value as needed */
   cursor: pointer;
-  width: 18px; /* Increase checkbox size */
-  height: 18px; /* Increase checkbox size */
+  width: 18px;
+  /* Increase checkbox size */
+  height: 18px;
+  /* Increase checkbox size */
 }
 
 .checkbox-item label {

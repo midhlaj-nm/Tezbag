@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Details</title>
+  <link rel="stylesheet" href="/Admin-css/orderDetailsPage.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+</head>
+<body>
+  <div class="header">
+    <h1>Order <%= order.orderId.slice(0,6).toUpperCase() %></h1>
+    <button class="cancel-btn" <%= (order.status === 'Delivered' || order.status === 'Cancelled') ? 'disabled' : '' %>>
+      Cancel this order
+    </button>
+  </div>
+
+  <div class="container">
+    <div class="left-section">
+      <div class="box user-details">
+        <h2>User Details</h2>
+        <div class="detail-row">
+          <span class="detail-label">Name:</span>
+          <span class="detail-value"><%= order.userId.f_Name %> <%= order.userId.l_Name %></span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Email:</span>
+          <span class="detail-value"><%= order.userId.email || 'Not provided' %></span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Customer ID:</span>
+          <span class="detail-value">#<%= customerId %></span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Customer Since:</span>
+          <span class="detail-value"><%= new Date(order.userId.createdOn).toLocaleDateString('en-US', { timeZone: 'Asia/Kolkata' }) %></span>
+        </div>
+      </div>
+
+      <div class="box billing-address">
+        <h2>Billing Address</h2>
+        <div class="detail-row">
+          <span class="detail-label">Street:</span>
+          <span class="detail-value"><%= address ? address.streetAddress : 'Not provided' %></span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">City:</span>
+          <span class="detail-value"><%= address ? address.city : 'Not provided' %></span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">State:</span>
+          <span class="detail-value"><%= address ? address.state : 'Not provided' %></span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">PIN Code:</span>
+          <span class="detail-value"><%= address ? address.pinCode : 'Not provided' %></span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Country:</span>
+          <span class="detail-value"><%= address ? address.country : 'Not provided' %></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="right-section">
+      <div class="box order-details">
+        <h2>Order Details</h2>
+        
+        <div class="order-status">
+          <div class="detail-row">
+            <span class="detail-label">Status:</span>
+            <span class="detail-value status-<%= order.status.toLowerCase().replace(' ', '-') %>"><%= order.status %></span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Payment Method:</span>
+            <span class="detail-value"><%= order.paymentMethod %></span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Invoice:</span>
+            <a href="<%= invoice.pdfUrl %>" target="_blank" class="invoice-link">View Invoice</a>
+          </div>
+        </div>
+                    
+        <div class="order-item" style="display: flex; justify-content: space-between; align-items: center;">
+          <% order.orderedItems.forEach(item => { %>
+            <div class="item-info">
+              <div class="item-name"><%= item.productId ? item.productId.productName : 'Unknown Product' %></div>
+              <div class="item-desc">Cutting Style: <%= item.cuttingStyle || 'Not provided' %> | Quantity: <%= item.quantity %> | SKU: <%= item.productId ? item.productId.SKU : 'Not provided' %></div>
+            </div>
+            <div class="item-price">$<%= item.price.toFixed(2) %></div>
+          <% }) %>
+        </div>
+
+        <div class="total-section">
+          <div class="total-row">
+            <span>Subtotal:</span>
+            <span>$<%= order.totalPrice.toFixed(2) %></span>
+          </div>
+          <div class="total-row">
+            <span>Shipping:</span>
+            <span>Free</span>
+          </div>
+          <div class="total-row total-final">
+            <span>Total:</span>
+            <span>$<%= order.finalAmount.toFixed(2) %></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirmation Modal -->
+  <div id="confirm-modal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <h3>Are you sure?</h3>
+      <div class="modal-buttons">
+        <button id="cancel-action" class="btn-no">NO</button>
+        <button id="confirm-action" class="btn-yes">YES</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Initialize toastr
+    toastr.options = {
+      "closeButton": true,
+      "positionClass": "toast-top-right",
+      "timeOut": "3000"
+    };
+
+    // Cancel button handler to show modal
+    document.querySelector('.cancel-btn').addEventListener('click', function() {
+      if (this.disabled) return;
+      document.getElementById('confirm-modal').style.display = 'block';
+    });
+
+    // Cancel action (No) handler
+    document.getElementById('cancel-action').addEventListener('click', function() {
+      document.getElementById('confirm-modal').style.display = 'none';
+    });
+
+    // Confirm action (Yes) handler
+    document.getElementById('confirm-action').addEventListener('click', function() {
+      document.getElementById('confirm-modal').style.display = 'none';
+      fetch(`/tezgrani/update-status/<%= order.orderId %>`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'Cancelled' })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          toastr.success('Order cancelled successfully!');
+          setTimeout(() => location.reload(), 1000); // Reload after toast
+        } else {
+          toastr.error(data.message || 'Failed to cancel order.');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        toastr.error('An error occurred.');
+      });
+    });
+
+    // Close modal if clicked outside
+    window.addEventListener('click', function(e) {
+      const modal = document.getElementById('confirm-modal');
+      if (e.target === modal) {
+        modal.style.display = 'none';
+      }
+    });
+  </script>
+</body>
+</html>

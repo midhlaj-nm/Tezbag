@@ -1,4 +1,5 @@
 const Order = require('../../models/orderSchema');
+const Invoice = require('../../models/invoiceSchema');
 
 const loadOrder = async (req, res) => {
   try {
@@ -31,19 +32,25 @@ const loadOrder = async (req, res) => {
     // Sort by date
     const sortDate = req.query.sortDate;
     if (sortDate) {
-      // Adjust for timezone (e.g., IST is UTC+5:30)
-      const startDate = new Date(sortDate);
-      startDate.setUTCHours(0, 0, 0, 0); // Start of the day in UTC
-      const endDate = new Date(sortDate);
-      endDate.setUTCHours(23, 59, 59, 999); // End of the day in UTC
+      const localDate = new Date(sortDate + 'T00:00:00');
+      localDate.setUTCHours(localDate.getUTCHours() + 5, localDate.getUTCMinutes() + 30);
+      const startDate = new Date(localDate);
+      startDate.setUTCHours(0, 0, 0, 0); // Start of the day in IST
+      const endDate = new Date(localDate);
+      endDate.setUTCHours(23, 59, 59, 999); // End of the day in IST
       query.invoiceDate = { $gte: startDate, $lte: endDate };
-      console.log('Sort Date Range Applied:', { startDate, endDate });
+      console.log('Sort Date Range Applied (IST):', { startDate, endDate });
     }
+
+    // Filter by payment status (only Paid or Not Paid)
+    query.paymentStatus = { $in: ['Paid', 'Not Paid'] };
+    console.log('Payment Status Filter Applied:', query.paymentStatus);
 
     // Fetch orders with user details and populate
     console.log('Executing MongoDB Query:', query);
     const orders = await Order.find(query)
-      .populate('userId', 'f_Name l_Name')
+      .populate('userId', 'f_Name l_Name _id email phone createdAt')
+      .populate('address')
       .skip(skip)
       .limit(limit)
       .sort({ invoiceDate: -1 });
@@ -53,13 +60,14 @@ const loadOrder = async (req, res) => {
       orderId: order.orderId,
       userId: order.userId ? { f_Name: order.userId.f_Name, l_Name: order.userId.l_Name } : null,
       status: order.status,
-      invoiceDate: order.invoiceDate
+      invoiceDate: order.invoiceDate,
+      paymentStatus: order.paymentStatus
     })));
 
     // Create username by concatenating f_Name and l_Name
     const ordersWithUsername = orders.map(order => {
       if (order.userId) {
-        order.userId.username = `${order.userId.f_Name || ''} ${order.userId.l_Name || ''}`.trim();
+        order.userId.username = `${order.userId.f_Name} ${order.userId.l_Name}`.trim();
         console.log(`Order ${order.orderId}: Username created - ${order.userId.username}`);
       }
       return order;
@@ -91,7 +99,7 @@ const loadOrder = async (req, res) => {
       totalPages,
       searchQuery,
       filterStatus,
-      sortDate // Pass sortDate to EJS for button display
+      sortDate
     });
   } catch (error) {
     console.error('Error in loadOrder:', error);
@@ -99,4 +107,97 @@ const loadOrder = async (req, res) => {
   }
 };
 
-module.exports = { loadOrder };
+const updateStatus = async (req, res) => {
+  try {
+    const orderId = req.params.orderId;
+    const { status: newStatus } = req.body;
+
+    // Validate newStatus
+    const validStatuses = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
+    if (!validStatuses.includes(newStatus)) {
+      return res.status(400).json({ success: false, message: 'Invalid status value' });
+    }
+
+    // Find and update the order
+    const order = await Order.findOneAndUpdate(
+      { orderId },
+      { status: newStatus },
+      { new: true, runValidators: true }
+    );
+
+    if (!order) {
+      return res.status(404);
+    }
+
+    console.log(`Order ${orderId} status updated to ${newStatus}`);
+    res.json({ success: true, message: 'Status updated successfully' });
+  } catch (error) {
+    console.error('Error updating status:', error);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
+const loadOrderDetails = async (req, res) => {
+  try {
+    console.log('Starting loadOrderDetails for orderId:', req.params.orderId);
+
+    const orderId = req.params.orderId;
+    const order = await Order.findOne({ orderId })
+      .populate('userId', 'f_Name l_Name _id email phone createdAt')
+      .populate('address'); // Populates the Address document
+    console.log('Order fetched:', order);
+
+    if (!order) {
+      console.log('Order not found for orderId:', orderId);
+      return res.status(404);
+    }
+
+    console.log('Populated order data:', {
+      userId: order.userId,
+      address: order.address,
+      status: order.status,
+      invoiceDate: order.invoiceDate
+    });
+
+    // Check and extract the correct address
+    let address = null;
+    console.log('Checking address population:', order.address);
+    if (order.address && order.address.address) {
+      console.log('Address document contains array:', order.address.address);
+      // Find the address object matching the order.address _id (should be the Address document _id)
+      const addressDocId = order.address._id.toString();
+      address = order.address.address.find(a => a._id.toString() === addressDocId);
+      console.log('Matched address by document _id:', address);
+      if (!address) {
+        console.log('No exact match, using first address as fallback');
+        address = order.address.address[0]; // Fallback to first address
+      }
+    } else {
+      console.log('No valid address data found in order.address');
+    }
+
+    const invoice = await Invoice.findOne({ orderId }).select('pdfUrl');
+    console.log('Invoice fetched:', invoice);
+
+    // Prepare customer ID from userId (first 6 characters of _id)
+    const customerId = order.userId._id.toString().substring(0, 6);
+    console.log('Generated customerId:', customerId);
+
+    res.render('orderDetailsPage', {
+      order,
+      customerId,
+      address,
+      invoice
+    });
+    console.log('Rendered orderDetailsPage with data:', { orderId, customerId, addressExists: !!address, invoiceExists: !!invoice });
+  } catch (error) {
+    console.error('Error loading order details:', error);
+    console.log('Error details:', {
+      message: error.message,
+      stack: error.stack
+    });
+    res.status(404);
+  }
+};
+
+module.exports = { loadOrder, updateStatus, loadOrderDetails };

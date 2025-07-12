@@ -17,6 +17,10 @@
         <div class="main-content">
           <% if (order.status === 'Payment Failed') { %>
           <h1 class="thank-you-heading">Sorry! Payment Failed</h1>
+          <% } else if (order.status === 'Cancelled') { %>
+          <h1 class="thank-you-heading">Your order cancelled successfully!</h1>
+          <% } else if (order.status === 'Returned') { %>
+          <h1 class="thank-you-heading">Your order Returned successfully!</h1>
           <% } else { %>
           <h1 class="thank-you-heading">Thank you for your order!</h1>
           <% } %>
@@ -43,7 +47,7 @@
           <button class="btn btn-cancelled" id="cancelButton" disabled>Return Requested</button>
           <% } else if (order.status === 'Payment Failed') { %>
           <button class="btn btn-cancelled" id="cancelButton" disabled>Cancel Order</button>
-          <% } else if (order.status === 'Pending') { %>
+          <% } else if (order.status === 'Pending' || order.status === 'Processing' || order.status === 'Shipped' || order.status === 'Shipped') { %>
           <button class="btn btn-secondary" id="cancelButton" onclick="openCancelModal('<%= orderId %>')">Cancel Order</button>
           <% } else if (order.status === 'Delivered') { %>
           <button class="btn btn-secondary" onclick="openReturnModal('<%= orderId %>')">Return Order</button>
@@ -235,12 +239,13 @@
             if (data.success) {
               toastr.success('Order cancelled successfully!');
               closeModal('cancel');
-              // Update button text to "Order Cancelled" without changing class
               const cancelButton = document.getElementById('cancelButton');
               if (cancelButton) {
                 cancelButton.textContent = 'Order Cancelled';
                 cancelButton.disabled = true;
               }
+              // Reload after 2 seconds
+              setTimeout(() => location.reload(), 2000);
             } else {
               toastr.error(data.message || 'Failed to cancel order.');
             }
@@ -275,6 +280,8 @@
             if (data.success) {
               toastr.success('Return request submitted successfully!');
               closeModal('return');
+              // Reload after 2 seconds
+              setTimeout(() => location.reload(), 2000);
             } else {
               toastr.error(data.message || 'Failed to submit return request.');
             }

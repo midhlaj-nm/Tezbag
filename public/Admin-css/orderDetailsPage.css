@@ -1,0 +1,293 @@
+/* Reset and base styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    padding-top: 80px;
+}
+
+/* Header styles */
+.header {
+    background-color: #fff;
+    padding: 20px;
+    border-bottom: 1px solid #ccc;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+}
+
+.header h1 {
+    color: #333;
+    font-size: 24px;
+    font-weight: 600;
+    font-family: 'Poppins', sans-serif;
+}
+
+.cancel-btn {
+    background-color: #00B207;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    font-family: 'Poppins', sans-serif;
+}
+
+.cancel-btn:hover {
+    background-color: #c82333;
+}
+
+/* Container and layout */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 20px;
+    display: flex;
+    gap: 30px;
+    min-height: calc(100vh - 160px);
+}
+
+.left-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.right-section {
+    flex: 1;
+}
+
+/* Box styles */
+.box {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 25px;
+    border: 1px solid #ccc;
+}
+
+.box h2 {
+    color: #333;
+    font-size: 18px;
+    margin-bottom: 10px;
+    border-bottom: 2px solid #000000;
+    padding-bottom: 10px;
+    font-family: 'Poppins', sans-serif;
+}
+
+.sub-heading {
+    color: #333;
+    font-size: 16px;
+    font-weight: 600;
+    margin: 10px 0 15px 0;
+    padding-bottom: 8px;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Box specific heights */
+.user-details {
+    min-height: 200px;
+}
+
+.billing-address {
+    min-height: 180px;
+}
+
+.order-details {
+    min-height: 400px;
+}
+
+/* Detail row styles */
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+}
+
+.detail-label {
+    font-weight: 600;
+    color: #000000;
+    font-family: 'Poppins', sans-serif;
+}
+
+.detail-value {
+    color: #000000;
+    font-family: 'Poppins', sans-serif;
+}
+
+.invoice-link {
+  color: #00B207;
+  text-decoration: underline;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Order item styles */
+.order-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+}
+
+.item-info {
+    flex: 1;
+}
+
+.item-name {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 5px;
+    font-family: 'Poppins', sans-serif;
+}
+
+.item-desc {
+    color: #666;
+    font-size: 14px;
+    font-family: 'Poppins', sans-serif;
+}
+
+.item-price {
+    font-weight: 600;
+    color: #007bff;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Total section styles */
+.total-section {
+    margin-top: 10px;
+    padding-top: 20px;
+    border-top: 2px solid #000000;
+}
+
+.total-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-size: 16px;
+    font-family: 'Poppins', sans-serif;
+}
+
+.total-final {
+    font-weight: 700;
+    font-size: 18px;
+    color: #28a745;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Order status section */
+.order-status {
+    border-bottom: 2px solid #000000;
+}
+
+.status {
+    color: #28a745;
+    font-weight: 600;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Confirmation Modal Styles */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  font-family: 'Poppins', sans-serif;
+  background-color: white;
+  padding: 30px;
+  border-radius: 12px;
+  text-align: center;
+  width: 30%;
+  max-width: 400px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-clip: padding-box;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  outline: 0;
+}
+
+.modal-content h3 {
+  font-size: 1.7rem !important;
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #333;
+  font-family: 'Poppins', sans-serif;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 30px;
+}
+
+.btn-no {
+  font-family: 'Poppins', sans-serif;
+  background-color: #ff172e;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 25px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+}
+
+.btn-no:hover {
+  background-color: #e30e24;
+}
+
+.btn-yes {
+  font-family: 'Poppins', sans-serif;
+  background-color: #00B207;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 25px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+}
+
+.btn-yes:hover {
+  background-color: #008C04;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+
+    body {
+        padding-top: 120px;
+    }
+}

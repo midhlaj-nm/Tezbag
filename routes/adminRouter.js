@@ -45,6 +45,8 @@ router.delete('/deals/delete/:dealId', adminAuth, dealsManageController.deleteDe
 
 //orderController
 router.get('/order-management', orderController.loadOrder)
+router.post('/update-status/:orderId', orderController.updateStatus)
+router.get('/order-details/:orderId',orderController.loadOrderDetails)
 
 
 module.exports = router;
