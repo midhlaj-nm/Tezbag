@@ -7,7 +7,7 @@ const returnSchema = new Schema({
         required: true
     },
     orderId: {
-        type: Schema.Types.ObjectId,
+        type: String,
         required: true
     },
     delivered: {

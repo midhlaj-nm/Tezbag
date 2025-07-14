@@ -219,7 +219,7 @@ const loadDashboard = async (req, res) => {
     try {
       console.log("📥 Loading admin dashboard");
 
-      const recentOrders = await Order.find().sort({ date: 1 }).limit(8); 
+      const recentOrders = await Order.find().sort({ invoiceDate: -1 }).limit(8); 
       const recentLogins = await User.find({}).sort({ createdOn: -1 }).limit(3).select('f_Name email createdOn'); 
   
       const admin = await Admin.findById(req.session.admin);

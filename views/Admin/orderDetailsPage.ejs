@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,10 +11,11 @@
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 </head>
+
 <body>
   <div class="header">
     <h1>Order <%= order.orderId.slice(0,6).toUpperCase() %></h1>
-    <button class="cancel-btn" <%= (order.status === 'Delivered' || order.status === 'Cancelled') ? 'disabled' : '' %>>
+    <button class="cancel-btn" <%= (order.status === 'Delivered' || order.status === 'Cancelled' || order.status === 'Returned' || order.status === 'Return Requested' || order.status === 'Request Declined') ? 'disabled' : '' %>>
       Cancel this order
     </button>
   </div>
@@ -36,7 +38,7 @@
         </div>
         <div class="detail-row">
           <span class="detail-label">Customer Since:</span>
-          <span class="detail-value"><%= new Date(order.userId.createdOn).toLocaleDateString('en-US', { timeZone: 'Asia/Kolkata' }) %></span>
+          <span class="detail-value"><%= new Date(order.userId.createdOn).toLocaleDateString('en-GB', { timeZone: 'Asia/Kolkata', day: '2-digit', month: '2-digit', year: 'numeric' }) %></span>
         </div>
       </div>
 
@@ -68,7 +70,7 @@
     <div class="right-section">
       <div class="box order-details">
         <h2>Order Details</h2>
-        
+
         <div class="order-status">
           <div class="detail-row">
             <span class="detail-label">Status:</span>
@@ -83,21 +85,27 @@
             <a href="<%= invoice.pdfUrl %>" target="_blank" class="invoice-link">View Invoice</a>
           </div>
         </div>
-                    
-        <div class="order-item" style="display: flex; justify-content: space-between; align-items: center;">
+
+        <div class="order-item">
           <% order.orderedItems.forEach(item => { %>
+          <div class="item-row">
             <div class="item-info">
               <div class="item-name"><%= item.productId ? item.productId.productName : 'Unknown Product' %></div>
+              <% if (item.cuttingStyle){ %>
               <div class="item-desc">Cutting Style: <%= item.cuttingStyle || 'Not provided' %> | Quantity: <%= item.quantity %> | SKU: <%= item.productId ? item.productId.SKU : 'Not provided' %></div>
+              <% } else { %>
+              <div class="item-desc"> Quantity: <%= item.quantity %> | SKU: <%= item.productId ? item.productId.SKU : 'Not provided' %></div>
+              <% } %>
             </div>
-            <div class="item-price">$<%= item.price.toFixed(2) %></div>
+            <div class="item-price"><%= item.price.toFixed(2) %>₹</div>
+          </div>
           <% }) %>
         </div>
 
         <div class="total-section">
           <div class="total-row">
             <span>Subtotal:</span>
-            <span>$<%= order.totalPrice.toFixed(2) %></span>
+            <span><%= order.totalPrice.toFixed(2) %>₹</span>
           </div>
           <div class="total-row">
             <span>Shipping:</span>
@@ -105,7 +113,7 @@
           </div>
           <div class="total-row total-final">
             <span>Total:</span>
-            <span>$<%= order.finalAmount.toFixed(2) %></span>
+            <span><%= order.finalAmount.toFixed(2) %>₹</span>
           </div>
         </div>
       </div>
@@ -124,13 +132,6 @@
   </div>
 
   <script>
-    // Initialize toastr
-    toastr.options = {
-      "closeButton": true,
-      "positionClass": "toast-top-right",
-      "timeOut": "3000"
-    };
-
     // Cancel button handler to show modal
     document.querySelector('.cancel-btn').addEventListener('click', function() {
       if (this.disabled) return;
@@ -145,24 +146,28 @@
     // Confirm action (Yes) handler
     document.getElementById('confirm-action').addEventListener('click', function() {
       document.getElementById('confirm-modal').style.display = 'none';
-      fetch(`/tezgrani/update-status/<%= order.orderId %>`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: 'Cancelled' })
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          toastr.success('Order cancelled successfully!');
-          setTimeout(() => location.reload(), 1000); // Reload after toast
-        } else {
-          toastr.error(data.message || 'Failed to cancel order.');
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        toastr.error('An error occurred.');
-      });
+      fetch(`/tezgrani/cancel-order/<%= order.orderId %>`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            status: 'Cancelled'
+          })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            toastr.success('Order cancelled successfully!');
+            setTimeout(() => location.reload(), 2000); // Reload after toast
+          } else {
+            toastr.error(data.message || 'Failed to cancel order.');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          toastr.error('An error occurred.');
+        });
     });
 
     // Close modal if clicked outside
@@ -174,4 +179,5 @@
     });
   </script>
 </body>
+
 </html>

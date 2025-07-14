@@ -42,9 +42,15 @@ body {
     font-size: 14px;
     font-weight: 500;
     font-family: 'Poppins', sans-serif;
+    transition: opacity 0.2s ease;
 }
 
-.cancel-btn:hover {
+.cancel-btn:disabled {
+    opacity: 0.5; /* Reduced opacity for disabled state */
+    cursor: not-allowed;
+}
+
+.cancel-btn:hover:not(:disabled) {
     background-color: #c82333;
 }
 
@@ -134,10 +140,19 @@ body {
 
 /* Order item styles */
 .order-item {
+    padding: 15px 0;
+}
+
+.item-row {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    padding: 15px 0;
+    align-items: flex-start;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.item-row:last-child {
+    border-bottom: none;
 }
 
 .item-info {
@@ -152,7 +167,7 @@ body {
 }
 
 .item-desc {
-    color: #666;
+    color: #000000;
     font-size: 14px;
     font-family: 'Poppins', sans-serif;
 }
@@ -161,6 +176,8 @@ body {
     font-weight: 600;
     color: #007bff;
     font-family: 'Poppins', sans-serif;
+    margin-left: 20px;
+    flex-shrink: 0;
 }
 
 /* Total section styles */
@@ -289,5 +306,15 @@ body {
 
     body {
         padding-top: 120px;
+    }
+
+    .item-row {
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .item-price {
+        margin-left: 0;
+        align-self: flex-end;
     }
 }

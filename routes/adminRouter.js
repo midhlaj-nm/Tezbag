@@ -5,7 +5,9 @@ const userManageController = require('../controllers/admin/userManageController'
 const categoryManageController = require('../controllers/admin/categoryManageController');
 const productManagementController = require('../controllers/admin/productManagementController');
 const dealsManageController = require('../controllers/admin/dealsManageController');
-const orderController = require('../controllers/admin/orderController')
+const orderController = require('../controllers/admin/orderController');
+const salesController = require('../controllers/admin/salesController');
+const returnManagementController = require('../controllers/admin/returnManagementController')
 const adminAuth = require('../middlewares/adminAuth');
 const upload = require('../middlewares/multer')
 
@@ -44,9 +46,19 @@ router.patch('/deals/edit/:dealId', adminAuth, dealsManageController.editDeals)
 router.delete('/deals/delete/:dealId', adminAuth, dealsManageController.deleteDeal)
 
 //orderController
-router.get('/order-management', orderController.loadOrder)
-router.post('/update-status/:orderId', orderController.updateStatus)
-router.get('/order-details/:orderId',orderController.loadOrderDetails)
+router.get('/order-management', adminAuth, orderController.loadOrder)
+router.post('/update-status/:orderId', adminAuth, orderController.updateStatus)
+router.get('/order-details/:orderId', adminAuth, orderController.loadOrderDetails)
+router.post('/cancel-order/:orderId', adminAuth, orderController.cancelOrder)
+
+//returnManagementController
+router.get('/return-management', returnManagementController.loadReturn)
+router.post('/update-return-status', returnManagementController.changeStatus)
+
+//salesController
+router.get('/sales-report', salesController.loadSales)
+
+
 
 
 module.exports = router;

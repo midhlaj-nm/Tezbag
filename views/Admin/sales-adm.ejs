@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sales Report</title>
+  <link rel="stylesheet" href="/Admin-css/dashboard-adm.css" />
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<style>
+  .filter-section {
+    margin-bottom: 20px;
+  }
+  
+  .filter-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .date-controls {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+  }
+  
+  .date-item {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    position: relative;
+  }
+  
+  .sort-item {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  
+  .date-item label, .sort-item label {
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  
+  .filter-group button {
+    padding: 5px 15px;
+    background-color: #00B207;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+    border-radius: 4px;
+  }
+  
+  .filter-group button:hover {
+    background-color: #009106;
+  }
+  
+  .filter-group select {
+    padding: 5px 15px 5px 4px;
+    background-color: #ffffff;
+    color: rgb(0, 0, 0);
+    border: 1px solid #ccc;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+    border-radius: 4px;
+  }
+  
+  /* Date Picker Styling */
+  .date-picker {
+    border: 1px solid #ccc;
+    background: white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    padding: 5px;
+  }
+  
+  /* Split Screen Styling */
+  .split-screen {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 200px); /* Adjust based on header and filter height */
+  }
+  
+  .report-upper, .report-lower {
+    flex: 1;
+    padding: 20px;
+  }
+  
+  .report-upper h2, .report-lower h2 {
+    margin-bottom: 15px;
+    font-weight: 500;
+  }
+  
+  /* Chart Container Styling */
+  .chart-container {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    -ms-overflow-style: none; /* Hide scrollbar in IE and Edge */
+    scrollbar-width: none; /* Hide scrollbar in Firefox */
+  }
+  
+  .chart-container::-webkit-scrollbar {
+    display: none; /* Hide scrollbar in Chrome, Safari, and Opera */
+  }
+  
+  .chart-box {
+    width: 450px; /* Increased width for better scrollable effect */
+    min-width: 450px; /* Ensure minimum width is maintained */
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    flex-shrink: 0; /* Prevent shrinking */
+  }
+  
+  .chart-box h3 {
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+    text-align: center;
+    font-weight: 500;
+  }
+  
+  .chart-box canvas {
+    height: 200px !important;
+    width: 100% !important;
+  }
+  
+  #salesChart {
+    max-height: 300px;
+  }
+  
+  /* Responsive design */
+  @media (max-width: 768px) {
+    .filter-group {
+      flex-direction: column;
+      gap: 15px;
+      align-items: flex-start;
+    }
+    
+    .date-controls {
+      flex-direction: column;
+      gap: 10px;
+      align-items: flex-start;
+    }
+    
+    .date-item, .sort-item {
+      width: 100%;
+    }
+    
+    .split-screen {
+      height: auto;
+    }
+    
+    .report-upper, .report-lower {
+      padding: 10px;
+    }
+    
+    .chart-container {
+      flex-direction: column;
+      gap: 15px;
+    }
+    
+    .chart-box {
+      width: 100%;
+      min-width: 0;
+    }
+  }
+</style>
+<body>
+
+<div id="middle" class="container-fluid">      
+  <div class="logo">
+    <img width="250" src="/Admin-css/Logo-Admins.jpg" alt="Logo">
+  </div>
+</div>    
+
+<!-- Sidebar -->
+<div class="sidebar" id="adminSidebar">
+  <ul class="sidebar-links">
+    <li>
+      <a href="/tezgrani/dashboard">
+        <span class="icon-svg">
+          <svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 -960 960 960" width="30px" fill="#5f5f5f">
+            <path d="M520-600v-240h320v240H520ZM120-440v-400h320v400H120Zm400 320v-400h320v400H520Zm-400 0v-240h320v240H120Zm80-400h160v-240H200v240Zm400 320h160v-240H600v240Zm0-480h160v-80H600v80ZM200-200h160v-80H200v80Zm160-320Zm240-160Zm0 240ZM360-280Z"/>
+          </svg>
+        </span>
+        <span>Dashboard</span>
+      </a>    
+    </li>
+
+    <li>
+      <a href="/tezgrani/order-management">
+        <span class="icon-svg">
+          <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f">
+            <path d="M280-80q-33 0-56.5-23.5T200-160q0-33 23.5-56.5T280-240q33 0 56.5 23.5T360-160q0 33-23.5 56.5T280-80Zm400 0q-33 0-56.5-23.5T600-160q0-33 23.5-56.5T680-240q33 0 56.5 23.5T760-160q0 33-23.5 56.5T680-80ZM246-720l96 200h280l110-200H246Zm-38-80h590q23 0 35 20.5t1 41.5L692-482q-11 20-29.5 31T622-440H324l-44 80h480v80H280q-45 0-68-39.5t-2-78.5l54-98-144-304H40v-80h130l38 80Zm134 280h280-280Z"/>
+          </svg>
+        </span>
+        <span>Orders</span>
+      </a>
+    </li>
+
+    <li>
+      <a href="/tezgrani/category-management">
+        <span class="icon-svg">
+          <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f">
+            <path d="m260-520 220-360 220 360H260ZM700-80q-75 0-127.5-52.5T520-260q0-75 52.5-127.5T700-440q75 0 127.5 52.5T880-260q0 75-52.5 127.5T700-80Zm-580-20v-320h320v320H120Zm580-60q42 0 71-29t29-71q0-42-29-71t-71-29q-42 0-71 29t-29 71q0 42 29 71t71 29Zm-500-20h160v-160H200v160Zm202-420h156l-78-126-78 126Zm78 0ZM360-340Zm340 80Z"/>
+          </svg>
+        </span>
+        <span>Category</span>
+      </a>
+    </li>
+
+    <li>
+      <a href="/tezgrani/product-management">
+        <span class="icon-svg">
+          <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f">
+            <path d="M200-80q-33 0-56.5-23.5T120-160v-451q-18-11-29-28.5T80-680v-120q0-33 23.5-56.5T160-880h640q33 0 56.5 23.5T880-800v120q0 23-11 40.5T840-611v451q0 33-23.5 56.5T760-80H200Zm0-520v440h560v-440H200Zm-40-80h640v-120H160v120Zm200 280h240v-80H360v80Zm120 20Z"/>
+          </svg>
+        </span>
+        <span>Products</span>
+      </a>
+    </li>
+
+    <li>
+      <a href="/tezgrani/user-management">
+        <span class="icon-svg">
+          <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f">
+            <path d="M0-240v-63q0-43 44-70t116-27q13 0 25 .5t23 2.5q-14 21-21 44t-7 48v65H0Zm240 0v-65q0-32 17.5-58.5T307-410q32-20 76.5-30t96.5-10q53 0 97.5 10t76.5 30q32 20 49 46.5t17 58.5v65H240Zm540 0v-65q0-26-6.5-49T754-397q11-2 22.5-2.5t23.5-.5q72 0 116 26.5t44 70.5v63H780Zm-455-80h311q-10-20-55.5-35T480-370q-55 0-100.5 15T325-320ZM160-440q-33 0-56.5-23.5T80-520q0-34 23.5-57t56.5-23q34 0 57 23t23 57q0 33-23 56.5T160-440Zm640 0q-33 0-56.5-23.5T720-520q0-34 23.5-57t56.5-23q34 0 57 23t23 57q0 33-23 56.5T800-440Zm-320-40q-50 0-85-35t-35-85q0-51 35-85.5t85-34.5q51 0 85.5 34.5T600-600q0 50-34.5 85T480-480Zm0-80q17 0 28.5-11.5T520-600q0-17-11.5-28.5T480-640q-17 0-28.5 11.5T440-600q0 17 11.5 28.5T480-560Zm1 240Zm-1-280Z"/>
+          </svg>
+        </span>
+        <span>Users</span>
+      </a>
+    </li>
+
+    <li>
+      <a href="/tezgrani/deals-management">
+        <span class="icon-svg">
+          <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f">
+            <path d="M160-280v80h640v-80H160Zm0-440h88q-5-9-6.5-19t-1.5-21q0-50 35-85t85-35q30 0 55.5 15.5T460-826l20 26 20-26q18-24 44-39t56-15q50 0 85 35t35 85q0 11-1.5 21t-6.5 19h88q33 0 56.5 23.5T880-640v440q0 33-23.5 56.5T800-120H160q-33 0-56.5-23.5T80-200v-440q0-33 23.5-56.5T160-720Zm0 320h640v-240H596l84 114-64 46-136-184-136 184-64-46 82-114H160v240Zm200-320q17 0 28.5-11.5T400-760q0-17-11.5-28.5T360-800q-17 0-28.5 11.5T320-760q0 17 11.5 28.5T360-720Zm240 0q17 0 28.5-11.5T640-760q0-17-11.5-28.5T600-800q-17 0-28.5 11.5T560-760q0 17 11.5 28.5T600-720Z"/>
+          </svg>
+        </span>
+        <span>Deals</span>
+      </a>
+    </li>
+
+    <li>
+      <a href="/tezgrani/return-management">
+        <span class="icon-svg">
+          <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f">
+            <path d="M360-240 120-480l240-240 56 56-144 144h488v-160h80v240H272l144 144-56 56Z"/>
+          </svg>
+        </span>
+        <span>Returns</span>
+      </a>
+    </li>
+
+    <li class="active">
+      <a href="/tezgrani/sales-report">
+        <span class="icon-svg">
+          <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f">
+            <path d="M640-160v-280h160v280H640Zm-240 0v-640h160v640H400Zm-240 0v-440h160v440H160Z"/>
+          </svg>
+        </span>
+        <span>Sales Report</span>
+      </a>
+    </li>
+
+    <li>
+      <a href="/tezgrani/gallery-management">
+        <span class="icon-svg">
+          <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f">
+            <path d="M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h640q33 0 56.5 23.5T880-720v480q0 33-23.5 56.5T800-160H160Zm0-80h640v-480H160v480Zm80-80h480L570-520 450-360l-90-120-120 160Zm-80 80v-480 480Z"/>
+          </svg>
+        </span>
+        <span>Gallery</span>
+      </a>
+    </li>
+
+    <li>
+      <a href="#" onclick="showLogoutModal()">
+        <span class="icon-svg">
+          <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f">
+            <path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h280v80H200v560h280v80H200Zm440-160-55-58 102-102H360v-80h327L585-622l55-58 200 200-200 200Z"/>
+          </svg>
+        </span>
+        <span>Log-out</span>
+      </a>
+    </li>
+  </ul>
+
+  <!-- Floating Toggle Button -->
+  <button class="floating-toggle-btn" onclick="toggleSidebar()">
+    <svg id="drawer-icon" xmlns="http://www.w3.org/2000/svg" height="28px" viewBox="0 -960 960 960" width="28px" fill="#000000">
+      <path d="M360-120v-720h80v720h-80Zm160-160v-400l200 200-200 200Z"/>
+    </svg>
+  </button>
+</div>
+
+<!-- Content Area -->
+<div class="content">
+  <h1 style="font-weight: 500;">Sales Report</h1>
+
+  <!-- Filter Section -->
+  <div class="filter-section">
+    <div class="filter-group">
+      <div class="date-controls">
+        <div class="date-item">
+          <label for="start-date">Start:</label>
+          <button id="start-date-btn" onclick="openStartDatePicker()">Start Date</button>
+        </div>
+        <div class="date-item">
+          <label for="end-date">To:</label>
+          <button id="end-date-btn" onclick="openEndDatePicker()">End Date</button>
+        </div>
+      </div>
+      <div class="sort-item">
+        <label for="sort-btn">Sort By:</label>
+        <select id="sort-btn" onchange="applySort()">
+          <option value="today">Today</option>
+          <option value="1day">1 Day</option>
+          <option value="week">Week</option>
+          <option value="month">Month</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Split Screen Layout -->
+  <div class="split-screen">
+    <!-- Upper Half: Scrollable Chart Boxes -->
+    <div class="report-upper">
+      <h2>Sales Summary</h2>
+      <div class="chart-container">
+        <div class="chart-box">
+          <h3>Discount & Coupons Deduction</h3>
+          <canvas id="couponChart"></canvas>
+        </div>
+        <div class="chart-box">
+          <h3>Overall Sales Count</h3>
+          <canvas id="salesCountChart"></canvas>
+        </div>
+        <div class="chart-box">
+          <h3>Overall Order Amount</h3>
+          <canvas id="orderAmountChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lower Half: Chart -->
+    <div class="report-lower">
+      <h2>Overall Sales In Website</h2>
+      <canvas id="salesChart"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- Logout Modal -->
+<div id="logout-modal" class="modal" style="display:none;">
+  <div class="modal-content">
+    <h3 style="font-size: 1.75rem; font-weight: 500;">Are you sure?</h3>
+    <div class="modal-buttons">
+      <button id="cancel-logout" class="btn-no">NO</button>
+      <button id="confirm-logout" class="btn-yes">YES</button>
+    </div>
+  </div>
+</div>
+
+<!-- JavaScript -->
+<script>
+  // Sidebar Toggle
+  function toggleSidebar() {
+    const sidebar = document.getElementById("adminSidebar");
+    const icon = document.getElementById("drawer-icon");
+    sidebar.classList.toggle("collapsed");
+    if (sidebar.classList.contains("collapsed")) {
+      icon.style.transform = "rotate(0deg)";
+    } else {
+      icon.style.transform = "rotate(180deg)";
+    }
+  }
+
+  // Show logout modal
+  function showLogoutModal() {
+    const logoutModal = document.getElementById('logout-modal');
+    logoutModal.style.display = 'flex';
+  }
+
+  // Setup event listeners for logout modal buttons
+  document.addEventListener('DOMContentLoaded', function() {
+    const logoutModal = document.getElementById('logout-modal');
+    const confirmLogoutButton = document.getElementById('confirm-logout');
+    const cancelLogoutButton = document.getElementById('cancel-logout');
+    confirmLogoutButton.addEventListener('click', () => {
+      logoutModal.style.display = 'none';
+      window.location.href = '/tezgrani/logout';
+    });
+    cancelLogoutButton.addEventListener('click', () => {
+      logoutModal.style.display = 'none';
+    });
+  });
+
+  // Initialize flatpickr with inline mode on hidden containers
+  let startDatePicker = flatpickr(document.createElement('div'), {
+    inline: true,
+    dateFormat: "d-m-Y",
+    onChange: function(selectedDates, dateStr) {
+      if (selectedDates.length > 0) {
+        document.getElementById('start-date-btn').textContent = dateStr;
+        endDatePicker.setDate(selectedDates[0]);
+        endDatePicker.set("minDate", selectedDates[0]);
+      }
+    }
+  }).calendarContainer;
+
+  let endDatePicker = flatpickr(document.createElement('div'), {
+    inline: true,
+    dateFormat: "d-m-Y",
+    onChange: function(selectedDates, dateStr) {
+      if (selectedDates.length > 0) {
+        document.getElementById('end-date-btn').textContent = dateStr;
+      }
+    }
+  }).calendarContainer;
+
+  // Append calendars to body with positioning
+  document.body.appendChild(startDatePicker);
+  document.body.appendChild(endDatePicker);
+  startDatePicker.style.display = 'none';
+  startDatePicker.className = 'date-picker';
+  endDatePicker.style.display = 'none';
+  endDatePicker.className = 'date-picker';
+
+  // Open date pickers on button click with positioning
+  function openStartDatePicker() {
+    const btn = document.getElementById('start-date-btn');
+    const rect = btn.getBoundingClientRect();
+    startDatePicker.style.display = 'block';
+    startDatePicker.style.position = 'absolute';
+    startDatePicker.style.left = `${rect.left}px`;
+    startDatePicker.style.top = `${rect.bottom + window.scrollY}px`;
+    startDatePicker.focus();
+  }
+
+  function openEndDatePicker() {
+    const btn = document.getElementById('end-date-btn');
+    const rect = btn.getBoundingClientRect();
+    endDatePicker.style.display = 'block';
+    endDatePicker.style.position = 'absolute';
+    endDatePicker.style.left = `${rect.left}px`;
+    endDatePicker.style.top = `${rect.bottom + window.scrollY}px`;
+    endDatePicker.focus();
+  }
+
+  // Hide calendars when clicking outside
+  document.addEventListener('click', function(event) {
+    if (!startDatePicker.contains(event.target) && event.target.id !== 'start-date-btn') {
+      startDatePicker.style.display = 'none';
+    }
+    if (!endDatePicker.contains(event.target) && event.target.id !== 'end-date-btn') {
+      endDatePicker.style.display = 'none';
+    }
+  });
+
+  // Apply sorting based on selection
+  function applySort() {
+    const sortValue = document.getElementById('sort-btn').value;
+    const today = new Date();
+    let startDate, endDate;
+
+    switch (sortValue) {
+      case 'today':
+        startDate = new Date(today);
+        endDate = new Date(today);
+        break;
+      case '1day':
+        startDate = new Date(today);
+        endDate = new Date(today);
+        startDate.setDate(today.getDate() - 1);
+        break;
+      case 'week':
+        startDate = new Date(today);
+        startDate.setDate(today.getDate() - 7);
+        endDate = new Date(today);
+        break;
+      case 'month':
+        startDate = new Date(today);
+        startDate.setMonth(today.getMonth() - 1);
+        endDate = new Date(today);
+        break;
+    }
+
+    const startDateStr = startDate.toLocaleDateString('en-GB').split('/').reverse().join('-');
+    const endDateStr = endDate.toLocaleDateString('en-GB').split('/').reverse().join('-');
+    document.getElementById('start-date-btn').textContent = startDateStr;
+    document.getElementById('end-date-btn').textContent = endDateStr;
+    startDatePicker.setDate(startDate);
+    endDatePicker.setDate(endDate);
+    endDatePicker.set("minDate", startDate);
+  }
+
+  // Initialize static charts
+  document.addEventListener('DOMContentLoaded', () => {
+    // Static Coupon Chart
+    const couponCtx = document.getElementById('couponChart').getContext('2d');
+    new Chart(couponCtx, {
+      type: 'bar',
+      data: {
+        labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+        datasets: [{
+          label: 'Customers Using Coupons',
+          data: [15, 20, 25, 30, 35, 40, 45],
+          backgroundColor: 'rgba(0, 178, 7, 0.6)',
+          borderColor: 'rgba(0, 178, 7, 1)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        scales: { y: { beginAtZero: true } },
+        maintainAspectRatio: false
+      }
+    });
+
+    // Static Sales Count Chart
+    const salesCountCtx = document.getElementById('salesCountChart').getContext('2d');
+    new Chart(salesCountCtx, {
+      type: 'bar',
+      data: {
+        labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+        datasets: [{
+          label: 'Products Sold',
+          data: [50, 75, 100, 125, 150, 175, 200],
+          backgroundColor: 'rgba(0, 178, 7, 0.6)',
+          borderColor: 'rgba(0, 178, 7, 1)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        scales: { y: { beginAtZero: true } },
+        maintainAspectRatio: false
+      }
+    });
+
+    // Static Order Amount Chart
+    const orderAmountCtx = document.getElementById('orderAmountChart').getContext('2d');
+    new Chart(orderAmountCtx, {
+      type: 'bar',
+      data: {
+        labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+        datasets: [{
+          label: 'Turnover ($)',
+          data: [1000, 1500, 2000, 2500, 3000, 3500, 4000],
+          backgroundColor: 'rgba(0, 178, 7, 0.6)',
+          borderColor: 'rgba(0, 178, 7, 1)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        scales: { y: { beginAtZero: true } },
+        maintainAspectRatio: false
+      }
+    });
+
+    // Static Sales Chart
+    const salesCtx = document.getElementById('salesChart').getContext('2d');
+    new Chart(salesCtx, {
+      type: 'bar',
+      data: {
+        labels: ['July 07', 'July 08', 'July 09', 'July 10', 'July 11', 'July 12', 'July 13'],
+        datasets: [{
+          label: 'Sales Amount ($)',
+          data: [500, 600, 700, 800, 900, 1000, 1100],
+          backgroundColor: 'rgba(0, 178, 7, 0.6)',
+          borderColor: 'rgba(0, 178, 7, 1)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        scales: { y: { beginAtZero: true } },
+        maintainAspectRatio: false
+      }
+    });
+  });
+</script>
+</html>

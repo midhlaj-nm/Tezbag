@@ -230,7 +230,7 @@ const confirmOrder = async (req, res, next) => {
       return res.status(400).json({ success: false, message: 'Missing required fields', redirect: '/retry-payment' });
     }
 
-    const requiredFields = ['firstName', 'lastName', 'streetAddress', 'city', 'state', 'country', 'pinCode', 'landmark', 'email', 'phone'];
+    const requiredFields = ['firstName', 'lastName', 'streetAddress', 'city', 'state', 'country', 'pinCode', 'landmark', 'phone'];
     const missing = requiredFields.filter(field => !address[field]);
     if (missing.length > 0) {
       console.log('Incomplete address fields:', missing);

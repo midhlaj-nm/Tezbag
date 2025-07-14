@@ -203,13 +203,13 @@
               <% orders.forEach((order, index) => { %>
               <tr>
                 <td><%= index + 1 %></td>
-                <td><%= order.orderId.slice(0,6) %></td>
+                <td><%= order.orderId.slice(0,6).toUpperCase() %></td>
                 <td><%= order.userId ? order.userId.username : 'Unknown' %></td>
                 <td><%= order.orderedItems.reduce((sum, item) => sum + item.quantity, 0) %></td>
                 <td><%= new Date(order.invoiceDate).toISOString().split('T')[0] %></td>
                 <td><%= order.finalAmount.toFixed(2) %>₹</td>
                 <td>
-                  <% if (order.status === 'Cancelled') { %>
+                  <% if (order.status === 'Cancelled' || order.status === 'Return Requested' || order.status === 'Returned' || order.status === 'Request Declined') { %>
                     <span class="status-text"><%= order.status %></span>
                   <% } else { %>
                     <select class="status-dropdown" onchange="updateStatus(this, '<%= order.orderId %>')">
@@ -250,7 +250,7 @@
     <nav aria-label="Admin page navigation" class="custom-pagination">
       <ul class="pagination-list">
         <li class="pagination-item <%= currentPage === 1 ? 'disabled' : '' %>">
-          <a class="pagination-link" href="/tezgrani/order-management?page=<%= currentPage - 1 %>&search=<%= searchQuery || '' %>&filter=<%= filterStatus || 'all' %>&sortDate=<%= sortDate || '' %>" <%= currentPage === 1 ? 'tabindex="-1" aria-disabled="true"' : '' %>>Previous</a>
+          <span class="pagination-link" href="/tezgrani/order-management?page=<%= currentPage - 1 %>&search=<%= searchQuery || '' %>&filter=<%= filterStatus || 'all' %>&sortDate=<%= sortDate || '' %>" <%= currentPage === 1 ? 'tabindex="-1" aria-disabled="true"' : '' %>>Previous</>
         </li>
         <% for (let i = 1; i <= totalPages; i++) { %>
         <li class="pagination-item <%= currentPage === i ? 'active' : '' %>">
@@ -258,7 +258,7 @@
         </li>
         <% } %>
         <li class="pagination-item <%= currentPage === totalPages ? 'disabled' : '' %>">
-          <a class="pagination-link" href="/tezgrani/order-management?page=<%= currentPage + 1 %>&search=<%= searchQuery || '' %>&filter=<%= filterStatus || 'all' %>&sortDate=<%= sortDate || '' %>" <%= currentPage === totalPages ? 'tabindex="-1" aria-disabled="true"' : '' %>>Next</a>
+          <span class="pagination-link" href="/tezgrani/order-management?page=<%= currentPage + 1 %>&search=<%= searchQuery || '' %>&filter=<%= filterStatus || 'all' %>&sortDate=<%= sortDate || '' %>" <%= currentPage === totalPages ? 'tabindex="-1" aria-disabled="true"' : '' %>>Next</>
         </li>
       </ul>
     </nav>
@@ -353,7 +353,7 @@
           })
           .catch(error => {
             confirmModal.style.display = 'none';
-            toastr.error('An error occurred.');
+            toastr.error('An error occurred. Please refresh the page');
           });
       });
 
