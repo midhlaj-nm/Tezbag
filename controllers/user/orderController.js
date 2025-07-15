@@ -173,16 +173,27 @@ const verifyPayment = async (req, res, next) => {
     await Cart.deleteOne({ userId: order.userId });
     console.log('Cart cleared for user:', order.userId);
 
-    // Generate invoice if payment is successful
-    const addrDoc = await Address.findOne({ userId: order.userId }).lean();
-    const addr = addrDoc.address.find(item => item._id.toString() === order.address.toString());
-    const invoice = await createInvoice(order, addr);
-    console.log('Generated invoice:', invoice);
-    const pdfUrl = await pdfGenerator(invoice, order);
-    console.log('PDF URL generated:', pdfUrl);
+    // --- ASYNCHRONOUS INVOICE GENERATION AND UPLOAD ---
+    setImmediate(async () => {
+      try {
+        console.log('Starting asynchronous invoice generation and PDF upload for order:', orderId);
+        const addrDoc = await Address.findOne({ userId: order.userId }).lean();
+        const addr = addrDoc.address.find(item => item._id.toString() === order.address.toString());
+        const invoice = await createInvoice(order, addr); // Assuming createInvoice saves the invoice doc
+        console.log('Asynchronously generated invoice doc:', invoice);
+        const pdfUrl = await pdfGenerator(invoice, order); // pdfGenerator updates invoice.pdfUrl
+        console.log('Asynchronously generated PDF and updated invoice with URL:', pdfUrl);
 
-    res.status(200).json({ success: true, message: 'Payment verified successfully', orderId, pdfUrl });
-    console.log('Verification response sent:', { success: true, orderId, pdfUrl });
+        order.pdfUrl = pdfUrl;
+        await order.save();
+        console.log('Order updated with PDF URL:', order.pdfUrl);
+      } catch (err) {
+        console.error(`Error during asynchronous invoice generation/PDF upload for order ${orderId}:`, err);
+      }
+    });
+    // Send response immediately, without waiting for PDF generation
+    res.status(200).json({ success: true, message: 'Payment verified successfully', orderId, pdfUrl: null });
+    console.log('Verification response sent: success=true, orderId=', orderId, ' (PDF generation in background)');
   } catch (error) {
     console.error('Error in verifyPayment:', error);
     const order = await Order.findOne({ orderId: req.body.orderId });
@@ -211,188 +222,287 @@ const paymentFailed = async (req, res) => {
 };
 
 const confirmOrder = async (req, res, next) => {
-  try {
-    console.log('Starting confirmOrder with paymentMethod:', req.body.paymentMethod);
-    const { paymentMethod, orderNotes, address, coupon, finalAmount } = req.body;
-    const userId = req.session.user;
-    const addressId = address._id;
+    try {
+        console.log('Starting confirmOrder with paymentMethod:', req.body.paymentMethod);
+        const { paymentMethod, orderNotes, address, coupon, finalAmount } = req.body;
+        const userId = req.session.user;
+        const addressId = address._id;
 
-    console.log('Address ID:', addressId);
+        console.log('Address ID:', addressId);
 
-    const addrDoc = await Address.findOne({ userId }).lean();
-    console.log('Parent address document:', addrDoc);
+        const addrDoc = await Address.findOne({ userId }).lean();
+        console.log('Parent address document:', addrDoc);
 
-    const addr = addrDoc.address.find(item => item._id.$oid === addressId || item._id.toString() === addressId);
-    console.log('Selected address:', addr);
+        const addr = addrDoc.address.find(item => item._id.$oid === addressId || item._id.toString() === addressId);
+        console.log('Selected address:', addr);
 
-    if (!paymentMethod || !address || !finalAmount) {
-      console.log('Missing required fields:', { paymentMethod, address, finalAmount });
-      return res.status(400).json({ success: false, message: 'Missing required fields', redirect: '/retry-payment' });
-    }
-
-    const requiredFields = ['firstName', 'lastName', 'streetAddress', 'city', 'state', 'country', 'pinCode', 'landmark', 'phone'];
-    const missing = requiredFields.filter(field => !address[field]);
-    if (missing.length > 0) {
-      console.log('Incomplete address fields:', missing);
-      return res.status(400).json({ success: false, message: 'Incomplete address information', redirect: '/retry-payment' });
-    }
-
-    if (!userId || !addressId) {
-      console.log('User or address missing:', { userId, addressId });
-      return res.status(401).json({ success: false, message: 'User or address missing', redirect: '/retry-payment' });
-    }
-
-    const cart = await Cart.findOne({ userId }).populate('items');
-    console.log('Cart data:', cart);
-    if (!cart || !cart.items.length) {
-      console.log('Cart is empty or not found');
-      return res.status(400).json({ success: false, message: 'Cart is empty or not found', redirect: '/retry-payment' });
-    }
-
-    const orderedItems = cart.items.map(item => ({
-      productId: item.productId,
-      quantity: item.quantity,
-      price: item.price,
-      id: item._id,
-      cuttingStyle: item.cuttingStyle
-    }));
-    console.log('Ordered items:', orderedItems);
-
-    const totalPrice = orderedItems.reduce((sum, item) => sum + item.quantity * item.price, 0);
-    const discount = totalPrice - parseFloat(finalAmount);
-    console.log('Calculated totals:', { totalPrice, discount, finalAmount });
-
-    const valid = [];
-    for (const item of orderedItems) {
-      const product = await Product.findById(item.productId);
-      if (!product || product.quantity < item.quantity) {
-        console.log('Out of stock product:', item.productId);
-        return res.status(400).json({ success: false, message: 'Some products are out of stock', redirect: '/shop', delay: 2000 });
-      }
-      product.quantity -= item.quantity;
-      product.status = product.quantity === 0 ? 'Out Of Stock' : 'Available';
-      valid.push({ ...item, product });
-    }
-    console.log('Valid items after stock check:', valid);
-
-    await Promise.all(valid.map(item => item.product.save()));
-    console.log('Product quantities updated');
-
-    // Create Razorpay order for UPI
-    let razorpayOrder = null;
-    if (paymentMethod === 'upi') {
-      try {
-        const options = {
-          amount: parseFloat(finalAmount) * 100,
-          currency: 'INR',
-          receipt: `order_rcptid_${Date.now()}`,
-        };
-        console.log('Razorpay options:', options);
-        razorpayOrder = await razorpay.orders.create(options);
-        console.log('Razorpay order created:', razorpayOrder);
-      } catch (razorpayError) {
-        console.error('Razorpay order creation failed:', razorpayError.message);
-        return res.status(400).json({ success: false, message: 'Failed to create Razorpay order', redirect: '/retry-payment' });
-      }
-    }
-
-    const order = new Order({
-      orderedItems: valid,
-      totalPrice,
-      discount,
-      finalAmount: parseFloat(finalAmount),
-      paymentMethod,
-      userId,
-      address: addressId,
-      orderNotes: orderNotes || '',
-      invoiceDate: new Date(),
-      status: 'Pending',
-      couponApplied: !!coupon,
-      paymentStatus: 'Not Paid',
-      ...(razorpayOrder && { razorpayOrderId: razorpayOrder.id }),
-    });
-    console.log('Order object before save:', order);
-    await order.save();
-    console.log('Order saved with ID:', order.orderId);
-
-    // Handle wallet payment after order is saved
-    if (paymentMethod === 'wallet') {
-      const userWallet = await Wallet.findOne({ user: userId });
-      console.log('User wallet:', userWallet);
-      if (!userWallet) {
-        console.log('Wallet not found for user:', userId);
-        return res.status(400).json({ success: false, message: 'Wallet not found for the user', redirect: '/retry-payment' });
-      }
-
-      const amountToDeduct = parseFloat(finalAmount);
-      if (userWallet.balance < amountToDeduct) {
-        console.log('Insufficient wallet balance:', { balance: userWallet.balance, amountToDeduct });
-        return res.status(400).json({ success: false, message: 'Insufficient wallet balance', redirect: '/retry-payment' });
-      }
-
-      userWallet.balance -= amountToDeduct;
-      userWallet.transactions.push({
-        type: 'debit',
-        amount: amountToDeduct,
-        reason: `Order payment (Order ID: ${order.orderId.slice(0, 6)})`,
-        date: new Date()
-      });
-      console.log('Wallet transaction added:', userWallet.transactions[userWallet.transactions.length - 1]);
-      await userWallet.save();
-      console.log('Wallet updated with balance:', userWallet.balance);
-
-      order.paymentStatus = 'Paid';
-      order.paymentDetails = {
-        method: 'Wallet',
-        amount: order.finalAmount,
-        date: new Date(),
-      };
-      await order.save();
-      console.log('Order payment details updated for wallet');
-
-      // Clear cart only after successful wallet payment
-      await Cart.deleteOne({ userId });
-      console.log('Cart cleared for user:', userId);
-    }
-
-    // Conditionally skip invoice generation for now (to be handled post-payment verification)
-    let pdfUrl = null;
-    if ((paymentMethod !== 'upi' && order.paymentStatus === 'Paid') || (paymentMethod === 'wallet' && order.paymentStatus === 'Paid')) {
-      const invoice = await createInvoice(order, addr);
-      console.log('Generated invoice:', invoice);
-      pdfUrl = await pdfGenerator(invoice, order);
-      console.log('PDF URL generated:', pdfUrl);
-
-      // Clear cart after successful non-UPI payment or wallet payment
-      await Cart.deleteOne({ userId });
-      console.log('Cart cleared for user:', userId);
-    }
-
-    res.status(200).json({
-      success: true,
-      message: 'Order initiated successfully',
-      orderId: order.orderId,
-      pdfUrl,
-      razorpayKey: paymentMethod === 'upi' ? process.env.RAZORPAY_KEY_ID : null,
-      razorpayOrderId: paymentMethod === 'upi' ? razorpayOrder.id : null,
-    });
-    console.log('Response sent to client:', { success: true, orderId: order.orderId, pdfUrl });
-  } catch (error) {
-    console.error('Error in confirmOrder:', error);
-    // Revert product quantities on failure
-    const cart = await Cart.findOne({ userId }).populate('items');
-    if (cart) {
-      for (const item of cart.items) {
-        const product = await Product.findById(item.productId);
-        if (product) {
-          product.quantity += item.quantity;
-          product.status = product.quantity > 0 ? 'Available' : 'Out Of Stock';
-          await product.save();
-          console.log('Reverted quantity for product on error:', item.productId);
+        if (!paymentMethod || !address || !finalAmount) {
+            console.log('Missing required fields:', { paymentMethod, address, finalAmount });
+            return res.status(400).json({ success: false, message: 'Missing required fields', redirect: '/retry-payment' });
         }
-      }
+
+        const requiredFields = ['firstName', 'lastName', 'streetAddress', 'city', 'state', 'country', 'pinCode', 'landmark', 'phone'];
+        const missing = requiredFields.filter(field => !address[field]);
+        if (missing.length > 0) {
+            console.log('Incomplete address fields:', missing);
+            return res.status(400).json({ success: false, message: 'Incomplete address information', redirect: '/retry-payment' });
+        }
+
+        if (!userId || !addressId) {
+            console.log('User or address missing:', { userId, addressId });
+            return res.status(401).json({ success: false, message: 'User or address missing', redirect: '/retry-payment' });
+        }
+
+        const cart = await Cart.findOne({ userId }).populate('items');
+        console.log('Cart data:', cart);
+        if (!cart || !cart.items.length) {
+            console.log('Cart is empty or not found');
+            return res.status(400).json({ success: false, message: 'Cart is empty or not found', redirect: '/retry-payment' });
+        }
+
+        const orderedItems = cart.items.map(item => ({
+            productId: item.productId,
+            quantity: item.quantity,
+            price: item.price,
+            id: item._id,
+            cuttingStyle: item.cuttingStyle
+        }));
+        console.log('Ordered items:', orderedItems);
+
+        const totalPrice = orderedItems.reduce((sum, item) => sum + item.quantity * item.price, 0);
+        const discount = totalPrice - parseFloat(finalAmount);
+        console.log('Calculated totals:', { totalPrice, discount, finalAmount });
+
+        const productsToUpdate = []; // Renamed 'valid' for clarity
+        for (const item of orderedItems) {
+            const product = await Product.findById(item.productId);
+            if (!product || product.quantity < item.quantity) {
+                console.log('Out of stock product:', item.productId);
+                // Revert any stock changes already made in this loop
+                await Promise.all(productsToUpdate.map(pItem => {
+                    pItem.product.quantity += pItem.quantity;
+                    pItem.product.status = pItem.product.quantity > 0 ? 'Available' : 'Out Of Stock';
+                    return pItem.product.save();
+                }));
+                return res.status(400).json({ success: false, message: 'Some products are out of stock', redirect: '/shop', delay: 2000 });
+            }
+            product.quantity -= item.quantity;
+            product.status = product.quantity === 0 ? 'Out Of Stock' : 'Available';
+            productsToUpdate.push({ ...item, product });
+        }
+        console.log('Products to update after stock check:', productsToUpdate);
+
+        await Promise.all(productsToUpdate.map(item => item.product.save()));
+        console.log('Product quantities updated');
+
+        // Create Razorpay order for UPI
+        let razorpayOrder = null;
+        if (paymentMethod === 'upi') {
+            try {
+                const options = {
+                    amount: parseFloat(finalAmount) * 100,
+                    currency: 'INR',
+                    receipt: `order_rcptid_${Date.now()}`,
+                };
+                console.log('Razorpay options:', options);
+                razorpayOrder = await razorpay.orders.create(options);
+                console.log('Razorpay order created:', razorpayOrder);
+            } catch (razorpayError) {
+                console.error('Razorpay order creation failed:', razorpayError.message);
+                // Revert product quantities if Razorpay order creation fails
+                await Promise.all(productsToUpdate.map(item => {
+                    item.product.quantity += item.quantity;
+                    item.product.status = item.product.quantity > 0 ? 'Available' : 'Out Of Stock';
+                    return item.product.save();
+                }));
+                return res.status(400).json({ success: false, message: 'Failed to create Razorpay order', redirect: '/retry-payment' });
+            }
+        }
+
+        const order = new Order({
+            orderedItems: orderedItems, // Use the original orderedItems for the order record
+            totalPrice,
+            discount,
+            finalAmount: parseFloat(finalAmount),
+            paymentMethod,
+            userId,
+            address: addressId,
+            orderNotes: orderNotes || '',
+            invoiceDate: new Date(),
+            status: 'Pending',
+            couponApplied: !!coupon,
+            paymentStatus: 'Not Paid', // Default status, updated for wallet below
+            ...(razorpayOrder && { razorpayOrderId: razorpayOrder.id }),
+        });
+        console.log('Order object before save:', order);
+        await order.save();
+        console.log('Order saved with ID:', order.orderId);
+
+        // Handle wallet payment after order is saved
+        if (paymentMethod === 'wallet') {
+            const userWallet = await Wallet.findOne({ user: userId });
+            console.log('User wallet:', userWallet);
+            if (!userWallet) {
+                console.log('Wallet not found for user:', userId);
+                // Revert product quantities
+                await Promise.all(productsToUpdate.map(item => {
+                    item.product.quantity += item.quantity;
+                    item.product.status = item.product.quantity > 0 ? 'Available' : 'Out Of Stock';
+                    return item.product.save();
+                }));
+                // Delete the newly created order since payment failed
+                await Order.deleteOne({ _id: order._id });
+                return res.status(400).json({ success: false, message: 'Wallet not found for the user', redirect: '/retry-payment' });
+            }
+
+            const amountToDeduct = parseFloat(finalAmount);
+            if (userWallet.balance < amountToDeduct) {
+                console.log('Insufficient wallet balance:', { balance: userWallet.balance, amountToDeduct });
+                // Revert product quantities
+                await Promise.all(productsToUpdate.map(item => {
+                    item.product.quantity += item.quantity;
+                    item.product.status = item.product.quantity > 0 ? 'Available' : 'Out Of Stock';
+                    return item.product.save();
+                }));
+                // Delete the newly created order since payment failed
+                await Order.deleteOne({ _id: order._id });
+                return res.status(400).json({ success: false, message: 'Insufficient wallet balance', redirect: '/retry-payment' });
+            }
+
+            userWallet.balance -= amountToDeduct;
+            userWallet.transactions.push({
+                type: 'debit',
+                amount: amountToDeduct,
+                reason: `Order payment (Order ID: ${order.orderId.slice(0, 6)})`,
+                date: new Date()
+            });
+            console.log('Wallet transaction added:', userWallet.transactions[userWallet.transactions.length - 1]);
+            await userWallet.save();
+            console.log('Wallet updated with balance:', userWallet.balance);
+
+            order.paymentStatus = 'Paid';
+            order.paymentDetails = {
+                method: 'Wallet',
+                amount: order.finalAmount,
+                date: new Date(),
+            };
+            await order.save(); // Save the order again with updated payment status
+            console.log('Order payment details updated for wallet');
+
+            // Clear cart only after successful wallet payment
+            await Cart.deleteOne({ userId });
+            console.log('Cart cleared for user:', userId);
+
+            // --- ASYNCHRONOUS INVOICE GENERATION FOR WALLET PAYMENT ---
+            // Pass the `order` and `addr` objects into the setImmediate context
+            setImmediate(async (orderContext, addrContext) => {
+                try {
+                    console.log('Starting asynchronous invoice generation and PDF upload for wallet order:', orderContext.orderId);
+                    // Ensure you fetch the address again if addrContext is not a full Mongoose doc
+                    // Or ideally, pass the full addr object
+                    const invoice = await createInvoice(orderContext, addrContext); // createInvoice saves the invoice doc
+                    console.log('Asynchronously generated invoice doc for wallet:', invoice);
+                    const pdfUrl = await pdfGenerator(invoice, orderContext); // pdfGenerator updates invoice.pdfUrl and returns it
+                    console.log('Asynchronously generated PDF for wallet order, URL:', pdfUrl);
+
+                    orderContext.pdfUrl = pdfUrl; // Update pdfUrl on the order document
+                    await orderContext.save(); // Save the order document with the new pdfUrl
+                    console.log('Wallet order updated with PDF URL:', orderContext.pdfUrl);
+                } catch (err) {
+                    console.error(`Error during asynchronous invoice generation/PDF upload for wallet order ${orderContext.orderId}:`, err);
+                    next(err); // Consider more robust error logging/handling for background tasks
+                }
+            }, order, addr); // Pass order and addr to the setImmediate callback
+            // --- END ASYNCHRONOUS ---
+        }
+        // If COD payment method, you can also trigger asynchronous invoice generation here if desired
+        else if (paymentMethod === 'cod') {
+            order.paymentStatus = 'Not Paid'; // COD is not paid upfront
+            order.status = 'Pending'; // Or 'Confirmed', etc.
+            order.paymentDetails = {
+                method: 'COD',
+                amount: order.finalAmount,
+                date: new Date(),
+            };
+            await order.save();
+            console.log('Order saved as COD. Payment status: Not Paid.');
+            await Cart.deleteOne({ userId }); // Clear cart for COD
+            console.log('Cart cleared for user:', userId);
+
+            // --- ASYNCHRONOUS INVOICE GENERATION FOR COD PAYMENT ---
+            setImmediate(async (orderContext, addrContext) => {
+                try {
+                    console.log('Starting asynchronous invoice generation and PDF upload for COD order:', orderContext.orderId);
+                    const invoice = await createInvoice(orderContext, addrContext);
+                    console.log('Asynchronously generated invoice doc for COD:', invoice);
+                    const pdfUrl = await pdfGenerator(invoice, orderContext);
+                    console.log('Asynchronously generated PDF for COD order, URL:', pdfUrl);
+
+                    orderContext.pdfUrl = pdfUrl;
+                    await orderContext.save();
+                    console.log('COD order updated with PDF URL:', orderContext.pdfUrl);
+                } catch (err) {
+                    console.error(`Error during asynchronous invoice generation/PDF upload for COD order ${orderContext.orderId}:`, err);
+                    next(err);
+                }
+            }, order, addr);
+            // --- END ASYNCHRONOUS ---
+        }
+
+        res.status(200).json({
+            success: true,
+            message: 'Order initiated successfully',
+            orderId: order.orderId,
+            pdfUrl: null,
+            razorpayKey: paymentMethod === 'upi' ? process.env.RAZORPAY_KEY_ID : null,
+            razorpayOrderId: paymentMethod === 'upi' ? razorpayOrder.id : null,
+        });
+        console.log('Response sent to client:', { success: true, orderId: order.orderId, pdfUrl: null });
+    } catch (error) {
+        console.error('Error in confirmOrder:', error);
+        // Revert product quantities on failure
+        const cart = await Cart.findOne({ userId }).populate('items');
+        if (cart) {
+            for (const item of cart.items) {
+                const product = await Product.findById(item.productId);
+                if (product) {
+                    product.quantity += item.quantity;
+                    product.status = product.quantity > 0 ? 'Available' : 'Out Of Stock';
+                    await product.save();
+                    console.log('Reverted quantity for product on error:', item.productId);
+                }
+            }
+        }
+        return res.status(500).json({ success: false, message: 'Order initiation failed due to an error', redirect: '/retry-payment' });
     }
-    return res.status(500).json({ success: false, message: 'Order initiation failed due to an error', redirect: '/retry-payment' });
+};
+
+const checkInvoiceStatus = async (req, res) => {
+  try {
+    const userId = req.session.user;
+    const orderId = req.params.orderId;
+    console.log('Checking invoice status for OrderId:', orderId);
+    console.log('UserId:', userId);
+
+    const user = await User.findById(userId);
+    if (!user) return res.status(401).json({ success: false, message: 'User not found' });
+
+    const order = await Order.findOne({ orderId }).lean();
+    if (!order) return res.status(404).json({ success: false, message: 'Order not found' });
+
+    const invoice = await Invoice.findOne({ orderId: order.orderId });
+    console.log('Invoice details:', invoice);
+    const invoicePdf = invoice ? invoice.pdfUrl : order.pdfUrl || null;
+    const invoiceNumber = invoice ? invoice.invoiceNumber.slice(-6) : null;
+
+    res.json({
+      success: true,
+      invoicePdf,
+      invoiceNumber
+    });
+  } catch (error) {
+    console.error('Error in checkInvoiceStatus:', error);
+    res.status(500).json({ success: false, message: 'Error checking invoice status' });
   }
 };
 
@@ -636,4 +746,4 @@ const returnOrder = async (req, res, next) => {
   }
 };
 
-module.exports = { loadCheckout, verifyPayment, paymentFailed, confirmOrder, loadConfirmation, downloadInvoice, loadOrderHistory, cancelOrder, returnOrder };
+module.exports = { loadCheckout, verifyPayment, paymentFailed, confirmOrder, loadConfirmation, checkInvoiceStatus, downloadInvoice, loadOrderHistory, cancelOrder, returnOrder };

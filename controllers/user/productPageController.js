@@ -130,6 +130,11 @@ const loadProductDetails = async (req, res) => {
       return res.redirect('/shop');
     }
 
+    const userId = req.session.user
+    if(!userId){
+      return res.redirect('/')
+    }
+
     const activeDeals = await Deal.find({
       offerType: 'percentage',
       status: 'Active'

@@ -89,6 +89,7 @@ router.post('/order/place', userAuth, orderController.confirmOrder);
 router.post('/order/verify-payment', userAuth, orderController.verifyPayment);
 router.get('/retry-payment', userAuth, orderController.paymentFailed)
 router.get('/order-confirmation/:orderId', userAuth, orderController.loadConfirmation);
+router.get('/check-invoice/:orderId', userAuth, orderController.checkInvoiceStatus)
 router.get('/download-invoice/', userAuth, orderController.downloadInvoice)
 router.get('/order-history', userAuth, orderController.loadOrderHistory)
 router.post('/cancel-order/:orderId', userAuth, orderController.cancelOrder)

@@ -47,12 +47,12 @@
           <button class="btn btn-cancelled" id="cancelButton" disabled>Return Requested</button>
           <% } else if (order.status === 'Payment Failed') { %>
           <button class="btn btn-cancelled" id="cancelButton" disabled>Cancel Order</button>
-          <% } else if (order.status === 'Pending' || order.status === 'Processing' || order.status === 'Shipped' || order.status === 'Shipped') { %>
+          <% } else if (order.status === 'Pending' || order.status === 'Processing' || order.status === 'Shipped') { %>
           <button class="btn btn-secondary" id="cancelButton" onclick="openCancelModal('<%= orderId %>')">Cancel Order</button>
           <% } else if (order.status === 'Delivered') { %>
           <button class="btn btn-secondary" onclick="openReturnModal('<%= orderId %>')">Return Order</button>
           <% } %>
-          <a href="/order-history" class="btn btn-secondary">View Order Details</a>
+          <a href="/order-history" class="btn btn-secondary">View Order History</a>
         </div>
 
         <div class="full-width-button">
@@ -60,7 +60,8 @@
           <% if (order.status === 'Payment Failed') { %>
           <button class="btn btn-cancelled" disabled>Download Invoice</button>
           <% } else { %>
-          <a href="/download-invoice?url=<%= encodeURIComponent(invoicePdf) %>&filename=<%= invoiceNumber.replace(/ /g, '_') + '.pdf' %>" class="btn btn-invoice">Download Invoice</a>
+          <div id="invoiceLoading" class="invoice-loading">Generating invoice...</div>
+          <a href="#" class="btn btn-invoice" id="downloadInvoice" style="display: none;">Download Invoice</a>
           <% } %>
         </div>
       </div>
@@ -187,7 +188,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.js"></script>
     <script>
-      // Modal Functions (defined globally)
+      // Modal Functions
       function openCancelModal(orderId) {
         document.getElementById('cancelModal').style.display = 'block';
       }
@@ -198,27 +199,20 @@
 
       function closeModal(type) {
         document.getElementById(type === 'cancel' ? 'cancelModal' : 'returnModal').style.display = 'none';
-        // Reset custom reason visibility and error message
         document.getElementById(`${type}CustomReason`).style.display = 'none';
         document.getElementById(`${type}CustomInput`).value = '';
-        if (type === 'return') {
-          document.getElementById('err1').style.display = 'none';
-        }
+        if (type === 'return') document.getElementById('err1').style.display = 'none';
       }
 
       function toggleCustomReason(type) {
         const select = document.getElementById(type === 'cancel' ? 'cancelReason' : 'returnReason');
         const customReason = document.getElementById(`${type}CustomReason`);
-        if (select.value === 'other') {
-          customReason.style.display = 'block';
-        } else {
+        if (select.value === 'other') customReason.style.display = 'block';
+        else {
           customReason.style.display = 'none';
           document.getElementById(`${type}CustomInput`).value = '';
         }
-        // Hide error message when a new option is selected
-        if (type === 'return') {
-          document.getElementById('err1').style.display = 'none';
-        }
+        if (type === 'return') document.getElementById('err1').style.display = 'none';
       }
 
       function confirmCancel(orderId) {
@@ -227,12 +221,8 @@
         const finalReason = reason === 'other' ? customReason : reason;
         fetch(`/cancel-order/${orderId}`, {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              reason: finalReason || 'No reason provided'
-            })
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ reason: finalReason || 'No reason provided' })
           })
           .then(response => response.json())
           .then(data => {
@@ -244,11 +234,8 @@
                 cancelButton.textContent = 'Order Cancelled';
                 cancelButton.disabled = true;
               }
-              // Reload after 2 seconds
               setTimeout(() => location.reload(), 2000);
-            } else {
-              toastr.error(data.message || 'Failed to cancel order.');
-            }
+            } else toastr.error(data.message || 'Failed to cancel order.');
           })
           .catch(error => {
             console.error('Error:', error);
@@ -268,23 +255,16 @@
         }
         fetch(`/return-order/${orderId}`, {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              reason: finalReason
-            })
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ reason: finalReason })
           })
           .then(response => response.json())
           .then(data => {
             if (data.success) {
               toastr.success('Return request submitted successfully!');
               closeModal('return');
-              // Reload after 2 seconds
               setTimeout(() => location.reload(), 2000);
-            } else {
-              toastr.error(data.message || 'Failed to submit return request.');
-            }
+            } else toastr.error(data.message || 'Failed to submit return request.');
           })
           .catch(error => {
             console.error('Error:', error);
@@ -292,7 +272,7 @@
           });
       }
 
-      // Initialize Toastr on window load
+      // Initialize Toastr and Invoice Polling
       window.onload = function() {
         if (typeof toastr === 'undefined') {
           console.error('Toastr is not loaded. Check the CDN link.');
@@ -303,6 +283,44 @@
             showDuration: 300,
             hideDuration: 300
           };
+        }
+
+        // Invoice polling logic
+        const orderId = "<%= orderId %>";
+        const invoiceLoading = document.getElementById('invoiceLoading');
+        const downloadInvoice = document.getElementById('downloadInvoice');
+        const initialInvoicePdf = "<%= invoicePdf %>";
+
+        if (initialInvoicePdf === 'null') {
+          invoiceLoading.style.display = 'block';
+          let pollCount = 0;
+          const maxPolls = 60; // Maximum 60 seconds
+          const pollInterval = setInterval(async () => {
+            try {
+              const response = await fetch(`/check-invoice/${orderId}`);
+              const data = await response.json();
+              if (data.success && data.invoicePdf && data.invoicePdf !== 'null') {
+                clearInterval(pollInterval);
+                invoiceLoading.style.display = 'none';
+                downloadInvoice.href = `/download-invoice?url=${encodeURIComponent(data.invoicePdf)}&filename=${data.invoiceNumber.replace(/ /g, '_') + '.pdf'}`;
+                downloadInvoice.style.display = 'inline-block';
+              }
+              if (++pollCount >= maxPolls) {
+                clearInterval(pollInterval);
+                invoiceLoading.textContent = 'Invoice generation failed. Contact support.';
+              }
+            } catch (error) {
+              console.error('Polling error:', error);
+              if (++pollCount >= maxPolls) {
+                clearInterval(pollInterval);
+                invoiceLoading.textContent = 'Error fetching invoice. Contact support.';
+              }
+            }
+          }, 5000);
+        } else {
+          invoiceLoading.style.display = 'none';
+          downloadInvoice.href = `/download-invoice?url=${encodeURIComponent(initialInvoicePdf)}&filename=<%= invoiceNumber.replace(/ /g, '_') + '.pdf' %>`;
+          downloadInvoice.style.display = 'inline-block';
         }
       };
     </script>
