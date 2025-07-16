@@ -150,6 +150,12 @@ body {
     background-color: #008905;
 }
 
+.btn-invoice.disabled {
+  pointer-events: none;
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 /* Right Section */
 .right-section {
     padding: 40px 30px;

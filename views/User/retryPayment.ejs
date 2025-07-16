@@ -109,7 +109,6 @@
       }
     }
   </style>
-
 </head>
 
 <body>
@@ -117,20 +116,18 @@
     <div class="icon"></div>
     <h1>Payment Failed</h1>
     <p>Your payment could not be processed at this time. Please try again or update your payment method to continue.</p>
-    <button class="update-button">Retry Payment</button>
-    <p class="support-text">Want to view Order History? <a href="#" class="support-link">Order History</a></p>
+    <button class="update-button" id="retryPaymentBtn">Retry Payment</button>
+    <p class="support-text">Want to view Order History? <a href="/order-history" class="support-link">Order History</a></p>
   </div>
-</body>
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const retryButton = document.querySelector('.update-button');
-    retryButton.addEventListener('click', () => {
-      window.location.href = '/cart/checkout'; 
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const retryButton = document.getElementById('retryPaymentBtn');
+      retryButton.addEventListener('click', () => {
+        const url = `/cart/checkout?retry=true&orderId=<%= orderId %>&amount=<%= amount %>&razorpayKey=<%= razorpayKey %>&razorpayOrderId=<%= razorpayOrderId %>`;
+        window.location.href = url;
+      });
     });
-
-    const orderHistoryLink = document.querySelector('.support-link');
-    orderHistoryLink.setAttribute('href', '/order-history'); 
-  });
-</script>
+  </script>
+</body>
 
 </html>

@@ -213,10 +213,30 @@ const verifyPayment = async (req, res, next) => {
 
 const paymentFailed = async (req, res) => {
   try {
-    console.log('Rendering retryPayment page');
-    res.render('retryPayment');
+    console.log('Rendering paymentFailed page');
+    const userId = req.session.user;
+    const latestFailedOrder = await Order.findOne({ userId, status: 'Payment Failed' })
+      .sort({ invoiceDate: -1 }) 
+      .populate('orderedItems.productId');
+
+    if (!latestFailedOrder) {
+      return res.status(404);
+    }
+
+    const razorpayKey = process.env.RAZORPAY_KEY_ID; 
+    const razorpayOrderId = latestFailedOrder.razorpayOrderId; 
+    console.log('This is raorpayOrderId: ',razorpayOrderId)
+    const amount = latestFailedOrder.finalAmount; 
+
+    res.render('retryPayment', {
+      orderId: latestFailedOrder._id,
+      amount: amount,
+      razorpayKey: razorpayKey,
+      razorpayOrderId: razorpayOrderId,
+      userId,
+    });
   } catch (error) {
-    console.error('Error rendering retryPayment:', error);
+    console.error('Error rendering paymentFailed:', error);
     res.status(404);
   }
 };
@@ -273,12 +293,11 @@ const confirmOrder = async (req, res, next) => {
         const discount = totalPrice - parseFloat(finalAmount);
         console.log('Calculated totals:', { totalPrice, discount, finalAmount });
 
-        const productsToUpdate = []; // Renamed 'valid' for clarity
+        const productsToUpdate = [];
         for (const item of orderedItems) {
             const product = await Product.findById(item.productId);
             if (!product || product.quantity < item.quantity) {
                 console.log('Out of stock product:', item.productId);
-                // Revert any stock changes already made in this loop
                 await Promise.all(productsToUpdate.map(pItem => {
                     pItem.product.quantity += pItem.quantity;
                     pItem.product.status = pItem.product.quantity > 0 ? 'Available' : 'Out Of Stock';
@@ -295,6 +314,23 @@ const confirmOrder = async (req, res, next) => {
         await Promise.all(productsToUpdate.map(item => item.product.save()));
         console.log('Product quantities updated');
 
+        let order = new Order({
+            orderedItems,
+            totalPrice,
+            discount,
+            finalAmount: parseFloat(finalAmount),
+            paymentMethod,
+            userId,
+            address: addressId,
+            orderNotes: orderNotes || '',
+            invoiceDate: new Date(),
+            status: 'Pending',
+            couponApplied: !!coupon,
+            paymentStatus: 'Not Paid',
+        });
+        await order.save();
+        console.log('Initial order saved with orderId:', order.orderId);
+
         // Create Razorpay order for UPI
         let razorpayOrder = null;
         if (paymentMethod === 'upi') {
@@ -307,6 +343,11 @@ const confirmOrder = async (req, res, next) => {
                 console.log('Razorpay options:', options);
                 razorpayOrder = await razorpay.orders.create(options);
                 console.log('Razorpay order created:', razorpayOrder);
+
+                // Update order with razorpayOrderId
+                order.razorpayOrderId = razorpayOrder.id;
+                await order.save();
+                console.log('Order updated with razorpayOrderId:', order.razorpayOrderId);
             } catch (razorpayError) {
                 console.error('Razorpay order creation failed:', razorpayError.message);
                 // Revert product quantities if Razorpay order creation fails
@@ -315,28 +356,14 @@ const confirmOrder = async (req, res, next) => {
                     item.product.status = item.product.quantity > 0 ? 'Available' : 'Out Of Stock';
                     return item.product.save();
                 }));
+                // Update order status to Payment Failed and retain razorpayOrderId
+                order.status = 'Payment Failed';
+                order.paymentStatus = 'Failed';
+                await order.save();
+                console.log('Order updated to Payment Failed with razorpayOrderId:', order.razorpayOrderId);
                 return res.status(400).json({ success: false, message: 'Failed to create Razorpay order', redirect: '/retry-payment' });
             }
         }
-
-        const order = new Order({
-            orderedItems: orderedItems, // Use the original orderedItems for the order record
-            totalPrice,
-            discount,
-            finalAmount: parseFloat(finalAmount),
-            paymentMethod,
-            userId,
-            address: addressId,
-            orderNotes: orderNotes || '',
-            invoiceDate: new Date(),
-            status: 'Pending',
-            couponApplied: !!coupon,
-            paymentStatus: 'Not Paid', // Default status, updated for wallet below
-            ...(razorpayOrder && { razorpayOrderId: razorpayOrder.id }),
-        });
-        console.log('Order object before save:', order);
-        await order.save();
-        console.log('Order saved with ID:', order.orderId);
 
         // Handle wallet payment after order is saved
         if (paymentMethod === 'wallet') {
@@ -344,13 +371,11 @@ const confirmOrder = async (req, res, next) => {
             console.log('User wallet:', userWallet);
             if (!userWallet) {
                 console.log('Wallet not found for user:', userId);
-                // Revert product quantities
                 await Promise.all(productsToUpdate.map(item => {
                     item.product.quantity += item.quantity;
                     item.product.status = item.product.quantity > 0 ? 'Available' : 'Out Of Stock';
                     return item.product.save();
                 }));
-                // Delete the newly created order since payment failed
                 await Order.deleteOne({ _id: order._id });
                 return res.status(400).json({ success: false, message: 'Wallet not found for the user', redirect: '/retry-payment' });
             }
@@ -358,13 +383,11 @@ const confirmOrder = async (req, res, next) => {
             const amountToDeduct = parseFloat(finalAmount);
             if (userWallet.balance < amountToDeduct) {
                 console.log('Insufficient wallet balance:', { balance: userWallet.balance, amountToDeduct });
-                // Revert product quantities
                 await Promise.all(productsToUpdate.map(item => {
                     item.product.quantity += item.quantity;
                     item.product.status = item.product.quantity > 0 ? 'Available' : 'Out Of Stock';
                     return item.product.save();
                 }));
-                // Delete the newly created order since payment failed
                 await Order.deleteOne({ _id: order._id });
                 return res.status(400).json({ success: false, message: 'Insufficient wallet balance', redirect: '/retry-payment' });
             }
@@ -386,39 +409,31 @@ const confirmOrder = async (req, res, next) => {
                 amount: order.finalAmount,
                 date: new Date(),
             };
-            await order.save(); // Save the order again with updated payment status
+            await order.save();
             console.log('Order payment details updated for wallet');
 
-            // Clear cart only after successful wallet payment
             await Cart.deleteOne({ userId });
             console.log('Cart cleared for user:', userId);
 
-            // --- ASYNCHRONOUS INVOICE GENERATION FOR WALLET PAYMENT ---
-            // Pass the `order` and `addr` objects into the setImmediate context
             setImmediate(async (orderContext, addrContext) => {
                 try {
                     console.log('Starting asynchronous invoice generation and PDF upload for wallet order:', orderContext.orderId);
-                    // Ensure you fetch the address again if addrContext is not a full Mongoose doc
-                    // Or ideally, pass the full addr object
-                    const invoice = await createInvoice(orderContext, addrContext); // createInvoice saves the invoice doc
+                    const invoice = await createInvoice(orderContext, addrContext);
                     console.log('Asynchronously generated invoice doc for wallet:', invoice);
-                    const pdfUrl = await pdfGenerator(invoice, orderContext); // pdfGenerator updates invoice.pdfUrl and returns it
+                    const pdfUrl = await pdfGenerator(invoice, orderContext);
                     console.log('Asynchronously generated PDF for wallet order, URL:', pdfUrl);
 
-                    orderContext.pdfUrl = pdfUrl; // Update pdfUrl on the order document
-                    await orderContext.save(); // Save the order document with the new pdfUrl
+                    orderContext.pdfUrl = pdfUrl;
+                    await orderContext.save();
                     console.log('Wallet order updated with PDF URL:', orderContext.pdfUrl);
                 } catch (err) {
                     console.error(`Error during asynchronous invoice generation/PDF upload for wallet order ${orderContext.orderId}:`, err);
-                    next(err); // Consider more robust error logging/handling for background tasks
+                    next(err);
                 }
-            }, order, addr); // Pass order and addr to the setImmediate callback
-            // --- END ASYNCHRONOUS ---
-        }
-        // If COD payment method, you can also trigger asynchronous invoice generation here if desired
-        else if (paymentMethod === 'cod') {
-            order.paymentStatus = 'Not Paid'; // COD is not paid upfront
-            order.status = 'Pending'; // Or 'Confirmed', etc.
+            }, order, addr);
+        } else if (paymentMethod === 'cod') {
+            order.paymentStatus = 'Not Paid';
+            order.status = 'Pending';
             order.paymentDetails = {
                 method: 'COD',
                 amount: order.finalAmount,
@@ -426,10 +441,9 @@ const confirmOrder = async (req, res, next) => {
             };
             await order.save();
             console.log('Order saved as COD. Payment status: Not Paid.');
-            await Cart.deleteOne({ userId }); // Clear cart for COD
+            await Cart.deleteOne({ userId });
             console.log('Cart cleared for user:', userId);
 
-            // --- ASYNCHRONOUS INVOICE GENERATION FOR COD PAYMENT ---
             setImmediate(async (orderContext, addrContext) => {
                 try {
                     console.log('Starting asynchronous invoice generation and PDF upload for COD order:', orderContext.orderId);
@@ -446,7 +460,6 @@ const confirmOrder = async (req, res, next) => {
                     next(err);
                 }
             }, order, addr);
-            // --- END ASYNCHRONOUS ---
         }
 
         res.status(200).json({

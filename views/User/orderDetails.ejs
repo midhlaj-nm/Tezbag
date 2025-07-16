@@ -21,6 +21,8 @@
           <h1 class="thank-you-heading">Your order cancelled successfully!</h1>
           <% } else if (order.status === 'Returned') { %>
           <h1 class="thank-you-heading">Your order Returned successfully!</h1>
+          <% } else if (order.status === 'Request Declined') { %>
+          <h1 class="thank-you-heading">Your return request declined!</h1>
           <% } else { %>
           <h1 class="thank-you-heading">Thank you for your order!</h1>
           <% } %>
@@ -45,6 +47,10 @@
           <button class="btn btn-cancelled" id="cancelButton" disabled>Order Cancelled</button>
           <% } else if (order.status === 'Return Requested') { %>
           <button class="btn btn-cancelled" id="cancelButton" disabled>Return Requested</button>
+          <% } else if (order.status === 'Returned') { %>
+          <button class="btn btn-cancelled" id="cancelButton" disabled>Return Accepted</button>
+          <% } else if (order.status === 'Request Declined') { %>
+          <button class="btn btn-cancelled" id="cancelButton" disabled>Return Declined</button>
           <% } else if (order.status === 'Payment Failed') { %>
           <button class="btn btn-cancelled" id="cancelButton" disabled>Cancel Order</button>
           <% } else if (order.status === 'Pending' || order.status === 'Processing' || order.status === 'Shipped') { %>
@@ -60,8 +66,10 @@
           <% if (order.status === 'Payment Failed') { %>
           <button class="btn btn-cancelled" disabled>Download Invoice</button>
           <% } else { %>
-          <div id="invoiceLoading" class="invoice-loading">Generating invoice...</div>
-          <a href="#" class="btn btn-invoice" id="downloadInvoice" style="display: none;">Download Invoice</a>
+          <span id="downloadTimer" class="btn btn-invoice disabled" style="display: <%= (invoicePdf || '').includes('https://') ? 'none' : 'inline-block' %>;">Download Invoice (10s)</span>
+          <a href="#" class="btn btn-invoice" id="downloadInvoice" style="display: <%= (invoicePdf || '').includes('https://') ? 'inline-block' : 'none' %>">
+            Download Invoice
+          </a>
           <% } %>
         </div>
       </div>
@@ -272,7 +280,7 @@
           });
       }
 
-      // Initialize Toastr and Invoice Polling
+      // Initialize Toastr and Invoice Polling with Timer
       window.onload = function() {
         if (typeof toastr === 'undefined') {
           console.error('Toastr is not loaded. Check the CDN link.');
@@ -285,42 +293,88 @@
           };
         }
 
-        // Invoice polling logic
         const orderId = "<%= orderId %>";
-        const invoiceLoading = document.getElementById('invoiceLoading');
+        const downloadTimer = document.getElementById('downloadTimer');
         const downloadInvoice = document.getElementById('downloadInvoice');
-        const initialInvoicePdf = "<%= invoicePdf %>";
+        const invoicePdf = "<%= invoicePdf || '' %>"; // Default to empty string if undefined
+        const invoiceNumber = "<%= invoiceNumber %>";
 
-        if (initialInvoicePdf === 'null') {
-          invoiceLoading.style.display = 'block';
+        // Check if invoicePdf is a valid URL
+        const isPdfReady = invoicePdf.includes('https://');
+
+        // Timer logic for 10 seconds
+        if (!isPdfReady) {
+          let timeLeft = 10;
+          downloadTimer.textContent = `Download Invoice ${timeLeft}s...`;
+          const timer = setInterval(() => {
+            timeLeft--;
+            downloadTimer.textContent = `Download Invoice ${timeLeft}s...`;
+            if (timeLeft <= 0) {
+              clearInterval(timer);
+              downloadTimer.style.display = 'none';
+              downloadInvoice.style.display = 'inline-block';
+              refreshInvoiceStatus(); // Refresh button state after 10 seconds
+            }
+          }, 1000);
+
+          // Continue polling
           let pollCount = 0;
-          const maxPolls = 60; // Maximum 60 seconds
+          const maxPolls = 60;
           const pollInterval = setInterval(async () => {
             try {
               const response = await fetch(`/check-invoice/${orderId}`);
               const data = await response.json();
-              if (data.success && data.invoicePdf && data.invoicePdf !== 'null') {
+              if (data.success && data.invoicePdf && data.invoicePdf.includes('https://')) {
                 clearInterval(pollInterval);
-                invoiceLoading.style.display = 'none';
-                downloadInvoice.href = `/download-invoice?url=${encodeURIComponent(data.invoicePdf)}&filename=${data.invoiceNumber.replace(/ /g, '_') + '.pdf'}`;
-                downloadInvoice.style.display = 'inline-block';
+                const filename = data.invoiceNumber ? data.invoiceNumber.replace(/ /g, '_') + '.pdf' : `${orderId}_invoice.pdf`;
+                downloadInvoice.href = `/download-invoice?url=${encodeURIComponent(data.invoicePdf)}&filename=${filename}`;
+                if (timeLeft <= 0) {
+                  downloadInvoice.style.display = 'inline-block';
+                  downloadInvoice.classList.remove('disabled');
+                } else {
+                  clearInterval(timer); // Stop timer if PDF is ready early
+                  downloadTimer.style.display = 'none';
+                  downloadInvoice.style.display = 'inline-block';
+                  downloadInvoice.classList.remove('disabled');
+                  downloadInvoice.href = `/download-invoice?url=${encodeURIComponent(data.invoicePdf)}&filename=${filename}`;
+                }
               }
               if (++pollCount >= maxPolls) {
                 clearInterval(pollInterval);
-                invoiceLoading.textContent = 'Invoice generation failed. Contact support.';
+                downloadTimer.textContent = 'Invoice generation failed. Contact support.';
               }
             } catch (error) {
               console.error('Polling error:', error);
               if (++pollCount >= maxPolls) {
                 clearInterval(pollInterval);
-                invoiceLoading.textContent = 'Error fetching invoice. Contact support.';
+                downloadTimer.textContent = 'Error fetching invoice. Contact support.';
               }
             }
           }, 5000);
         } else {
-          invoiceLoading.style.display = 'none';
-          downloadInvoice.href = `/download-invoice?url=${encodeURIComponent(initialInvoicePdf)}&filename=<%= invoiceNumber.replace(/ /g, '_') + '.pdf' %>`;
+          const filename = invoiceNumber ? invoiceNumber.replace(/ /g, '_') + '.pdf' : `${orderId}_invoice.pdf`;
+          downloadInvoice.href = `/download-invoice?url=${encodeURIComponent(invoicePdf)}&filename=${filename}`;
           downloadInvoice.style.display = 'inline-block';
+          downloadInvoice.classList.remove('disabled');
+        }
+
+        // Function to refresh invoice status
+        function refreshInvoiceStatus() {
+          fetch(`/check-invoice/${orderId}`)
+            .then(response => response.json())
+            .then(data => {
+              if (data.success && data.invoicePdf && data.invoicePdf.includes('https://')) {
+                const filename = data.invoiceNumber ? data.invoiceNumber.replace(/ /g, '_') + '.pdf' : `${orderId}_invoice.pdf`;
+                downloadInvoice.href = `/download-invoice?url=${encodeURIComponent(data.invoicePdf)}&filename=${filename}`;
+                downloadInvoice.classList.remove('disabled');
+              } else {
+                downloadInvoice.style.display = 'none';
+                downloadTimer.style.display = 'inline-block';
+                downloadTimer.textContent = 'Invoice not ready yet. Refreshing...';
+                setTimeout(refreshInvoiceStatus, 5000); // Small refresh every 5 seconds
+              }
+            })
+            .catch(error => console.error('Refresh error:', error));
         }
       };
     </script>

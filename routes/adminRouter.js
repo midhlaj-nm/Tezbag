@@ -52,11 +52,11 @@ router.get('/order-details/:orderId', adminAuth, orderController.loadOrderDetail
 router.post('/cancel-order/:orderId', adminAuth, orderController.cancelOrder)
 
 //returnManagementController
-router.get('/return-management', returnManagementController.loadReturn)
-router.post('/update-return-status', returnManagementController.changeStatus)
+router.get('/return-management', adminAuth, returnManagementController.loadReturn)
+router.post('/update-return-status', adminAuth, returnManagementController.changeStatus)
 
 //salesController
-router.get('/sales-report', salesController.loadSales)
+router.get('/sales-report', adminAuth, salesController.loadSales)
 
 
 

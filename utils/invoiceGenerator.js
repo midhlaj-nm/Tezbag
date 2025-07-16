@@ -1,5 +1,4 @@
 const Invoice = require('../models/invoiceSchema')
-const fs = require('fs')
 
 const createInvoice = async(order, addr) => {
     const invoiceNumber = `INV-${order.invoiceDate}-${order.orderId.toString().slice(-6)}`

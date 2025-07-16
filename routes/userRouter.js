@@ -96,10 +96,10 @@ router.post('/cancel-order/:orderId', userAuth, orderController.cancelOrder)
 router.post('/return-order/:orderId', userAuth, orderController.returnOrder)
 
 //wishlist
-router.get('/wishlist', wishlistController.loadWishlist)
-router.post('/wishlist/add-or-remove', wishlistController.wishlistPrdct)
+router.get('/wishlist', userAuth, wishlistController.loadWishlist)
+router.post('/wishlist/add-or-remove', userAuth, wishlistController.wishlistPrdct)
 
 //wallet
-router.get('/wallet', walletController.loadWallet)
+router.get('/wallet', userAuth, walletController.loadWallet)
 
 module.exports = router

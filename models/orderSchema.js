@@ -75,6 +75,9 @@ const orderSchema = new Schema({
     enum: ['Not Paid', 'Paid', 'Failed'],
     default: 'Not Paid'
   },
+  razorpayOrderId: {
+    type: String
+  },
   paymentDetails: {
     paymentId: String,
     orderId: String,

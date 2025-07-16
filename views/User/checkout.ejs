@@ -754,24 +754,25 @@
     }
 
     function initiateRazorpayPayment(orderId, amount, razorpayKey, razorpayOrderId) {
+      const urlParams = new URLSearchParams(window.location.search);
+      const isRetry = urlParams.get('retry');
       const options = {
         key: razorpayKey,
         amount: amount * 100,
         currency: 'INR',
         name: 'TezBag',
-        description: 'Order Payment',
+        description: 'Order Payment' + (isRetry ? ' (Retry)' : ''),
         order_id: razorpayOrderId,
         handler: function(response) {
           verifyPayment(response, orderId);
         },
         prefill: {
-          name: savedAddresses[selectedAddressIndex]?.firstName,
-          email: savedAddresses[selectedAddressIndex]?.email,
-          contact: savedAddresses[selectedAddressIndex]?.phone,
+          name: '<%= userId.f_Name %>', 
+          email: '<%= userId.email %>', 
         },
         notes: {
           orderId: orderId,
-          userId: '<%=userId%>'
+          userId: '<%= userId %>'
         },
         theme: {
           color: '#00B207'
@@ -779,13 +780,13 @@
         modal: {
           ondismiss: function() {
             fetch(`/cancel-order/${orderId}`, {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json'
-                },
-              })
-              .then(res => res.json())
-              .catch(err => {});
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+            })
+            .then(res => res.json())
+            .catch(err => {});
             const loadingOverlay = document.getElementById('loading-overlay');
             loadingOverlay.style.display = 'none';
             setTimeout(() => {
@@ -811,16 +812,16 @@
         const data = await res.json();
         if (data.success) {
           toastr.success('Payment Successful! Redirecting...');
-          setTimeout(() => window.location.href = `/order-confirmation/${orderId}`, 2000);
+          setTimeout(() => window.location.href = `/order-confirmation/${orderId}`, 1000);
         } else {
           fetch(`/cancel-order/${orderId}`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json'
-              },
-            })
-            .then(res => res.json())
-            .catch(err => {});
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+          })
+          .then(res => res.json())
+          .catch(err => {});
           toastr.error(data.message || 'Payment verification failed');
         }
       } catch (error) {
@@ -847,49 +848,49 @@
       loadingOverlay.style.display = 'flex';
 
       fetch('/order/place', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(orderData)
-        })
-        .then(response => response.json())
-        .then(data => {
-          if (data.success) {
-            loadingOverlay.style.display = 'none';
-            closeOrderConfirmModal();
-            if (paymentMethod === 'upi') {
-              initiateRazorpayPayment(data.orderId, currentTotal, data.razorpayKey, data.razorpayOrderId);
-            } else {
-              const animationContainer = document.getElementById('order-success-animation');
-              animationContainer.style.display = 'block';
-              lottie.loadAnimation({
-                container: animationContainer,
-                renderer: 'svg',
-                loop: false,
-                autoplay: true,
-                path: '/Order_success.json'
-              });
-              setTimeout(() => {
-                animationContainer.style.display = 'none';
-                window.location.href = `/order-confirmation/${data.orderId}`;
-              }, 3700);
-            }
-          } else {
-            if (data.message === 'Product is out-of-stock') {
-              toastr.error(data.message);
-              setTimeout(() => window.location.href = '/shop', 2000);
-            } else {
-              toastr.error(data.message || 'Failed to place order.');
-            }
-            loadingOverlay.style.display = 'none';
-          }
-        })
-        .catch(error => {
-          toastr.error('An error occurred while placing the order.');
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(orderData)
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
           loadingOverlay.style.display = 'none';
           closeOrderConfirmModal();
-        });
+          if (paymentMethod === 'upi') {
+            initiateRazorpayPayment(data.orderId, currentTotal, data.razorpayKey, data.razorpayOrderId);
+          } else {
+            const animationContainer = document.getElementById('order-success-animation');
+            animationContainer.style.display = 'block';
+            lottie.loadAnimation({
+              container: animationContainer,
+              renderer: 'svg',
+              loop: false,
+              autoplay: true,
+              path: '/Order_success.json'
+            });
+            setTimeout(() => {
+              animationContainer.style.display = 'none';
+              window.location.href = `/order-confirmation/${data.orderId}`;
+            }, 3700);
+          }
+        } else {
+          if (data.message === 'Product is out-of-stock') {
+            toastr.error(data.message);
+            setTimeout(() => window.location.href = '/shop', 2000);
+          } else {
+            toastr.error(data.message || 'Failed to place order.');
+          }
+          loadingOverlay.style.display = 'none';
+        }
+      })
+      .catch(error => {
+        toastr.error('An error occurred while placing the order.');
+        loadingOverlay.style.display = 'none';
+        closeOrderConfirmModal();
+      });
     }
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -927,6 +928,18 @@
         else selectAddress(0);
       }
       checkWalletBalance();
+
+      // Retry payment logic
+      const urlParams = new URLSearchParams(window.location.search);
+      const isRetry = urlParams.get('retry');
+      const orderId = urlParams.get('orderId');
+      const amount = urlParams.get('amount');
+      const razorpayKey = urlParams.get('razorpayKey');
+      const razorpayOrderId = urlParams.get('razorpayOrderId');
+
+      if (isRetry && orderId && amount && razorpayKey && razorpayOrderId) {
+        initiateRazorpayPayment(orderId, amount, razorpayKey, razorpayOrderId);
+      }
     });
 
     function selectAddress(index) {
