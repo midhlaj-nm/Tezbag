@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>East Repair Inc. Invoice</title>
+    <title>Invoice</title>
     <style>
         * {
             margin: 0;
@@ -139,6 +139,15 @@
             padding-top: 10px;
         }
 
+        .totals .subtotal .label {
+            text-align: left;
+        }
+
+        .totals .subtotal .amount {
+            text-align: right;
+            margin-left: 50px;
+        }
+
         .totals .total {
             font-weight: bold;
             font-size: 18px;
@@ -146,6 +155,15 @@
             border-top: 2px solid #333;
             padding-top: 10px;
             margin-top: 10px;
+        }
+
+        .totals .total .label {
+            text-align: left;
+        }
+
+        .totals .total .amount {
+            text-align: right;
+            margin-left: 20px;
         }
 
         .terms {
@@ -197,7 +215,7 @@
                 </div>
                 <div class="row">
                     <span class="label">Invoice Date</span>
-                    <span class="value"><%=invoiceDate%></span>
+                    <span class="value"><%=new Date(invoiceDate).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '-')%></span>
                 </div>
                 <div class="row">
                     <span class="label">Shipping</span>
@@ -222,10 +240,18 @@
             <tbody>
                 <% items.forEach((item, index) => { %>
                     <tr>
-                        <td><%= item.productName %></td>
-                        <td class="qty-col"><%= item.quantiy %></tdclass>
-                        <td class="price-col"><%= item.price.toFixed(2) %>₹</td>
-                        <td class="amount-col"><%= item.total.toFixed(2) %>₹</td>
+                        <td>
+                            <%= item.productName %>
+                        </td>
+                        <td class="qty-col">
+                            <%= item.quantity %>
+                        </td>
+                        <td class="price-col">
+                            <%= item.price.toFixed(2) %>₹
+                        </td>
+                        <td class="amount-col">
+                            <%= item.total.toFixed(2) %>₹
+                        </td>
                     </tr>
                 <% }) %>
             </tbody>
@@ -233,12 +259,16 @@
 
         <div class="totals">
             <div class="row subtotal">
-                <span>Subtotal</span>
-                <span><%= totalPrice.toFixed(2) %>₹</span>
+                <span class="label">Subtotal</span>
+                <span class="amount"><%= totalPrice.toFixed(2) %>₹</span>
+            </div>
+            <div class="row subtotal">
+                <span class="label">Discount</span>
+                <span class="amount"><%= discount.toFixed(2) %>₹</span>
             </div>
             <div class="row total">
-                <span>INVOICE TOTAL</span>
-                <span><%= finalAmount.toFixed(2) %>₹</span>
+                <span class="label">INVOICE TOTAL</span>
+                <span class="amount"><%= finalAmount.toFixed(2) %>₹</span>
             </div>
         </div>
     </div>

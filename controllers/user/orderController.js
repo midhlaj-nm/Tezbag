@@ -90,10 +90,13 @@ const loadCheckout = async (req, res, next) => {
       }))
     };
 
+    const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY
+
     res.render('checkout', {
       userId,
       name,
       wallet,
+      GOOGLE_API_KEY,
       total: cartDetails.total.toFixed(2) + '₹',
       coupons: formattedCoupons,
       orderItems,
@@ -179,9 +182,9 @@ const verifyPayment = async (req, res, next) => {
         console.log('Starting asynchronous invoice generation and PDF upload for order:', orderId);
         const addrDoc = await Address.findOne({ userId: order.userId }).lean();
         const addr = addrDoc.address.find(item => item._id.toString() === order.address.toString());
-        const invoice = await createInvoice(order, addr); // Assuming createInvoice saves the invoice doc
+        const invoice = await createInvoice(order, addr);
         console.log('Asynchronously generated invoice doc:', invoice);
-        const pdfUrl = await pdfGenerator(invoice, order); // pdfGenerator updates invoice.pdfUrl
+        const pdfUrl = await pdfGenerator(invoice, order);
         console.log('Asynchronously generated PDF and updated invoice with URL:', pdfUrl);
 
         order.pdfUrl = pdfUrl;
