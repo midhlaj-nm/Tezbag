@@ -1,228 +1,254 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin Dashboard</title>
   <link rel="stylesheet" href="/Admin-css/dashboard-adm.css" />
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-
-
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body>
 
-<div id="middle" class="container-fluid">      
-  <div class="logo">
-    <img width="250" src="/Admin-css/Logo-Admins.jpg" alt="Logo">
-  </div>
-</div>    
-
-<!-- Sidebar -->
-<div class="sidebar" id="adminSidebar">
-  <ul class="sidebar-links">
-    <li class="active">
-      <a href="/tezgrani/dashboard">
-        <span class="icon-svg">
-          <!-- Dashboard -->
-          <svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 -960 960 960" width="30px" fill="#5f5f5f">
-            <path d="M520-600v-240h320v240H520ZM120-440v-400h320v400H120Zm400 320v-400h320v400H520Zm-400 0v-240h320v240H120Zm80-400h160v-240H200v240Zm400 320h160v-240H600v240Zm0-480h160v-80H600v80ZM200-200h160v-80H200v80Zm160-320Zm240-160Zm0 240ZM360-280Z"/>
-          </svg>
-        </span>
-        <span>Dashboard</span>
-      </a>    
-    </li>
-
-    <li>
-      <a href="/tezgrani/order-management">
-        <span class="icon-svg">
-          <!-- Orders -->
-          <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f">
-            <path d="M280-80q-33 0-56.5-23.5T200-160q0-33 23.5-56.5T280-240q33 0 56.5 23.5T360-160q0 33-23.5 56.5T280-80Zm400 0q-33 0-56.5-23.5T600-160q0-33 23.5-56.5T680-240q33 0 56.5 23.5T760-160q0 33-23.5 56.5T680-80ZM246-720l96 200h280l110-200H246Zm-38-80h590q23 0 35 20.5t1 41.5L692-482q-11 20-29.5 31T622-440H324l-44 80h480v80H280q-45 0-68-39.5t-2-78.5l54-98-144-304H40v-80h130l38 80Zm134 280h280-280Z"/>
-          </svg>
-        </span>
-        <span>Orders</span>
-      </a>
-    </li>
-
-    <li>
-      <a href="/tezgrani/category-management">
-        <span class="icon-svg">
-          <!-- Category -->
-          <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f">
-            <path d="m260-520 220-360 220 360H260ZM700-80q-75 0-127.5-52.5T520-260q0-75 52.5-127.5T700-440q75 0 127.5 52.5T880-260q0 75-52.5 127.5T700-80Zm-580-20v-320h320v320H120Zm580-60q42 0 71-29t29-71q0-42-29-71t-71-29q-42 0-71 29t-29 71q0 42 29 71t71 29Zm-500-20h160v-160H200v160Zm202-420h156l-78-126-78 126Zm78 0ZM360-340Zm340 80Z"/>
-          </svg>
-        </span>
-        <span>Category</span>
-      </a>
-    </li>
-
-    <li>
-      <a href="/tezgrani/product-management">
-        <span class="icon-svg">
-          <!-- Products -->
-          <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f">
-            <path d="M200-80q-33 0-56.5-23.5T120-160v-451q-18-11-29-28.5T80-680v-120q0-33 23.5-56.5T160-880h640q33 0 56.5 23.5T880-800v120q0 23-11 40.5T840-611v451q0 33-23.5 56.5T760-80H200Zm0-520v440h560v-440H200Zm-40-80h640v-120H160v120Zm200 280h240v-80H360v80Zm120 20Z"/>
-          </svg>
-        </span>
-        <span>Products</span>
-      </a>
-    </li>
-
-    <li>
-      <a href="/tezgrani/user-management">
-        <span class="icon-svg">
-          <!-- Users -->
-          <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f">
-            <path d="M0-240v-63q0-43 44-70t116-27q13 0 25 .5t23 2.5q-14 21-21 44t-7 48v65H0Zm240 0v-65q0-32 17.5-58.5T307-410q32-20 76.5-30t96.5-10q53 0 97.5 10t76.5 30q32 20 49 46.5t17 58.5v65H240Zm540 0v-65q0-26-6.5-49T754-397q11-2 22.5-2.5t23.5-.5q72 0 116 26.5t44 70.5v63H780Zm-455-80h311q-10-20-55.5-35T480-370q-55 0-100.5 15T325-320ZM160-440q-33 0-56.5-23.5T80-520q0-34 23.5-57t56.5-23q34 0 57 23t23 57q0 33-23 56.5T160-440Zm640 0q-33 0-56.5-23.5T720-520q0-34 23.5-57t56.5-23q34 0 57 23t23 57q0 33-23 56.5T800-440Zm-320-40q-50 0-85-35t-35-85q0-51 35-85.5t85-34.5q51 0 85.5 34.5T600-600q0 50-34.5 85T480-480Zm0-80q17 0 28.5-11.5T520-600q0-17-11.5-28.5T480-640q-17 0-28.5 11.5T440-600q0 17 11.5 28.5T480-560Zm1 240Zm-1-280Z"/>
-          </svg>
-        </span>
-        <span>Users</span>
-      </a>
-    </li>
-
-    <li>
-      <a href="/tezgrani/deals-management">
-        <span class="icon-svg">
-          <!-- Deals -->
-          <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f">
-            <path d="M160-280v80h640v-80H160Zm0-440h88q-5-9-6.5-19t-1.5-21q0-50 35-85t85-35q30 0 55.5 15.5T460-826l20 26 20-26q18-24 44-39t56-15q50 0 85 35t35 85q0 11-1.5 21t-6.5 19h88q33 0 56.5 23.5T880-640v440q0 33-23.5 56.5T800-120H160q-33 0-56.5-23.5T80-200v-440q0-33 23.5-56.5T160-720Zm0 320h640v-240H596l84 114-64 46-136-184-136 184-64-46 82-114H160v240Zm200-320q17 0 28.5-11.5T400-760q0-17-11.5-28.5T360-800q-17 0-28.5 11.5T320-760q0 17 11.5 28.5T360-720Zm240 0q17 0 28.5-11.5T640-760q0-17-11.5-28.5T600-800q-17 0-28.5 11.5T560-760q0 17 11.5 28.5T600-720Z"/>
-          </svg>
-        </span>
-        <span>Deals</span>
-      </a>
-    </li>
-
-    <li>
-      <a href="/tezgrani/return-management">
-        <span class="icon-svg">
-          <!-- Returns -->
-          <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f">
-            <path d="M360-240 120-480l240-240 56 56-144 144h488v-160h80v240H272l144 144-56 56Z"/>
-          </svg>
-        </span>
-        <span>Returns</span>
-      </a>
-    </li>
-
-    <li>
-      <a href="/tezgrani/sales-report">
-        <span class="icon-svg">
-          <!-- Sales Report -->
-          <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f">
-            <path d="M640-160v-280h160v280H640Zm-240 0v-640h160v640H400Zm-240 0v-440h160v440H160Z"/>
-          </svg>
-        </span>
-        <span>Sales Report</span>
-      </a>
-    </li>
-
-    <li>
-      <a href="/tezgrani/gallery-management">
-        <span class="icon-svg">
-          <!-- Banners -->
-          <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f">
-            <path d="M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h640q33 0 56.5 23.5T880-720v480q0 33-23.5 56.5T800-160H160Zm0-80h640v-480H160v480Zm80-80h480L570-520 450-360l-90-120-120 160Zm-80 80v-480 480Z"/>
-          </svg>
-        </span>
-        <span>Gallery</span>
-      </a>
-    </li>
-
-    <li>
-      <a href="#" onclick="showLogoutModal()">
-        <span class="icon-svg">
-          <!-- Log-out -->
-          <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f">
-            <path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h280v80H200v560h280v80H200Zm440-160-55-58 102-102H360v-80h327L585-622l55-58 200 200-200 200Z"/>
-          </svg>
-        </span>
-        <span>Log-out</span>
-      </a>
-    </li>
-  </ul>
-
-  <!-- Floating Toggle Button -->
-  <button class="floating-toggle-btn" onclick="toggleSidebar()">
-    <svg id="drawer-icon" xmlns="http://www.w3.org/2000/svg" height="28px" viewBox="0 -960 960 960" width="28px" fill="#000000">
-      <path d="M360-120v-720h80v720h-80Zm160-160v-400l200 200-200 200Z"/>
-    </svg>
-  </button>
-</div>
-
-<!-- Content Area -->
-<div class="content">
-  <h1>Welcome <span style="color: #00B207;"><%= name %></span> to Admin Dashboard</h1>
-  
-  <div class="login-reg-container">
-    <div class="login-reg">
-      <div class="punch-box">
-        <div class="date-time">
-          <h3 id="greeting">Good Morning, <span style="color: #00B207;"><%= name %></span>!</h3>
-          <p id="current-day-date">Friday, April 18, 2025</p>
-          <p id="current-time" style="font-size:2rem;">09:15 AM</p>
-        </div>
-      
-        <div class="punch-status">
-          <p id="punch-info">You have not punched in yet.</p>
-          <button id="punchBtn" onclick="togglePunch()" style="font-family:'Poppins', sans-serif;">Punch In</button>
-        </div>
-      </div>        
+  <div id="middle" class="container-fluid">
+    <div class="logo">
+      <img width="250" src="/Admin-css/Logo-Admins.jpg" alt="Logo">
     </div>
-    <div class="last-logins">
-      <div class="card">
-        <div class="card-header">
-          <h3>Users</h3>
-          <a href="/tezgrani/user-management" class="view-all">View All</a>
+  </div>
+
+  <!-- Sidebar -->
+  <div class="sidebar" id="adminSidebar">
+    <ul class="sidebar-links">
+      <li class="active">
+        <a href="/tezgrani/dashboard">
+          <span class="icon-svg">
+            <svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 -960 960 960" width="30px" fill="#5f5f5f">
+              <path d="M520-600v-240h320v240H520ZM120-440v-400h320v400H120Zm400 320v-400h320v400H520Zm-400 0v-240h320v240H120Zm80-400h160v-240H200v240Zm400 320h160v-240H600v240Zm0-480h160v-80H600v80ZM200-200h160v-80H200v80Zm160-320Zm240-160Zm0 240ZM360-280Z" />
+            </svg>
+          </span>
+          <span>Dashboard</span>
+        </a>
+      </li>
+
+      <li>
+        <a href="/tezgrani/order-management">
+          <span class="icon-svg">
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f">
+              <path d="M280-80q-33 0-56.5-23.5T200-160q0-33 23.5-56.5T280-240q33 0 56.5 23.5T360-160q0 33-23.5 56.5T280-80Zm400 0q-33 0-56.5-23.5T600-160q0-33 23.5-56.5T680-240q33 0 56.5 23.5T760-160q0 33-23.5 56.5T680-80ZM246-720l96 200h280l110-200H246Zm-38-80h590q23 0 35 20.5t1 41.5L692-482q-11 20-29.5 31T622-440H324l-44 80h480v80H280q-45 0-68-39.5t-2-78.5l54-98-144-304H40v-80h130l38 80Zm134 280h280-280Z" />
+            </svg>
+          </span>
+          <span>Orders</span>
+        </a>
+      </li>
+
+      <li>
+        <a href="/tezgrani/category-management">
+          <span class="icon-svg">
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f">
+              <path d="m260-520 220-360 220 360H260ZM700-80q-75 0-127.5-52.5T520-260q0-75 52.5-127.5T700-440q75 0 127.5 52.5T880-260q0 75-52.5 127.5T700-80Zm-580-20v-320h320v320H120Zm580-60q42 0 71-29t29-71q0-42-29-71t-71-29q-42 0-71 29t-29 71q0 42 29 71t71 29Zm-500-20h160v-160H200v160Zm202-420h156l-78-126-78 126Zm78 0ZM360-340Zm340 80Z" />
+            </svg>
+          </span>
+          <span>Category</span>
+        </a>
+      </li>
+
+      <li>
+        <a href="/tezgrani/product-management">
+          <span class="icon-svg">
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f">
+              <path d="M200-80q-33 0-56.5-23.5T120-160v-451q-18-11-29-28.5T80-680v-120q0-33 23.5-56.5T160-880h640q33 0 56.5 23.5T880-800v120q0 23-11 40.5T840-611v451q0 33-23.5 56.5T760-80H200Zm0-520v440h560v-440H200Zm-40-80h640v-120H160v120Zm200 280h240v-80H360v80Zm120 20Z" />
+            </svg>
+          </span>
+          <span>Products</span>
+        </a>
+      </li>
+
+      <li>
+        <a href="/tezgrani/user-management">
+          <span class="icon-svg">
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f">
+              <path d="M0-240v-63q0-43 44-70t116-27q13 0 25 .5t23 2.5q-14 21-21 44t-7 48v65H0Zm240 0v-65q0-32 17.5-58.5T307-410q32-20 76.5-30t96.5-10q53 0 97.5 10t76.5 30q32 20 49 46.5t17 58.5v65H240Zm540 0v-65q0-26-6.5-49T754-397q11-2 22.5-2.5t23.5-.5q72 0 116 26.5t44 70.5v63H780Zm-455-80h311q-10-20-55.5-35T480-370q-55 0-100.5 15T325-320ZM160-440q-33 0-56.5-23.5T80-520q0-34 23.5-57t56.5-23q34 0 57 23t23 57q0 33-23 56.5T160-440Zm640 0q-33 0-56.5-23.5T720-520q0-34 23.5-57t56.5-23q34 0 57 23t23 57q0 33-23 56.5T800-440Zm-320-40q-50 0-85-35t-35-85q0-51 35-85.5t85-34.5q51 0 85.5 34.5T600-600q0 50-34.5 85T480-480Zm0-80q17 0 28.5-11.5T520-600q0-17-11.5-28.5T480-640q-17 0-28.5 11.5T440-600q0 17 11.5 28.5T480-560Zm1 240Zm-1-280Z" />
+            </svg>
+          </span>
+          <span>Users</span>
+        </a>
+      </li>
+
+      <li>
+        <a href="/tezgrani/deals-management">
+          <span class="icon-svg">
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f">
+              <path d="M160-280v80h640v-80H160Zm0-440h88q-5-9-6.5-19t-1.5-21q0-50 35-85t85-35q30 0 55.5 15.5T460-826l20 26 20-26q18-24 44-39t56-15q50 0 85 35t35 85q0 11-1.5 21t-6.5 19h88q33 0 56.5 23.5T880-640v440q0 33-23.5 56.5T800-120H160q-33 0-56.5-23.5T80-200v-440q0-33 23.5-56.5T160-720Zm0 320h640v-240H596l84 114-64 46-136-184-136 184-64-46 82-114H160v240Zm200-320q17 0 28.5-11.5T400-760q0-17-11.5-28.5T360-800q-17 0-28.5 11.5T320-760q0 17 11.5 28.5T360-720Zm240 0q17 0 28.5-11.5T640-760q0-17-11.5-28.5T600-800q-17 0-28.5 11.5T560-760q0 17 11.5 28.5T600-720Z" />
+            </svg>
+          </span>
+          <span>Deals</span>
+        </a>
+      </li>
+
+      <li>
+        <a href="/tezgrani/return-management">
+          <span class="icon-svg">
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f">
+              <path d="M360-240 120-480l240-240 56 56-144 144h488v-160h80v240H272l144 144-56 56Z" />
+            </svg>
+          </span>
+          <span>Returns</span>
+        </a>
+      </li>
+
+      <li>
+        <a href="/tezgrani/sales-report">
+          <span class="icon-svg">
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f">
+              <path d="M640-160v-280h160v280H640Zm-240 0v-640h160v640H400Zm-240 0v-440h160v440H160Z" />
+            </svg>
+          </span>
+          <span>Sales Report</span>
+        </a>
+      </li>
+
+      <li>
+        <a href="/tezgrani/gallery-management">
+          <span class="icon-svg">
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f">
+              <path d="M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h640q33 0 56.5 23.5T880-720v480q0 33-23.5 56.5T800-160H160Zm0-80h640v-480H160v480Zm80-80h480L570-520 450-360l-90-120-120 160Zm-80 80v-480 480Z" />
+            </svg>
+          </span>
+          <span>Gallery</span>
+        </a>
+      </li>
+
+      <li>
+        <a href="#" onclick="showLogoutModal()">
+          <span class="icon-svg">
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f">
+              <path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h280v80H200v560h280v80H200Zm440-160-55-58 102-102H360v-80h327L585-622l55-58 200 200-200 200Z" />
+            </svg>
+          </span>
+          <span>Log-out</span>
+        </a>
+      </li>
+    </ul>
+
+    <button class="floating-toggle-btn" onclick="toggleSidebar()">
+      <svg id="drawer-icon" xmlns="http://www.w3.org/2000/svg" height="28px" viewBox="0 -960 960 960" width="28px" fill="#000000">
+        <path d="M360-120v-720h80v720h-80Zm160-160v-400l200 200-200 200Z" />
+      </svg>
+    </button>
+  </div>
+
+  <!-- Content Area -->
+  <div class="content">
+    <div class="stats-container">
+      <div class="stat-card total-orders">
+        <div class="stat-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f">
+            <path d="M280-80q-33 0-56.5-23.5T200-160q0-33 23.5-56.5T280-240q33 0 56.5 23.5T360-160q0 33-23.5 56.5T280-80Zm400 0q-33 0-56.5-23.5T600-160q0-33 23.5-56.5T680-240q33 0 56.5 23.5T760-160q0 33-23.5 56.5T680-80ZM246-720l96 200h280l110-200H246Zm-38-80h590q23 0 35 20.5t1 41.5L692-482q-11 20-29.5 31T622-440H324l-44 80h480v80H280q-45 0-68-39.5t-2-78.5l54-98-144-304H40v-80h130l38 80Zm134 280h280-280Z" />
+          </svg>
         </div>
-      
-        <table class="table">
-          <thead>
-            <tr>
-              <th>NAME</th>
-              <th>EMAIL</th>
-              <th>CREATED_ON</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% if (recentLogins.length === 0) { %>
+        <div class="stat-value"><%= countOrders || 0 %></div>
+        <div class="stat-label">Total Orders</div>
+      </div>
+      <div class="stat-card total-revenue">
+        <div class="stat-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
+            <path d="M320-414v-306h120v306l-60-56-60 56Zm200 60v-526h120v406L520-354ZM120-216v-344h120v224L120-216Zm0 98 258-258 142 122 224-224h-64v-80h200v200h-80v-64L524-146 382-268 232-118H120Z" />
+          </svg>
+        </div>
+        <div class="stat-value"><%= revenue || 0 %></div>
+        <div class="stat-label">Total Revenue</div>
+      </div>
+      <div class="stat-card active-users">
+        <div class="stat-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f5f5f">
+            <path d="M0-240v-63q0-43 44-70t116-27q13 0 25 .5t23 2.5q-14 21-21 44t-7 48v65H0Zm240 0v-65q0-32 17.5-58.5T307-410q32-20 76.5-30t96.5-10q53 0 97.5 10t76.5 30q32 20 49 46.5t17 58.5v65H240Zm540 0v-65q0-26-6.5-49T754-397q11-2 22.5-2.5t23.5-.5q72 0 116 26.5t44 70.5v63H780Zm-455-80h311q-10-20-55.5-35T480-370q-55 0-100.5 15T325-320ZM160-440q-33 0-56.5-23.5T80-520q0-34 23.5-57t56.5-23q34 0 57 23t23 57q0 33-23 56.5T160-440Zm640 0q-33 0-56.5-23.5T720-520q0-34 23.5-57t56.5-23q34 0 57 23t23 57q0 33-23 56.5T800-440Zm-320-40q-50 0-85-35t-35-85q0-51 35-85.5t85-34.5q51 0 85.5 34.5T600-600q0 50-34.5 85T480-480Zm0-80q17 0 28.5-11.5T520-600q0-17-11.5-28.5T480-640q-17 0-28.5 11.5T440-600q0 17 11.5 28.5T480-560Zm1 240Zm-1-280Z" />
+          </svg>
+        </div>
+        <div class="stat-value"><%= countUsers || 0 %></div>
+        <div class="stat-label">Active Users</div>
+      </div>
+      <div class="stat-card pending-orders">
+        <div class="stat-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
+            <path d="M280-420q25 0 42.5-17.5T340-480q0-25-17.5-42.5T280-540q-25 0-42.5 17.5T220-480q0 25 17.5 42.5T280-420Zm200 0q25 0 42.5-17.5T540-480q0-25-17.5-42.5T480-540q-25 0-42.5 17.5T420-480q0 25 17.5 42.5T480-420Zm200 0q25 0 42.5-17.5T740-480q0-25-17.5-42.5T680-540q-25 0-42.5 17.5T620-480q0 25 17.5 42.5T680-420ZM480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z" />
+          </svg>
+        </div>
+        <div class="stat-value"><%= pendingOrders || 0 %></div>
+        <div class="stat-label">Pending Orders</div>
+      </div>
+    </div>
+    <div class="login-reg-container">
+      <div class="login-reg">
+        <div class="punch-box">
+          <div class="date-time">
+            <h3 id="greeting">Good Morning, <span style="color: #00B207;"><%= name %></span>!</h3>
+            <p id="current-day-date">Monday, July 21, 2025</p>
+            <p id="current-time" style="font-size:2rem;">08:48 PM</p>
+          </div>
+
+          <div class="punch-status">
+            <p id="punch-info">You have not punched in yet.</p>
+            <button id="punchBtn" onclick="togglePunch()" style="font-family:'Poppins', sans-serif;">Punch In</button>
+          </div>
+        </div>
+      </div>
+      <div class="last-logins">
+        <div class="card">
+          <div class="card-header">
+            <h3>Users</h3>
+            <a href="/tezgrani/user-management" class="view-all">View All</a>
+          </div>
+
+          <table class="table">
+            <thead>
+              <tr>
+                <th>NAME</th>
+                <th>EMAIL</th>
+                <th>CREATED_ON</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (recentLogins.length === 0) { %>
               <tr>
                 <td colspan="3" style="text-align:center; height: 200px; font-weight: 500; vertical-align: middle;">
                   No data to show
                 </td>
               </tr>
-            <% } else { %>
+              <% } else { %>
               <% recentLogins.forEach(user => { %>
-                <tr>
-                  <td><%= user.f_Name %></td>
-                  <td><%= user.email %></td>
-                  <td><%= user.createdOn ? new Date(user.createdOn).toLocaleDateString() : 'N/A' %></td>
-                </tr>
+              <tr>
+                <td><%= user.f_Name %></td>
+                <td><%= user.email %></td>
+                <td><%= user.createdOn ? new Date(user.createdOn).toLocaleDateString() : 'N/A' %></td>
+              </tr>
               <% }) %>
-            <% } %>
-          </tbody>
-        </table>
-      </div>        
-    </div>
-    <div class="recently-sold-container">
-      <div class="header-row">
-        <h3 class="heading">Recent Orders</h3>
-        <a href="#" class="view-all">View All</a>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
       </div>
-      
-      <div class="table-container">
-        <table class="sales-table">
-          <thead style="background-color: #e9ecef;">
-            <tr>
-              <th>PRODUCT_ID</th>
-              <th>DATE</th>
-              <th>QUANTITY</th>
-              <th>TOTAL AMOUNT</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% if (recentOrders.length === 0) { %>
+      <div class="recently-sold-container">
+        <div class="header-row">
+          <h3 class="heading">Recent Orders</h3>
+          <a href="/tezgrani/order-management" class="view-all">View All</a>
+        </div>
+
+        <div class="table-container">
+          <table class="sales-table">
+            <thead style="background-color: #e9ecef;">
+              <tr>
+                <th>PRODUCT_ID</th>
+                <th>DATE</th>
+                <th>QUANTITY</th>
+                <th>TOTAL AMOUNT</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (recentOrders.length === 0) { %>
               <tr>
                 <td colspan="4">
                   <div style="
@@ -238,213 +264,471 @@
                   </div>
                 </td>
               </tr>
-            <% } else { %>
+              <% } else { %>
               <% recentOrders.forEach(order => { %>
-                <tr>
-                  <td>#<%= order.orderId.toString().slice(0,6) %></td>
-                  <td><%= new Date(order.invoiceDate).toLocaleDateString() %></td>
-                  <td><%= order.orderedItems.reduce((sum, item) => sum + item.quantity, 0) %> nos</td>
-                  <td><%= order.finalAmount.toFixed(2) %> ₹</td>
-                </tr>
+              <tr>
+                <td>#<%= order.orderId.toString().slice(0,6) %></td>
+                <td><%= new Date(order.invoiceDate).toLocaleDateString() %></td>
+                <td><%= order.orderedItems.reduce((sum, item) => sum + item.quantity, 0) %> nos</td>
+                <td><%= order.finalAmount.toFixed(2) %> ₹</td>
+              </tr>
               <% }) %>
-            <% } %>
-          </tbody>
-        </table>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
       </div>
-    </div>      
-  </div>
-</div>
+      <div class="running-offers-container">
+        <div class="card">
+          <div class="card-header">
+            <h3>Running Offers</h3>
+            <a href="/tezgrani/deals-management" class="view-all">View All</a>
+          </div>
 
-<!-- Logout Modal -->
-<div id="logout-modal" class="modal" style="display:none;">
-  <div class="modal-content">
-    <h3 style="font-size: 1.75rem; font-weight: 500;">Are you sure?</h3>
-    <div class="modal-buttons">
-      <button id="cancel-logout" class="btn-no">NO</button>
-      <button id="confirm-logout" class="btn-yes">YES</button>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>NAME</th>
+                <th>TYPE</th>
+                <th>EXPIRY DATE</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (deal && deal.length > 0) { %>
+              <% deal.forEach(d => { %>
+              <tr>
+                <td><%= d.name %></td>
+                <td><%= d.offerType %></td>
+                <td><%= new Date(d.expireOn).toLocaleDateString('en-GB') %></td>
+              </tr>
+              <% }); %>
+              <% } else { %>
+              <tr>
+                <td colspan="3">
+                  <div style="
+                height: 360px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: 500;
+                font-size: 1.1rem;
+                color: #666;
+              ">
+                    No data to show right now!
+                  </div>
+                </td>
+              </tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <!-- Logout Modal -->
+      <div id="logout-modal" class="modal" style="display:none;">
+        <div class="modal-content">
+          <h3 style="font-size: 1.75rem; font-weight: 500;">Are you sure?</h3>
+          <div class="modal-buttons">
+            <button id="cancel-logout" class="btn-no">NO</button>
+            <button id="confirm-logout" class="btn-yes">YES</button>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
+    <!-- Top Sold Products Section -->
+    <div class="top-sold-products-container">
+      <div class="solds-heading">
+        <h3>Top Sold Products</h3>
+        <select id="productFilter" class="filter-dropdown" onchange="filterProducts()">
+          <option value="last28Days" <%= (productFilter || 'last28Days') === 'last28Days' ? 'selected' : '' %>>Last 28 Days</option>
+          <option value="last6Month" <%= (productFilter || 'last28Days') === 'last6Month' ? 'selected' : '' %>>Last 6 Month</option>
+          <option value="last1Year" <%= (productFilter || 'last28Days') === 'last1Year' ? 'selected' : '' %>>Last 1 Year</option>
+        </select>
+      </div>
+      <div class="product-cards" id="productCards">
+        <% if (topProducts && topProducts.length > 0) { %>
+        <% topProducts.forEach(product => { %>
+        <div class="product-card">
+          <div class="product-image">
+            <img src="<%= product.productImage || 'https://via.placeholder.com/178x166' %>" alt="<%= product.productName %>" style="width: 178px; height: 166px; object-fit: cover; border-radius: 8px;">
+          </div>
+          <div class="product-quantity"><%= product.totalQuantity %> pcs</div>
+        </div>
+        <% }); %>
+        <% } else { %>
+        <div style="
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-weight: 500;
+                    font-size: 1.1rem;
+                    color: #666;
+                  ">
+          No data to show right now!
+        </div>
+        <% } %>
+      </div>
+    </div>
 
-<!-- JavaScript -->
-<script>
-  toastr.options = {
-    "closeButton": true,
-    "debug": false,
-    "newestOnTop": false,
-    "progressBar": false,
-    "positionClass": "toast-bottom-right",
-    "preventDuplicates": false,
-    "onclick": null,
-    "showDuration": "300",
-    "hideDuration": "1000",
-    "timeOut": "5000",
-    "extendedTimeOut": "1000",
-    "showEasing": "swing",
-    "hideEasing": "linear",
-    "showMethod": "fadeIn",
-    "hideMethod": "fadeOut"
-  }
-  
-  function toggleSidebar() {
-    const sidebar = document.getElementById("adminSidebar");
-    const icon = document.getElementById("drawer-icon");
+    <div class="top-sold-products-container" style="margin-bottom: 20px;">
+      <div class="solds-heading">
+        <h3>Top Sold Categories</h3>
+        <select id="categoryFilter" class="filter-dropdown" onchange="filterCategories()">
+          <option value="last28Days" <%= (categoryFilter || 'last28Days') === 'last28Days' ? 'selected' : '' %>>Last 28 Days</option>
+          <option value="last6Month" <%= (categoryFilter || 'last28Days') === 'last6Month' ? 'selected' : '' %>>Last 6 Month</option>
+          <option value="last1Year" <%= (categoryFilter || 'last28Days') === 'last1Year' ? 'selected' : '' %>>Last 1 Year</option>
+        </select>
+      </div>
+      <div class="product-cards" id="categoryCards">
+        <% if (topCategories && topCategories.length > 0) { %>
+        <% topCategories.forEach(category => { %>
+        <div class="product-card">
+          <div class="product-image">
+            <img src="<%= category.categoryImage || 'https://via.placeholder.com/178x175' %>" alt="<%= category.categoryName %>" style="width: 178px; height: 175px; object-fit: cover; border-radius: 8px;">
+          </div>
+          <div class="product-quantity"><%= category.totalQuantity %> pcs</div>
+        </div>
+        <% }); %>
+        <% } else { %>
+        <div style="
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-weight: 500;
+                    font-size: 1.1rem;
+                    color: #666;
+                  ">
+          No data to show right now!
+        </div>
+        <% } %>
+      </div>
+    </div>
+    <div class="top-sold-products-container" style="margin-bottom: 20px;">
+      <div class="solds-heading">
+        <h3>Overall Sales</h3>
+        <select id="salesFilter" class="filter-dropdown" onchange="filterSales()">
+          <option value="last28Days" <%= (salesFilter || 'last28Days') === 'last28Days' ? 'selected' : '' %>>Last 28 Days</option>
+          <option value="last6Month" <%= (salesFilter || 'last28Days') === 'last6Month' ? 'selected' : '' %>>Last 6 Month</option>
+          <option value="last1Year" <%= (salesFilter || 'last28Days') === 'last1Year' ? 'selected' : '' %>>Last 1 Year</option>
+        </select>
+      </div>
+      <div class="chart-container" style="max-height: 250px; overflow: auto;" id="salesContainer">
+        <% if (salesData && salesData.labels && salesData.labels.length > 0) { %>
+        <canvas id="overallSalesChart" style="max-height: 200px; width: 100%;"></canvas>
+        <%- '<script type="application/json" id="sales-data">' + JSON.stringify(salesData).replace(/</g, '\\u003c') + '</script>' %>
+        <% } else { %>
+        <div style="
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-weight: 500;
+                    font-size: 1.1rem;
+                    color: #666;
+                  ">
+          No data to show right now!
+        </div>
+        <% } %>
+      </div>
+    </div>
 
-    sidebar.classList.toggle("collapsed");
+    <!-- JavaScript -->
+    <script>
+      toastr.options = {
+        "debug": false,
+        "preventDuplicates": false,
+        "onclick": null,
+        "showDuration": "300",
+        "hideDuration": "1000",
+        "timeOut": "5000",
+        "extendedTimeOut": "1000",
+        "showEasing": "swing",
+        "hideEasing": "linear",
+        "showMethod": "fadeIn",
+        "hideMethod": "fadeOut"
+      }
 
-    if (sidebar.classList.contains("collapsed")) {
-      icon.style.transform = "rotate(0deg)";
-    } else {
-      icon.style.transform = "rotate(180deg)";
-    }
-  }
+      function toggleSidebar() {
+        const sidebar = document.getElementById("adminSidebar");
+        const icon = document.getElementById("drawer-icon");
 
-  // Show logout modal
-  function showLogoutModal() {
-    const logoutModal = document.getElementById('logout-modal');
-    logoutModal.style.display = 'flex';
-  }
+        sidebar.classList.toggle("collapsed");
 
-  // Setup event listeners for logout modal buttons
-  document.addEventListener('DOMContentLoaded', function() {
-    const logoutModal = document.getElementById('logout-modal');
-    const confirmLogoutButton = document.getElementById('confirm-logout');
-    const cancelLogoutButton = document.getElementById('cancel-logout');
+        if (sidebar.classList.contains("collapsed")) {
+          icon.style.transform = "rotate(0deg)";
+        } else {
+          icon.style.transform = "rotate(180deg)";
+        }
+      }
 
-    confirmLogoutButton.addEventListener('click', () => {
-      logoutModal.style.display = 'none';
-      window.location.href = '/tezgrani/logout';
-    });
+      function showLogoutModal() {
+        const logoutModal = document.getElementById('logout-modal');
+        logoutModal.style.display = 'flex';
+      }
 
-    cancelLogoutButton.addEventListener('click', () => {
-      logoutModal.style.display = 'none';
-    });
-  });
+      document.addEventListener('DOMContentLoaded', function() {
+        const logoutModal = document.getElementById('logout-modal');
+        const confirmLogoutButton = document.getElementById('confirm-logout');
+        const cancelLogoutButton = document.getElementById('cancel-logout');
 
-  // Function to update time and greeting dynamically
-  function updateDateTime() {
-    const now = new Date();
-  
-    // Day and date
-    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August',
-                    'September', 'October', 'November', 'December'];
-    const day = days[now.getDay()];
-    const date = `${day}, ${months[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`;
-    document.getElementById('current-day-date').innerText = date;
-  
-    // Time
-    let hours = now.getHours();
-    const minutes = now.getMinutes().toString().padStart(2, '0');
-    const seconds = now.getSeconds().toString().padStart(2, '0');
-    const ampm = hours >= 12 ? 'PM' : 'AM';
-    hours = hours % 12 || 12;
-    const timeStr = `${hours}:${minutes} ${ampm}`;
-    document.getElementById('current-time').innerText = timeStr;
-  
-    // Greeting
-    let greeting = '';
-    const hour = now.getHours();
-    if (hour < 12) greeting = 'Good Morning';
-    else if (hour < 17) greeting = 'Good Afternoon';
-    else greeting = 'Good Evening';
-    document.getElementById('greeting').innerHTML = `${greeting}, <span style="color: #00B207;"><%= name %></span>!`;
-  }
+        confirmLogoutButton.addEventListener('click', () => {
+          logoutModal.style.display = 'none';
+          window.location.href = '/tezgrani/logout';
+        });
 
-  // Initial call and interval
-  updateDateTime();
-  setInterval(updateDateTime, 1000);
+        cancelLogoutButton.addEventListener('click', () => {
+          logoutModal.style.display = 'none';
+        });
 
-  // Load punch state from localStorage
-  let isPunchedIn = false;
-  window.onload = function () {
-    const storedDate = localStorage.getItem('punchDate');
-    const storedStatus = localStorage.getItem('isPunchedIn') === 'true';
-    const today = new Date().toDateString();
+        // Set initial filters from URL or default
+        const urlParams = new URLSearchParams(window.location.search);
+        const productFilter = urlParams.get('productFilter') || 'last28Days';
+        const categoryFilter = urlParams.get('categoryFilter') || 'last28Days';
+        const salesFilter = urlParams.get('salesFilter') || 'last28Days';
 
-    if (storedDate === today && storedStatus) {
-      isPunchedIn = true;
-      updatePunchUI('in', localStorage.getItem('punchTime'), storedDate);
-    } else {
-      localStorage.removeItem('punchDate');
-      localStorage.setItem('isPunchedIn', 'false');
-      isPunchedIn = false;
-      updatePunchUI('out');
-    }
-  };
+        document.getElementById('productFilter').value = productFilter;
+        document.getElementById('categoryFilter').value = categoryFilter;
+        document.getElementById('salesFilter').value = salesFilter;
 
-  // Toggle punch in/out
-  function togglePunch() {
-    isPunchedIn = !isPunchedIn;
-
-    const now = new Date();
-    const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    const date = now.toDateString(); // e.g., "Fri Apr 19 2025"
-
-    localStorage.setItem('isPunchedIn', isPunchedIn);
-    localStorage.setItem('punchDate', date);
-    localStorage.setItem('punchTime', time);
-
-    if (isPunchedIn) {
-      updatePunchUI('in', time, date);
-
-      fetch('/tezgrani/punch-in', {
-        method: 'PATCH',
-      })
-      .then(response => {
-        if (!response.ok) throw new Error("Punch-in failed");
-        return response.json();
-      })
-      .then(data => {
-        console.log("🎉 Punch-in success:", data);
-        toastr.success('You have successfully punched in!', 'Punch-in');
-      })
-      .catch(err => {
-        console.error("❌ Error during punch-in:", err);
-        toastr.error('Something went wrong while punching in.', 'Error');
+        // Initialize chart
+        const overallSalesCtx = document.getElementById('overallSalesChart')?.getContext('2d');
+        if (overallSalesCtx && <%- JSON.stringify(salesData.labels).length > 2 %>) {
+          window.salesChart = new Chart(overallSalesCtx, {
+            type: 'bar',
+            data: {
+              labels: <%- JSON.stringify(salesData.labels) %>,
+              datasets: [{
+                label: 'Sales Amount (₹)',
+                data: <%- JSON.stringify(salesData.data) %>,
+                backgroundColor: 'rgba(0, 178, 7, 0.6)',
+                borderColor: 'rgba(0, 178, 7, 1)',
+                borderWidth: 1
+              }]
+            },
+            options: {
+              scales: {
+                y: {
+                  beginAtZero: true
+                }
+              },
+              maintainAspectRatio: false,
+              responsive: true,
+              height: 200
+            }
+          });
+        }
       });
 
-    } else {
-      updatePunchUI('out', time, date);
+      function updateDateTime() {
+        const now = new Date();
+        const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+        const day = days[now.getDay()];
+        const date = `${day}, ${months[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`;
+        document.getElementById('current-day-date').innerText = date;
 
-      fetch('/tezgrani/punch-out', {
-        method: 'PATCH',
-      })
-      .then(response => {
-        if (!response.ok) throw new Error("Punch-out failed");
-        return response.json();
-      })
-      .then(data => {
-        console.log("📤 Punch-out success:", data);
-        toastr.success('You have successfully punched out!', 'Punch-Out');
-      })
-      .catch(err => {
-        console.error("❌ Error during punch-out:", err);
-        toastr.error('Something went wrong while punching out.', 'Error');
-      });
-    }
-  }
+        let hours = now.getHours();
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12 || 12;
+        const timeStr = `${hours}:${minutes} ${ampm}`;
+        document.getElementById('current-time').innerText = timeStr;
 
-  // UI update function
-  function updatePunchUI(status, time = '', date = '') {
-    const punchInfo = document.getElementById('punch-info');
-    const punchBtn = document.getElementById('punchBtn');
+        let greeting = '';
+        const hour = now.getHours();
+        if (hour < 12) greeting = 'Good Morning';
+        else if (hour < 17) greeting = 'Good Afternoon';
+        else greeting = 'Good Evening';
+        document.getElementById('greeting').innerHTML = `${greeting}, <span style="color: #00B207;"><%= name %></span>!`;
+      }
 
-    if (status === 'in') {
-      punchInfo.innerText = `You punched in at ${time} on ${date}`;
-      punchBtn.innerText = 'Punch Out';
-      punchBtn.style.backgroundColor = '#dc3545'; // red
-    } else if (status === 'out' && time && date) {
-      punchInfo.innerText = `You punched out at ${time} on ${date}`;
-      punchBtn.innerText = 'Punch In';
-      punchBtn.style.backgroundColor = '#00B207'; // green
-    } else {
-      punchInfo.innerText = 'You have not punched in yet.';
-      punchBtn.innerText = 'Punch In';
-      punchBtn.style.backgroundColor = '#00B207'; // green
-    }
-  }
-</script>
+      updateDateTime();
+      setInterval(updateDateTime, 1000);
+
+      let isPunchedIn = false;
+      window.onload = function() {
+        const storedDate = localStorage.getItem('punchDate');
+        const storedStatus = localStorage.getItem('isPunchedIn') === 'true';
+        const today = new Date().toDateString();
+
+        if (storedDate === today && storedStatus) {
+          isPunchedIn = true;
+          updatePunchUI('in', localStorage.getItem('punchTime'), storedDate);
+        } else {
+          localStorage.removeItem('punchDate');
+          localStorage.setItem('isPunchedIn', 'false');
+          isPunchedIn = false;
+          updatePunchUI('out');
+        }
+      };
+
+      function togglePunch() {
+        isPunchedIn = !isPunchedIn;
+
+        const now = new Date();
+        const time = now.toLocaleTimeString([], {
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+        const date = now.toDateString();
+
+        localStorage.setItem('isPunchedIn', isPunchedIn);
+        localStorage.setItem('punchDate', date);
+        localStorage.setItem('punchTime', time);
+
+        if (isPunchedIn) {
+          updatePunchUI('in', time, date);
+          fetch('/tezgrani/punch-in', {
+              method: 'PATCH'
+            })
+            .then(response => response.json())
+            .then(data => {
+              console.log("🎉 Punch-in success:", data);
+              toastr.success('You have successfully punched in!', 'Punch-in');
+            })
+            .catch(err => {
+              console.error("❌ Error during punch-in:", err);
+              toastr.error('Something went wrong while punching in.', 'Error');
+            });
+        } else {
+          updatePunchUI('out', time, date);
+          fetch('/tezgrani/punch-out', {
+              method: 'PATCH'
+            })
+            .then(response => response.json())
+            .then(data => {
+              console.log("📤 Punch-out success:", data);
+              toastr.success('You have successfully punched out!', 'Punch-Out');
+            })
+            .catch(err => {
+              console.error("❌ Error during punch-out:", err);
+              toastr.error('Something went wrong while punching out.', 'Error');
+            });
+        }
+      }
+
+      function updatePunchUI(status, time = '', date = '') {
+        const punchInfo = document.getElementById('punch-info');
+        const punchBtn = document.getElementById('punchBtn');
+
+        if (status === 'in') {
+          punchInfo.innerText = `You punched in at ${time} on ${date}`;
+          punchBtn.innerText = 'Punch Out';
+          punchBtn.style.backgroundColor = '#dc3545';
+        } else if (status === 'out' && time && date) {
+          punchInfo.innerText = `You punched out at ${time} on ${date}`;
+          punchBtn.innerText = 'Punch In';
+          punchBtn.style.backgroundColor = '#00B207';
+        } else {
+          punchInfo.innerText = 'You have not punched in yet.';
+          punchBtn.innerText = 'Punch In';
+          punchBtn.style.backgroundColor = '#00B207';
+        }
+      }
+
+      let salesChart;
+
+      function filterProducts() {
+        const filter = document.getElementById('productFilter').value;
+        window.history.pushState({}, '', `?productFilter=${filter}&categoryFilter=${document.getElementById('categoryFilter').value}&salesFilter=${document.getElementById('salesFilter').value}`);
+        fetch(`/tezgrani/dashboard?productFilter=${filter}`, {
+            method: 'GET',
+            headers: {
+              'Accept': 'text/html'
+            }
+          })
+          .then(response => response.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const productCards = doc.querySelector('#productCards').innerHTML;
+            document.getElementById('productCards').innerHTML = productCards;
+          })
+          .catch(err => {
+            console.error('Error fetching product data:', err);
+            toastr.error('Failed to load product data. Please try again.', 'Error');
+          });
+      }
+
+      function filterCategories() {
+        const filter = document.getElementById('categoryFilter').value;
+        window.history.pushState({}, '', `?productFilter=${document.getElementById('productFilter').value}&categoryFilter=${filter}&salesFilter=${document.getElementById('salesFilter').value}`);
+        fetch(`/tezgrani/dashboard?categoryFilter=${filter}`, {
+            method: 'GET',
+            headers: {
+              'Accept': 'text/html'
+            }
+          })
+          .then(response => response.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const categoryCards = doc.querySelector('#categoryCards').innerHTML;
+            document.getElementById('categoryCards').innerHTML = categoryCards;
+          })
+          .catch(err => {
+            console.error('Error fetching category data:', err);
+            toastr.error('Failed to load category data. Please try again.', 'Error');
+          });
+      }
+
+      function filterSales() {
+        const filter = document.getElementById('salesFilter').value;
+        window.history.pushState({}, '', `?productFilter=${document.getElementById('productFilter').value}&categoryFilter=${document.getElementById('categoryFilter').value}&salesFilter=${filter}`);
+        fetch(`/tezgrani/dashboard?salesFilter=${filter}`, {
+            method: 'GET',
+            headers: {
+              'Accept': 'text/html'
+            }
+          })
+          .then(response => response.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const salesContainer = doc.querySelector('#salesContainer');
+            document.getElementById('salesContainer').innerHTML = salesContainer.innerHTML;
+            const salesScript = document.getElementById('sales-data');
+            if (salesScript) {
+              const salesData = JSON.parse(salesScript.textContent);
+              const overallSalesCtx = document.getElementById('overallSalesChart')?.getContext('2d');
+              if (overallSalesCtx && salesData.labels.length > 0) {
+                if (window.salesChart) window.salesChart.destroy();
+                window.salesChart = new Chart(overallSalesCtx, {
+                  type: 'bar',
+                  data: {
+                    labels: salesData.labels,
+                    datasets: [{
+                      label: 'Sales Amount (₹)',
+                      data: salesData.data,
+                      backgroundColor: 'rgba(0, 178, 7, 0.6)',
+                      borderColor: 'rgba(0, 178, 7, 1)',
+                      borderWidth: 1
+                    }]
+                  },
+                  options: {
+                    scales: {
+                      y: {
+                        beginAtZero: true
+                      }
+                    },
+                    maintainAspectRatio: false,
+                    responsive: true,
+                    height: 200
+                  }
+                });
+              }
+            }
+          })
+          .catch(err => {
+            console.error('Error fetching sales data:', err);
+            toastr.error('Failed to load sales data. Please try again.', 'Error');
+          });
+      }
+
+      // Initial load of all filters
+      document.getElementById('productFilter').dispatchEvent(new Event('change'));
+      document.getElementById('categoryFilter').dispatchEvent(new Event('change'));
+      document.getElementById('salesFilter').dispatchEvent(new Event('change'));
+    </script>
 
 </body>
+
 </html>

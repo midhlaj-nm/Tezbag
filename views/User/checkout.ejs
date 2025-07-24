@@ -276,6 +276,24 @@
       width: 100%;
     }
   }
+
+  .delivery-status {
+    background-color: #f8d7da91;
+    color: #721c24;
+    border: 1px solid #721c24;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 2rem;
+    text-align: center;
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.4rem;
+  }
+
+  .place-order-btn.disabled {
+    background-color: #6c757d !important;
+    cursor: not-allowed;
+    border-color: #6c757d !important;
+  }
 </style>
 
 <body>
@@ -296,6 +314,12 @@
 
   <div class="checkout-container">
     <h1 class="checkout-title">Checkout</h1>
+    <div id="delivery-status" class="delivery-status" style="display: none;">
+      <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#721c24">
+        <path d="m40-120 440-760 440 760H40Zm440-120q17 0 28.5-11.5T520-280q0-17-11.5-28.5T480-320q-17 0-28.5 11.5T440-280q0 17 11.5 28.5T480-240Zm-40-120h80v-200h-80v200Z" />
+      </svg>
+      Delivery is not available to this address.
+    </div>
 
     <div class="row">
       <div class="col-lg-8">
@@ -596,6 +620,24 @@
       }
     }
 
+    function checkCODLimit() {
+      const codOption = document.querySelector('.payment-option[data-payment="cod"]');
+      const codRadio = codOption.querySelector('.payment-radio');
+      if (currentTotal >= 1000) {
+        codOption.classList.add('disabled');
+        codOption.style.pointerEvents = 'none';
+        codRadio.disabled = true;
+        if (codOption.classList.contains('selected')) {
+          document.querySelector('.payment-option[data-payment="upi"]').classList.add('selected');
+          document.querySelector('.payment-option[data-payment="upi"] .payment-radio').checked = true;
+        }
+      } else {
+        codOption.classList.remove('disabled');
+        codOption.style.pointerEvents = 'auto';
+        codRadio.disabled = false;
+      }
+    }
+
     function applyCoupon(couponCode) {
       const couponItem = document.querySelector(`.coupon-item[data-coupon-code="${couponCode}"]`);
       if (!couponItem) return;
@@ -623,13 +665,17 @@
       const applyButton = couponItem.querySelector('.coupon-apply-btn');
       applyButton.textContent = 'Remove';
       applyButton.onclick = () => removeCoupon(couponCode);
-      appliedCoupon = { code: couponCode, offerPrice };
+      appliedCoupon = {
+        code: couponCode,
+        offerPrice
+      };
 
       currentTotal -= offerPrice;
       if (currentTotal < 0) currentTotal = 0;
       updateTotals();
       addCouponRow(couponCode, offerPrice);
       checkWalletBalance();
+      checkCODLimit(); // Check COD limit after applying coupon
       toastr.success(`Coupon ${couponCode} applied successfully! You saved ${offerPrice}₹.`);
     }
 
@@ -649,6 +695,7 @@
         removeCouponRow();
         updateTotals();
         checkWalletBalance();
+        checkCODLimit(); // Check COD limit after removing coupon
         toastr.success(`Coupon ${couponCode} removed successfully!`);
       }
     }
@@ -672,12 +719,16 @@
       document.getElementById('subtotal').textContent = `${currentSubtotal.toFixed(2)}₹`;
       document.getElementById('finalTotal').textContent = `${currentTotal.toFixed(2)}₹`;
       checkWalletBalance();
+      checkCODLimit(); // Update COD status whenever totals change
     }
 
     function openAddressModal(index = null) {
       const modalElement = document.getElementById('addressModal');
       if (!modalElement) return;
-      const modal = new bootstrap.Modal(modalElement, { backdrop: true, keyboard: true });
+      const modal = new bootstrap.Modal(modalElement, {
+        backdrop: true,
+        keyboard: true
+      });
       const modalTitle = document.getElementById('addressModalLabel');
       const makeDefaultCheckbox = document.getElementById('makeDefaultCheckbox');
       const editIndexInput = document.getElementById('editIndex');
@@ -737,7 +788,9 @@
             'Content-Type': 'application/json',
             'Accept': 'application/json'
           },
-          body: JSON.stringify({ index: currentDeleteIndex })
+          body: JSON.stringify({
+            index: currentDeleteIndex
+          })
         })
         .then(response => response.json())
         .then(data => {
@@ -767,8 +820,8 @@
           verifyPayment(response, orderId);
         },
         prefill: {
-          name: '<%= userId.f_Name %>', 
-          email: '<%= userId.email %>', 
+          name: '<%= userId.f_Name %>',
+          email: '<%= userId.email %>',
         },
         notes: {
           orderId: orderId,
@@ -780,13 +833,13 @@
         modal: {
           ondismiss: function() {
             fetch(`/cancel-order/${orderId}`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json'
-              },
-            })
-            .then(res => res.json())
-            .catch(err => {});
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+              })
+              .then(res => res.json())
+              .catch(err => {});
             const loadingOverlay = document.getElementById('loading-overlay');
             loadingOverlay.style.display = 'none';
             setTimeout(() => {
@@ -807,7 +860,10 @@
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ paymentResponse, orderId })
+          body: JSON.stringify({
+            paymentResponse,
+            orderId
+          })
         });
         const data = await res.json();
         if (data.success) {
@@ -815,13 +871,13 @@
           setTimeout(() => window.location.href = `/order-confirmation/${orderId}`, 1000);
         } else {
           fetch(`/cancel-order/${orderId}`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-          })
-          .then(res => res.json())
-          .catch(err => {});
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+            })
+            .then(res => res.json())
+            .catch(err => {});
           toastr.error(data.message || 'Payment verification failed');
         }
       } catch (error) {
@@ -848,49 +904,147 @@
       loadingOverlay.style.display = 'flex';
 
       fetch('/order/place', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(orderData)
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(orderData)
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            loadingOverlay.style.display = 'none';
+            closeOrderConfirmModal();
+            if (paymentMethod === 'upi') {
+              initiateRazorpayPayment(data.orderId, currentTotal, data.razorpayKey, data.razorpayOrderId);
+            } else {
+              const animationContainer = document.getElementById('order-success-animation');
+              animationContainer.style.display = 'block';
+              lottie.loadAnimation({
+                container: animationContainer,
+                renderer: 'svg',
+                loop: false,
+                autoplay: true,
+                path: '/Order_success.json'
+              });
+              setTimeout(() => {
+                animationContainer.style.display = 'none';
+                window.location.href = `/order-confirmation/${data.orderId}`;
+              }, 3700);
+            }
+          } else {
+            if (data.message === 'Product is out-of-stock') {
+              toastr.error(data.message);
+              setTimeout(() => window.location.href = '/shop', 2000);
+            } else {
+              toastr.error(data.message || 'Failed to place order.');
+            }
+            loadingOverlay.style.display = 'none';
+          }
+        })
+        .catch(error => {
+          toastr.error('An error occurred while placing the order.');
           loadingOverlay.style.display = 'none';
           closeOrderConfirmModal();
-          if (paymentMethod === 'upi') {
-            initiateRazorpayPayment(data.orderId, currentTotal, data.razorpayKey, data.razorpayOrderId);
-          } else {
-            const animationContainer = document.getElementById('order-success-animation');
-            animationContainer.style.display = 'block';
-            lottie.loadAnimation({
-              container: animationContainer,
-              renderer: 'svg',
-              loop: false,
-              autoplay: true,
-              path: '/Order_success.json'
-            });
-            setTimeout(() => {
-              animationContainer.style.display = 'none';
-              window.location.href = `/order-confirmation/${data.orderId}`;
-            }, 3700);
-          }
+        });
+    }
+
+    // Define shop's location
+    const shopCoords = {
+      latitude: 10.553513235812982,
+      longitude: 76.05424695935642
+    };
+
+    async function getCoordinates(pincode) {
+      try {
+        const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${pincode}&key=<%= GOOGLE_API_KEY %>`);
+        const data = await response.json();
+        if (data.status === "OK" && data.results.length > 0) {
+          const location = data.results[0].geometry.location;
+          return {
+            latitude: location.lat,
+            longitude: location.lng
+          };
         } else {
-          if (data.message === 'Product is out-of-stock') {
-            toastr.error(data.message);
-            setTimeout(() => window.location.href = '/shop', 2000);
-          } else {
-            toastr.error(data.message || 'Failed to place order.');
-          }
-          loadingOverlay.style.display = 'none';
+          return null;
         }
-      })
-      .catch(error => {
-        toastr.error('An error occurred while placing the order.');
-        loadingOverlay.style.display = 'none';
-        closeOrderConfirmModal();
-      });
+      } catch (error) {
+        console.error("Geocoding error:", error);
+        return null;
+      }
+    }
+
+    // Function to calculate distance using Haversine formula
+    function calculateDistance(lat1, lon1, lat2, lon2) {
+      const R = 6371; // Earth's radius in kilometers
+      const dLat = toRadians(lat2 - lat1);
+      const dLon = toRadians(lon2 - lon1);
+      const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return R * c;
+    }
+
+    function toRadians(degrees) {
+      return degrees * (Math.PI / 180);
+    }
+
+    // Function to check delivery eligibility
+    async function checkDeliveryEligibility(pincode) {
+      const customerCoords = await getCoordinates(pincode);
+      if (!customerCoords) {
+        return {
+          eligible: false,
+          message: "Unable to determine delivery location"
+        };
+      }
+
+      const distance = calculateDistance(
+        shopCoords.latitude, shopCoords.longitude,
+        customerCoords.latitude, customerCoords.longitude
+      );
+
+      return distance <= 5 ? {
+        eligible: true,
+        message: "Delivery available"
+      } : {
+        eligible: false,
+        message: "Delivery not available beyond 5 km"
+      };
+    }
+
+    // Update selectAddress to check delivery eligibility
+    async function selectAddress(index) {
+      if (index === null || index < 0 || index >= savedAddresses.length) {
+        selectedAddressIndex = null;
+        return;
+      }
+      selectedAddressIndex = index;
+      document.querySelectorAll('.address-card').forEach(card => card.classList.remove('selected'));
+      const selectedCard = document.querySelector(`.address-card[data-index="${index}"]`);
+      if (selectedCard) selectedCard.classList.add('selected');
+
+      // Check delivery eligibility when address is selected
+      const address = savedAddresses[index];
+      const deliveryCheck = await checkDeliveryEligibility(address.pinCode);
+      updateDeliveryStatus(deliveryCheck.eligible, deliveryCheck.message);
+    }
+
+    // Function to update delivery status and button
+    function updateDeliveryStatus(isEligible, message) {
+      const deliveryStatusDiv = document.getElementById('delivery-status');
+      const placeOrderBtn = document.querySelector('.place-order-btn');
+
+      if (!isEligible) {
+        deliveryStatusDiv.style.display = 'block';
+        placeOrderBtn.disabled = true;
+        placeOrderBtn.classList.add('disabled');
+      } else {
+        deliveryStatusDiv.style.display = 'none';
+        placeOrderBtn.disabled = false;
+        placeOrderBtn.classList.remove('disabled');
+      }
     }
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -928,6 +1082,7 @@
         else selectAddress(0);
       }
       checkWalletBalance();
+      checkCODLimit(); // Initial check on page load
 
       // Retry payment logic
       const urlParams = new URLSearchParams(window.location.search);
@@ -941,17 +1096,6 @@
         initiateRazorpayPayment(orderId, amount, razorpayKey, razorpayOrderId);
       }
     });
-
-    function selectAddress(index) {
-      if (index === null || index < 0 || index >= savedAddresses.length) {
-        selectedAddressIndex = null;
-        return;
-      }
-      selectedAddressIndex = index;
-      document.querySelectorAll('.address-card').forEach(card => card.classList.remove('selected'));
-      const selectedCard = document.querySelector(`.address-card[data-index="${index}"]`);
-      if (selectedCard) selectedCard.classList.add('selected');
-    }
 
     function validateAddressForm() {
       let isValid = true;
@@ -1149,7 +1293,9 @@
             'Accept': 'application/json',
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ country: countryName })
+          body: JSON.stringify({
+            country: countryName
+          })
         });
         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
         const data = await response.json();

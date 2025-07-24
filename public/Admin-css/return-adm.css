@@ -443,10 +443,6 @@ body {
   color: #ffffff;
 }
 
-.view-btn:hover {
-  background-color: #009505;
-}
-
 /* Custom Pagination Styling */
 .custom-pagination {
   margin-top: 1.5rem;

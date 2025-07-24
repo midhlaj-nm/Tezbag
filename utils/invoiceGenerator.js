@@ -1,30 +1,31 @@
 const Invoice = require('../models/invoiceSchema')
 
-const createInvoice = async(order, addr) => {
+const createInvoice = async (order, addr) => {
     const invoiceNumber = `INV-${order.invoiceDate}-${order.orderId.toString().slice(-6)}`
     const totalPrice = order.totalPrice
     const discount = order.discount
     const finalAmount = order.finalAmount
+    const items = order.orderedItems.map(item => ({
+        productId: item.productId,
+        quantity: item.quantity,
+        price: item.price,
+        total: item.price * item.quantity
+    }))
 
     const invoice = new Invoice({
         orderId: order.orderId,
         invoiceNumber: invoiceNumber,
-        totalPrice:totalPrice,
-        discount:discount,
-        finalAmount:finalAmount,
+        totalPrice: totalPrice,
+        discount: discount,
+        finalAmount: finalAmount,
         paymentMethod: order.paymentMethod,
-        billingDetails:{
+        billingDetails: {
             name: `${addr.firstName} ${addr.lastName}`.trim(),
             address: `${addr.streetAddress}, ${addr.city}, ${addr.state}`,
             phone: addr.phone,
             email: addr.email
         },
-        items: order.orderedItems.map(item => ({
-            productName: item.productId.productName,
-            quantity: item.quantity,
-            price: item.price,
-            total: item.price * item.quantity
-        })),
+        items,
         createdAt: Date.now()
     })
 

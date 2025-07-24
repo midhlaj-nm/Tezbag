@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
 * {
   margin: 0;
   padding: 0;
@@ -16,41 +17,44 @@ body {
   flex-direction: column;
   min-height: 100vh;
 }
+
 #middle {
-    width: 100%;
-    height: 50px;
-    background-color: #fff;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: fixed;
-    top: 0;
-    left: 0;
-    padding: 0 5%;
-    border-bottom: 1px solid #ccc;
-    z-index: 1000;
+  width: 100%;
+  height: 50px;
+  background-color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  padding: 0 5%;
+  border-bottom: 1px solid #ccc;
+  z-index: 1000;
 }
+
 .logo {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
 }
+
 .logo img {
-    width: 100%;
-    max-width: 250px;
-    height: auto;
+  width: 100%;
+  max-width: 250px;
+  height: auto;
 }
-/* Sidebar Container */
+
 /* Sidebar Container */
 .sidebar {
-  margin-top: 68px; /* Adjusted to account for the header height + some spacing */
-  height: calc(100vh - 80px); /* Calculate height based on viewport minus header and some padding */
+  margin-top: 68px;
+  height: calc(100vh - 80px);
   width: 220px;
   border: 1px solid #ccc;
   border-radius: 12px;
   padding: 16px 12px;
-  position: absolute;
+  position: fixed;
   left: 10px;
   display: flex;
   flex-direction: column;
@@ -71,7 +75,7 @@ body {
   flex-direction: column;
   gap: 3px;
   flex-grow: 1;
-  overflow-y: auto; /* Allow scrolling if menu items exceed height */
+  overflow-y: auto;
 }
 
 .sidebar-links li {
@@ -140,15 +144,15 @@ body {
 
 /* Content Area */
 .content {
-  margin-top: 60px; /* Match the margin-top of sidebar to align with it */
-  margin-left: 240px; /* 220px sidebar width + 20px spacing */
+  margin-top: 60px;
+  margin-left: 240px;
   padding: 0px 37px;
   flex: 1;
   transition: margin-left 0.3s ease;
 }
 
-.sidebar.collapsed ~ .content {
-  margin-left: 80px; /* 60px collapsed sidebar width + 20px spacing */
+.sidebar.collapsed~.content {
+  margin-left: 80px;
 }
 
 /* Floating SVG Toggle Button */
@@ -189,6 +193,43 @@ body {
   fill: #000;
 }
 
+/* Stats Container */
+.stats-container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.stat-card {
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  height: 100px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.stat-icon svg {
+  width: 24px;
+  height: 24px;
+  fill: #5f5f5f;
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #000;
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  color: #5f5f5f;
+}
+
 /* Add a container for the login-reg divs */
 .login-reg-container {
   display: grid;
@@ -198,10 +239,10 @@ body {
   margin-top: 8px;
 }
 
-.login-reg{
+.login-reg {
   grid-column: 1;
   grid-row: 1;
-  width: 100%; /* Take full width within their flex container */
+  width: 100%;
   height: fit-content;
   border: 1px solid #ccc;
   border-radius: 12px;
@@ -247,10 +288,8 @@ body {
   font-size: 0.95rem;
 }
 
-
 .recently-sold-container {
   grid-column: 2;
-  grid-row: 1 / span 2;
   border: 1px solid #ccc;
   width: 100%;
   max-width: 680px;
@@ -282,7 +321,6 @@ body {
 }
 
 .table-container {
-  /* background-color: #f1f9f2; */
   overflow-x: auto;
 }
 
@@ -297,7 +335,6 @@ body {
   font-size: 13px;
   font-weight: 600;
   color: black;
-  /* background-color: #e8f5e9; */
   border-bottom: 1px solid #d7eadc;
 }
 
@@ -326,7 +363,6 @@ body {
   grid-row: 2;
   width: 100%;
   height: auto;
-  /* Remove this line: transform: translateY(-105px); */
   border-radius: 12px;
 }
 
@@ -335,7 +371,7 @@ body {
   border-radius: 10px;
   overflow: hidden;
   font-family: 'Poppins', sans-serif;
-  margin-top: 0; /* Change from 20px to 0 */
+  margin-top: 0;
 }
 
 .card-header {
@@ -367,7 +403,7 @@ body {
   background-color: #e9ecef;
 }
 
-.table th{
+.table th {
   padding: 10px 15px;
   text-align: left;
   font-size: 13px;
@@ -385,15 +421,94 @@ body {
   background-color: #f5f5f5;
 }
 
+.running-offers-container {
+  width: 100%;
+  max-width: 680px;
+}
+
+/* Top Sold Products Container */
+.top-sold-products-container {
+  width: 100%;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  padding: 20px;
+  margin-top: 20px;
+}
+
+.solds-heading {
+  display: flex;
+  justify-content: space-between;
+}
+
+.top-sold-products-container h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 15px;
+}
+
+.filter-dropdown {
+  height: fit-content;
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: 'Poppins', sans-serif;
+  transition: border-color 0.3s;
+}
+
+.filter-dropdown:focus {
+  outline: none;
+  border-color: #00B207;
+}
+
+.product-cards {
+  display: flex;
+  gap: 15px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.product-cards::-webkit-scrollbar {
+  display: none;
+}
+
+.product-card {
+  display: inline-block;
+  width: 180px;
+  height: 200px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  text-align: center;
+  vertical-align: top;
+  flex-shrink: 0;
+}
+
+.product-image {
+  width: 100%;
+  height: 160px;
+  background-color: #f5f5f5;
+  border-radius: 8px 8px 0 0;
+}
+
+.product-quantity {
+  font-size: 0.9rem;
+  color: #5f5f5f;
+  padding: 10px 0;
+}
+
 /* CSS for the modal */
 .modal {
-  display: none; /* Will be changed to flex when shown */
-  position: fixed; /* This was missing - needed for proper positioning */
+  display: none;
+  position: fixed;
   top: 0;
   left: 0;
-  width: 100%; /* Keep this at 100% for the overlay */
+  width: 100%;
   height: 100%;
-  background-color: rgba(0,0,0,0.5);
+  background-color: rgba(0, 0, 0, 0.5);
   z-index: 1000;
   justify-content: center;
   align-items: center;
@@ -406,8 +521,8 @@ body {
   padding: 30px;
   border-radius: 10px;
   text-align: center;
-  width: 30%; /* This controls the actual width of your modal */
-  max-width: 400px; /* Adding max-width is good for responsiveness */
+  width: 30%;
+  max-width: 400px;
   pointer-events: auto;
   background-color: #fff;
   background-clip: padding-box;
@@ -443,21 +558,52 @@ body {
   cursor: pointer;
 }
 
+/* New or updated styles for chart container */
+.chart-container {
+  max-height: 250px;
+  overflow: auto;
+  position: relative;
+}
 
-
-
+.chart-container canvas {
+  max-height: 200px !important;
+  width: 100% !important;
+  display: block; /* Ensure the canvas behaves as a block element */
+}
 
 /* Responsive Support */
 @media (max-width: 768px) {
   .sidebar {
     position: fixed;
-    z-index: 990; /* Below header but above content */
+    z-index: 990;
     margin-top: 60px;
   }
-  .sidebar.collapsed ~ .content {
+
+  .sidebar.collapsed~.content {
     margin-left: 80px;
   }
+
   .content {
     margin-left: 240px;
+  }
+
+  .stats-container {
+    grid-template-columns: 1fr;
+  }
+
+  .login-reg-container {
+    grid-template-columns: 1fr;
+  }
+
+  .recently-sold-container {
+    max-width: 100%;
+  }
+
+  .running-offers-container {
+    max-width: 100%;
+  }
+
+  .top-sold-products-container .product-cards {
+    flex-wrap: nowrap;
   }
 }

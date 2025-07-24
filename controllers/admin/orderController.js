@@ -89,10 +89,9 @@ const updateStatus = async (req, res, next) => {
     const orderId = req.params.orderId;
     const { status: newStatus } = req.body;
 
-    // Validate newStatus
-    const validStatuses = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
+    const validStatuses = ['Pending', 'Processing', 'Shipped', 'Delivered'];
     if (!validStatuses.includes(newStatus)) {
-      console.warn(`Attempted to update order ${orderId} with invalid status: ${newStatus}`); // Essential debug
+      console.warn(`Attempted to update order ${orderId} with invalid status: ${newStatus}`); 
       return res.status(400).json({ success: false, message: 'Invalid status value' });
     }
 
@@ -104,13 +103,13 @@ const updateStatus = async (req, res, next) => {
     );
 
     if (!order) {
-      console.warn(`Order with ID ${orderId} not found for status update.`); // Essential debug
-      return res.status(404).json({ success: false, message: 'Order not found' }); // Proper error response
+      console.warn(`Order with ID ${orderId} not found for status update.`); 
+      return res.status(404).json({ success: false, message: 'Order not found' }); 
     }
 
     res.json({ success: true, message: 'Status updated successfully' });
   } catch (error) {
-    console.error('Error updating status:', error); // Essential debug
+    console.error('Error updating status:', error); 
     next(error)
   }
 };

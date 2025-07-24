@@ -209,11 +209,21 @@
                 <td><%= new Date(order.invoiceDate).toISOString().split('T')[0] %></td>
                 <td><%= order.finalAmount.toFixed(2) %>₹</td>
                 <td>
-                  <% if (order.status === 'Cancelled' || order.status === 'Return Requested' || order.status === 'Returned' || order.status === 'Request Declined') { %>
+                  <% if (order.status === 'Delivered' || order.status === 'Cancelled' || order.status === 'Return Requested' || order.status === 'Returned' || order.status === 'Request Declined') { %>
                     <span class="status-text"><%= order.status %></span>
                   <% } else { %>
-                    <select class="status-dropdown" onchange="updateStatus(this, '<%= order.orderId %>')">
-                      <% ['Pending', 'Processing', 'Shipped', 'Delivered'].forEach(status => { %>
+                    <select class="status-dropdown" onchange="updateStatus(this, '<%= order.orderId %>', '<%= order.status %>')">
+                      <% 
+                        const statusOrder = {
+                          'Pending': 0,
+                          'Processing': 1,
+                          'Shipped': 2,
+                          'Delivered': 3
+                        };
+                        const currentIndex = statusOrder[order.status] || 0;
+                        const allowedStatuses = ['Pending', 'Processing', 'Shipped', 'Delivered'].filter(status => statusOrder[status] >= currentIndex);
+                      %>
+                      <% allowedStatuses.forEach(status => { %>
                         <option value="<%= status %>" <%= order.status === status ? 'selected' : '' %>><%= status %></option>
                       <% }) %>
                     </select>
@@ -326,7 +336,17 @@
       const confirmAction = document.getElementById('confirm-action');
 
       cancelAction.addEventListener('click', () => {
+        const originalStatus = confirmModal.dataset.originalStatus;
+        const orderId = confirmModal.dataset.orderId;
         confirmModal.style.display = 'none';
+        // Reset the dropdown to the original status
+        const select = document.querySelector(`select.status-dropdown[data-order-id="${orderId}"]`);
+        if (select) {
+          select.value = originalStatus;
+        }
+        confirmModal.removeAttribute('data-orderId');
+        confirmModal.removeAttribute('data-newStatus');
+        confirmModal.removeAttribute('data-originalStatus');
       });
 
       confirmAction.addEventListener('click', () => {
@@ -358,10 +378,11 @@
       });
 
       // Status Update Function
-      window.updateStatus = function(select, orderId) {
+      window.updateStatus = function(select, orderId, originalStatus) {
         const newStatus = select.value;
         confirmModal.dataset.orderId = orderId;
         confirmModal.dataset.newStatus = newStatus;
+        confirmModal.dataset.originalStatus = originalStatus; // Store the original status
         confirmModal.style.display = 'block';
       };
 
@@ -396,10 +417,22 @@
       window.addEventListener("click", function(e) {
         if (e.target === confirmModal) {
           confirmModal.style.display = "none";
+          const originalStatus = confirmModal.dataset.originalStatus;
+          const orderId = confirmModal.dataset.orderId;
+          const select = document.querySelector(`select.status-dropdown[data-order-id="${orderId}"]`);
+          if (select) {
+            select.value = originalStatus;
+          }
           confirmModal.removeAttribute('data-orderId');
           confirmModal.removeAttribute('data-newStatus');
+          confirmModal.removeAttribute('data-originalStatus');
         }
       });
+    });
+
+    // Add data-order-id attribute to status dropdowns
+    document.querySelectorAll('.status-dropdown').forEach(select => {
+      select.setAttribute('data-order-id', select.getAttribute('onchange').match(/'([^']+)'/)[1]);
     });
   </script>
 </body>
