@@ -587,6 +587,11 @@
     let selectedAddressIndex = null;
     const walletBalance = parseFloat('<%= wallet.balance %>');
 
+    // --- New variables for Buy Now flow ---
+    const productId = '<%= (typeof orderItems !== "undefined" && orderItems[0]) ? orderItems[0].productId : "" %>';
+    const quantity = '<%= (typeof orderItems !== "undefined" && orderItems[0]) ? orderItems[0].quantity : "" %>';
+    const cuttingStyle = '<%= (typeof orderItems !== "undefined" && orderItems[0] && orderItems[0].cuttingStyle) ? orderItems[0].cuttingStyle : "" %>';
+
     toastr.options = {
       timeOut: 3000,
       preventDuplicates: true
@@ -892,6 +897,7 @@
       }
       const paymentMethod = document.querySelector('input[name="payment"]:checked')?.value || '';
       const address = savedAddresses[selectedAddressIndex];
+
       const orderData = {
         paymentMethod,
         orderNotes: document.getElementById('orderNotes').value || '',
@@ -899,6 +905,15 @@
         coupon: appliedCoupon ? appliedCoupon.code : null,
         finalAmount: currentTotal
       };
+
+      // --- New logic to include product details for "Buy Now" orders ---
+      if (productId) {
+        orderData.productId = productId;
+        orderData.quantity = quantity;
+        if (cuttingStyle) {
+          orderData.cuttingStyle = cuttingStyle;
+        }
+      }
 
       const loadingOverlay = document.getElementById('loading-overlay');
       loadingOverlay.style.display = 'flex';
@@ -1316,8 +1331,8 @@
 
     window.onclick = function(event) {
       const orderModal = document.getElementById('order-confirm-modal');
-      if (event.target === orderModal) closeOrderConfirmModal();
       const addressModal = document.getElementById('addressModal');
+      if (event.target === orderModal) closeOrderConfirmModal();
       if (event.target === addressModal) closeAddressModal();
     };
   </script>

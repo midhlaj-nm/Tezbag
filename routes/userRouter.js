@@ -74,10 +74,10 @@ router.get('/logout', userAuth, userController.logout);
 //productPage
 router.get('/shop', productPageController.loadshop);
 router.get('/product/:id', productPageController.loadProductDetails);
+router.post('/cart/toggle', productPageController.cartToggle)
 
 //cartPageController
 router.get('/cart', userAuth, cartPageController.loadCart);
-router.post('/cart/add/:productId', userAuth, cartPageController.addToCart)
 router.patch('/cart/increase-quantity', userAuth, cartPageController.increaseQuantity);
 router.patch('/cart/decrease-quantity', userAuth, cartPageController.decreaseQuantity);
 router.delete('/cart/remove-item', userAuth, cartPageController.removeItem);

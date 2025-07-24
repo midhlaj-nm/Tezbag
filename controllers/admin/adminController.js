@@ -227,7 +227,7 @@ const loadDashboard = async (req, res) => {
     const salesFilter = req.query.salesFilter || 'last28Days';
 
     // Fetch recent orders and logins
-    const recentOrders = await Order.find().sort({ invoiceDate: -1 }).limit(8);
+    const recentOrders = await Order.find().sort({ invoiceDate: -1 }).limit(3);
     const recentLogins = await User.find({ isBlocked: false }).sort({ createdOn: -1 }).limit(3).select('f_Name email createdOn');
 
     // Fetch basic stats
@@ -245,14 +245,17 @@ const loadDashboard = async (req, res) => {
     console.log("Got it", admin);
     const name = admin?.f_Name;
 
-    const deal = await Deal.find({status: 'Active'}).select('name offerType expireOn')
-    console.log('This are the deals running now: ',deal)
+    const deal = await Deal.find({ status: 'Active' }).select('name offerType expireOn');
+    console.log('This are the deals running now: ', deal);
 
-    //start dates based on individual filters
+    // Start dates based on individual filters
     const now = new Date();
     const getStartDate = (filter) => {
       const date = new Date(now);
       switch (filter) {
+        case 'Today':
+          date.setHours(0, 0, 0, 0); // Set to start of today
+          return date;
         case 'last6Month':
           return new Date(date.setMonth(date.getMonth() - 6));
         case 'last1Year':

@@ -186,8 +186,8 @@
         <div class="punch-box">
           <div class="date-time">
             <h3 id="greeting">Good Morning, <span style="color: #00B207;"><%= name %></span>!</h3>
-            <p id="current-day-date">Monday, July 21, 2025</p>
-            <p id="current-time" style="font-size:2rem;">08:48 PM</p>
+            <p id="current-day-date">Thursday, July 24, 2025</p>
+            <p id="current-time" style="font-size:2rem;">03:25 PM</p>
           </div>
 
           <div class="punch-status">
@@ -339,9 +339,10 @@
       <div class="solds-heading">
         <h3>Top Sold Products</h3>
         <select id="productFilter" class="filter-dropdown" onchange="filterProducts()">
-          <option value="last28Days" <%= (productFilter || 'last28Days') === 'last28Days' ? 'selected' : '' %>>Last 28 Days</option>
-          <option value="last6Month" <%= (productFilter || 'last28Days') === 'last6Month' ? 'selected' : '' %>>Last 6 Month</option>
-          <option value="last1Year" <%= (productFilter || 'last28Days') === 'last1Year' ? 'selected' : '' %>>Last 1 Year</option>
+          <option value="Today" <%= (productFilter || 'Today') === 'Today' ? 'selected' : '' %>>Today</option>
+          <option value="last28Days" <%= (productFilter || 'Today') === 'last28Days' ? 'selected' : '' %>>Last 28 Days</option>
+          <option value="last6Month" <%= (productFilter || 'Today') === 'last6Month' ? 'selected' : '' %>>Last 6 Month</option>
+          <option value="last1Year" <%= (productFilter || 'Today') === 'last1Year' ? 'selected' : '' %>>Last 1 Year</option>
         </select>
       </div>
       <div class="product-cards" id="productCards">
@@ -373,6 +374,7 @@
       <div class="solds-heading">
         <h3>Top Sold Categories</h3>
         <select id="categoryFilter" class="filter-dropdown" onchange="filterCategories()">
+          <option value="Today" <%= (categoryFilter || 'last28Days') === 'Today' ? 'selected' : '' %>>Today</option>
           <option value="last28Days" <%= (categoryFilter || 'last28Days') === 'last28Days' ? 'selected' : '' %>>Last 28 Days</option>
           <option value="last6Month" <%= (categoryFilter || 'last28Days') === 'last6Month' ? 'selected' : '' %>>Last 6 Month</option>
           <option value="last1Year" <%= (categoryFilter || 'last28Days') === 'last1Year' ? 'selected' : '' %>>Last 1 Year</option>
@@ -406,6 +408,7 @@
       <div class="solds-heading">
         <h3>Overall Sales</h3>
         <select id="salesFilter" class="filter-dropdown" onchange="filterSales()">
+          <option value="Today" <%= (salesFilter || 'last28Days') === 'Today' ? 'selected' : '' %>>Today</option>
           <option value="last28Days" <%= (salesFilter || 'last28Days') === 'last28Days' ? 'selected' : '' %>>Last 28 Days</option>
           <option value="last6Month" <%= (salesFilter || 'last28Days') === 'last6Month' ? 'selected' : '' %>>Last 6 Month</option>
           <option value="last1Year" <%= (salesFilter || 'last28Days') === 'last1Year' ? 'selected' : '' %>>Last 1 Year</option>
@@ -478,9 +481,9 @@
           logoutModal.style.display = 'none';
         });
 
-        // Set initial filters from URL or default
+        // Set initial filters from URL or default to 'Today' for productFilter
         const urlParams = new URLSearchParams(window.location.search);
-        const productFilter = urlParams.get('productFilter') || 'last28Days';
+        const productFilter = urlParams.get('productFilter') || 'Today'; // Default to 'Today' for Top Sold Products
         const categoryFilter = urlParams.get('categoryFilter') || 'last28Days';
         const salesFilter = urlParams.get('salesFilter') || 'last28Days';
 

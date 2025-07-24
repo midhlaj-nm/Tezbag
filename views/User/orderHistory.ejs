@@ -95,8 +95,8 @@
             <span class="material-symbols-outlined icon">shopping_bag</span>
             <div class="cart-text">
               <p class="cart-label">Shopping cart:</p>
-              <% if (typeof cartTotal !== 'undefined' && cartTotal > 0) { %>
-              <span class="cart-total"><%= cartTotal.toFixed(2) %>₹</span>
+              <% if (cartTotal) { %>
+              <span class="cart-total"><%= cartTotal %></span>
               <% } else { %>
               <span class="cart-total">0.00₹</span>
               <% } %>
