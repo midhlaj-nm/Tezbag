@@ -1,7 +1,7 @@
+const mongoose = require('mongoose');
 const Order = require('../../models/orderSchema');
 const Invoice = require('../../models/invoiceSchema');
 const Address = require('../../models/addressSchema');
-const mongoose = require('mongoose');
 
 const loadOrder = async (req, res) => {
   try {
@@ -9,13 +9,13 @@ const loadOrder = async (req, res) => {
     const limit = 10;
     const skip = (page - 1) * limit;
 
-    let query = {};
+    const query = {};
 
     // Search functionality
     const searchQuery = req.query.search;
     if (searchQuery) {
       query.$or = [
-        { orderId: { $regex: new RegExp(searchQuery, 'i') } }
+        { orderId: { $regex: new RegExp(searchQuery, 'i') } },
       ];
     }
 
@@ -26,9 +26,9 @@ const loadOrder = async (req, res) => {
     }
 
     // Sort by date
-    const sortDate = req.query.sortDate;
+    const { sortDate } = req.query;
     if (sortDate) {
-      const localDate = new Date(sortDate + 'T00:00:00');
+      const localDate = new Date(`${sortDate}T00:00:00`);
       localDate.setUTCHours(localDate.getUTCHours() + 5, localDate.getUTCMinutes() + 30); // Adjust for IST
       const startDate = new Date(localDate);
       startDate.setUTCHours(0, 0, 0, 0); // Start of the day in IST
@@ -49,7 +49,7 @@ const loadOrder = async (req, res) => {
       .sort({ invoiceDate: -1 });
 
     // Create username for display and filtering
-    const ordersWithUsername = orders.map(order => {
+    const ordersWithUsername = orders.map((order) => {
       if (order.userId) {
         order.userId.username = `${order.userId.f_Name} ${order.userId.l_Name}`.trim();
       }
@@ -59,7 +59,7 @@ const loadOrder = async (req, res) => {
     // Filter by username if searchQuery exists (after populating and creating username)
     let filteredOrders = ordersWithUsername;
     if (searchQuery) {
-      filteredOrders = ordersWithUsername.filter(order => {
+      filteredOrders = ordersWithUsername.filter((order) => {
         const lowerCaseSearchQuery = searchQuery.toLowerCase();
         const matchesOrderId = order.orderId && order.orderId.toLowerCase().includes(lowerCaseSearchQuery);
         const matchesUsername = order.userId && order.userId.username && order.userId.username.toLowerCase().includes(lowerCaseSearchQuery);
@@ -76,22 +76,22 @@ const loadOrder = async (req, res) => {
       totalPages,
       searchQuery,
       filterStatus,
-      sortDate
+      sortDate,
     });
   } catch (error) {
     console.error('Error in loadOrder:', error); // Essential debug
-    res.status(404)
+    res.status(404);
   }
 };
 
 const updateStatus = async (req, res, next) => {
   try {
-    const orderId = req.params.orderId;
+    const { orderId } = req.params;
     const { status: newStatus } = req.body;
 
     const validStatuses = ['Pending', 'Processing', 'Shipped', 'Delivered'];
     if (!validStatuses.includes(newStatus)) {
-      console.warn(`Attempted to update order ${orderId} with invalid status: ${newStatus}`); 
+      console.warn(`Attempted to update order ${orderId} with invalid status: ${newStatus}`);
       return res.status(400).json({ success: false, message: 'Invalid status value' });
     }
 
@@ -99,30 +99,30 @@ const updateStatus = async (req, res, next) => {
     const order = await Order.findOneAndUpdate(
       { orderId },
       { status: newStatus },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
 
     if (!order) {
-      console.warn(`Order with ID ${orderId} not found for status update.`); 
-      return res.status(404).json({ success: false, message: 'Order not found' }); 
+      console.warn(`Order with ID ${orderId} not found for status update.`);
+      return res.status(404).json({ success: false, message: 'Order not found' });
     }
 
     res.json({ success: true, message: 'Status updated successfully' });
   } catch (error) {
-    console.error('Error updating status:', error); 
-    next(error)
+    console.error('Error updating status:', error);
+    next(error);
   }
 };
 
 const loadOrderDetails = async (req, res) => {
   try {
-    const orderId = req.params.orderId;
+    const { orderId } = req.params;
     const order = await Order.findOne({ orderId })
       .populate('userId', 'f_Name l_Name _id email phone createdOn')
       .populate({
         path: 'orderedItems.productId',
         model: 'Product',
-        select: 'productName SKU'
+        select: 'productName SKU',
       });
 
     if (!order) {
@@ -135,8 +135,8 @@ const loadOrderDetails = async (req, res) => {
       const selectedAddressId = order.address.toString();
 
       const addressDoc = await Address.findOne(
-        { "address._id": new mongoose.Types.ObjectId(selectedAddressId) },
-        { "address.$": 1 }
+        { 'address._id': new mongoose.Types.ObjectId(selectedAddressId) },
+        { 'address.$': 1 },
       );
 
       if (addressDoc && addressDoc.address && addressDoc.address.length > 0) {
@@ -145,7 +145,7 @@ const loadOrderDetails = async (req, res) => {
         console.warn(`Address subdocument with ID ${selectedAddressId} not found in any address document for order ${orderId}.`); // Essential debug
       }
     } else {
-        console.warn(`Order ${orderId} does not have an associated address ID.`); // Essential debug
+      console.warn(`Order ${orderId} does not have an associated address ID.`); // Essential debug
     }
 
     const invoice = await Invoice.findOne({ orderId }).select('pdfUrl');
@@ -156,17 +156,17 @@ const loadOrderDetails = async (req, res) => {
       order,
       customerId,
       address,
-      invoice
+      invoice,
     });
   } catch (error) {
     console.error('Error loading order details:', error); // Essential debug
-    res.status(404)
+    res.status(404);
   }
 };
 
 const cancelOrder = async (req, res, next) => {
   try {
-    const orderId = req.params.orderId;
+    const { orderId } = req.params;
 
     const order = await Order.findOne({ orderId });
 
@@ -186,8 +186,10 @@ const cancelOrder = async (req, res, next) => {
     res.json({ success: true, message: 'Order cancelled successfully' });
   } catch (error) {
     console.error('Error cancelling order:', error); // Essential debug
-    next(error)
+    next(error);
   }
 };
 
-module.exports = { loadOrder, updateStatus, loadOrderDetails, cancelOrder };
+module.exports = {
+  loadOrder, updateStatus, loadOrderDetails, cancelOrder,
+};

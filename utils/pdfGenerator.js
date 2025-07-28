@@ -1,13 +1,12 @@
-const Invoice = require('../models/invoiceSchema');
-const Product = require('../models/productSchema')
 const pdf = require('html-pdf');
 const ejs = require('ejs');
 const path = require('path');
-const cloudinary = require('../config/cloudinary');
 const streamifier = require('streamifier');
+const cloudinary = require('../config/cloudinary');
+const Product = require('../models/productSchema');
+const Invoice = require('../models/invoiceSchema');
 
 const pdfGenerator = async (invoice, order) => {
-
   const data = {
     invoiceNumber: invoice.invoiceNumber,
     invoiceDate: invoice.createdAt,
@@ -20,12 +19,12 @@ const pdfGenerator = async (invoice, order) => {
       const product = await Product.findById(item.productId).select('productName');
       return {
         ...item._doc,
-        productName: product.productName
+        productName: product.productName,
       };
     })),
     discount: invoice.discount,
     totalPrice: invoice.totalPrice,
-    finalAmount: invoice.finalAmount
+    finalAmount: invoice.finalAmount,
   };
   console.log('Data prepared for EJS rendering:', data);
 
@@ -55,7 +54,9 @@ const pdfGenerator = async (invoice, order) => {
   console.log('Uploading PDF to Cloudinary with filename:', fileName);
   const uploadResult = await new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(
-      { resource_type: 'raw', folder: 'invoices', public_id: fileName.replace('.pdf', ''), format: 'pdf' },
+      {
+        resource_type: 'raw', folder: 'invoices', public_id: fileName.replace('.pdf', ''), format: 'pdf',
+      },
       (error, result) => {
         if (error) {
           console.error('Cloudinary upload error:', error);
@@ -64,7 +65,7 @@ const pdfGenerator = async (invoice, order) => {
           console.log('Cloudinary upload successful, result:', result);
           resolve(result);
         }
-      }
+      },
     );
     pdfStream.pipe(stream);
   });

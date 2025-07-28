@@ -8,7 +8,7 @@ const loadReturn = async (req, res) => {
     const { search, page = 1, sortDate } = req.query;
     const perPage = 10;
 
-    let query = { status: { $in: ['Return Requested', 'Returned', 'Request Declined'] } };
+    const query = { status: { $in: ['Return Requested', 'Returned', 'Request Declined'] } };
 
     if (search) {
       query.orderId = { $regex: new RegExp(search, 'i') };
@@ -43,12 +43,12 @@ const loadReturn = async (req, res) => {
       .lean();
 
     const ordersWithNames = await Promise.all(orders.map(async (order) => {
-      const returnQuery = { orderId: order._id }; 
+      const returnQuery = { orderId: order._id };
       const returnData = await Return.findOne(returnQuery).lean();
       return {
         ...order,
         userName: `${order.userId ? order.userId.f_Name || '' : ''} ${order.userId ? order.userId.l_Name || '' : ''}`.trim(),
-        returnReason: returnData.reason
+        returnReason: returnData.reason,
       };
     }));
 
@@ -57,11 +57,10 @@ const loadReturn = async (req, res) => {
       currentPage,
       totalPages,
       searchQuery: search || '',
-      sortDate: sortDate || ''
+      sortDate: sortDate || '',
     });
-
   } catch (error) {
-    res.status(500).send('Internal Server Error: ' + error.message);
+    res.status(500).send(`Internal Server Error: ${error.message}`);
   }
 };
 
@@ -89,7 +88,7 @@ const changeStatus = async (req, res, next) => {
       wallet.transactions.push({
         type: 'credit',
         amount: order.finalAmount,
-        reason: `Return refund for order ${orderId}`
+        reason: `Return refund for order ${orderId}`,
       });
       await wallet.save();
 

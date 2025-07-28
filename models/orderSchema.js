@@ -1,82 +1,83 @@
 const mongoose = require('mongoose');
 const { v4: uuidv4 } = require('uuid');
+
 const { Schema } = mongoose;
 
 const orderSchema = new Schema({
   orderId: {
     type: String,
     default: () => uuidv4(),
-    unique: true
+    unique: true,
   },
   orderedItems: [{
     productId: {
       type: Schema.Types.ObjectId,
       ref: 'Product',
-      required: true
+      required: true,
     },
     quantity: {
       type: Number,
-      default: 1
+      default: 1,
     },
     price: {
       type: Number,
-      required: true
+      required: true,
     },
     cuttingStyle: {
       type: String,
-      required: false
-    }
+      required: false,
+    },
   }],
   totalPrice: {
     type: Number,
-    required: true
+    required: true,
   },
   discount: {
     type: Number,
-    default: 0
+    default: 0,
   },
   finalAmount: {
     type: Number,
-    required: true
+    required: true,
   },
   paymentMethod: {
     type: String,
-    required: true
+    required: true,
   },
   userId: {
     type: Schema.Types.ObjectId,
     ref: 'User',
-    required: true
+    required: true,
   },
   address: {
     type: Schema.Types.ObjectId,
     ref: 'Address',
-    required: true
+    required: true,
   },
   orderNotes: {
     type: String,
-    required: false
+    required: false,
   },
   invoiceDate: {
-    type: Date
+    type: Date,
   },
   status: {
     type: String,
     required: true,
-    enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled', 'Return Requested', 'Returned', 'Payment Failed', 'Request Declined']
+    enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled', 'Return Requested', 'Returned', 'Payment Failed', 'Request Declined'],
   },
   couponApplied: {
     type: Boolean,
-    default: false
+    default: false,
   },
   paymentStatus: {
     type: String,
     required: true,
     enum: ['Not Paid', 'Paid', 'Failed'],
-    default: 'Not Paid'
+    default: 'Not Paid',
   },
   razorpayOrderId: {
-    type: String
+    type: String,
   },
   paymentDetails: {
     paymentId: String,

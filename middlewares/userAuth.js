@@ -1,9 +1,10 @@
-const User = require('../models/userSchema'); 
+const User = require('../models/userSchema');
+
 const userAuth = async (req, res, next) => {
   try {
     // Step 1: Check if session contains userId
     if (!req.session.user) {
-      return res.redirect('/'); 
+      return res.redirect('/');
     }
 
     // Step 2: Fetch the user from the DB
@@ -20,7 +21,6 @@ const userAuth = async (req, res, next) => {
 
     // Step 4: All good, proceed
     next();
-
   } catch (err) {
     res.redirect('/');
   }

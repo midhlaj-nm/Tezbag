@@ -8,7 +8,7 @@ module.exports = async (req, res, next) => {
 
   for (let i = 0; i < pathParts.length; i++) {
     let name = pathParts[i];
-    let url = '/' + pathParts.slice(0, i + 1).join('/');
+    const url = `/${pathParts.slice(0, i + 1).join('/')}`;
 
     // Handle /product/:id → Show "Shop" and "Product Name"
     if (i > 0 && pathParts[i - 1] === 'product') {
@@ -35,7 +35,7 @@ module.exports = async (req, res, next) => {
 
     // Capitalize static parts
     if (typeof name === 'string') {
-      name = name.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+      name = name.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
     }
 
     breadcrumbs.push({ name, url });

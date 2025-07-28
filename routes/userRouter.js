@@ -1,17 +1,18 @@
-const express = require('express')
-const router = express.Router()
+const express = require('express');
+
+const router = express.Router();
+const passport = require('passport');
 const userController = require('../controllers/user/userController');
 const productPageController = require('../controllers/user/productPageController');
 const profileController = require('../controllers/user/profileController');
 const cartPageController = require('../controllers/user/cartPageController');
 const orderController = require('../controllers/user/orderController');
 const wishlistController = require('../controllers/user/wishlistPageController');
-const walletController = require('../controllers/user/walletController')
-const passport = require('passport');
+const walletController = require('../controllers/user/walletController');
 const userAuth = require('../middlewares/userAuth');
 
 router.get('/', userController.loadHomepage);
-router.get('/404Error', userController.load404)
+router.get('/404Error', userController.load404);
 
 router.get('/login', userController.login_user);
 router.post('/login', userController.logpost);
@@ -25,31 +26,33 @@ router.get('/resend-otp', userController.resendOtp);
 
 // Google Registration
 router.get('/auth/google/signup', passport.authenticate('google-registration', { scope: ['profile', 'email'] }));
-router.get('/auth/google/callback/register',
+router.get(
+  '/auth/google/callback/register',
   passport.authenticate('google-registration', {
     failureRedirect: '/login',
-    failureFlash: true
+    failureFlash: true,
   }),
   (req, res) => {
     res.redirect('/');
-  }
+  },
 );
 
 // Google Login
 router.get('/auth/google/login', passport.authenticate('google-login', { scope: ['profile', 'email'] }));
-router.get('/auth/google/callback/login',
+router.get(
+  '/auth/google/callback/login',
   passport.authenticate('google-login', {
     failureRedirect: '/login',
-    failureFlash: true
+    failureFlash: true,
   }),
   (req, res) => {
-    if(req.user){
-      req.session.user = req.user._id
+    if (req.user) {
+      req.session.user = req.user._id;
       console.log('🔐 Session user set to:', req.session.user);
-      console.log('')
+      console.log('');
     }
     res.redirect('/');
-  }
+  },
 );
 
 // Forget Password Flow
@@ -71,35 +74,35 @@ router.delete('/account-settings/delete-address/:index', userAuth, profileContro
 router.post('/account-settings/password-reset', userAuth, profileController.changePassword);
 router.get('/logout', userAuth, userController.logout);
 
-//productPage
+// productPage
 router.get('/shop', productPageController.loadshop);
 router.get('/product/:id', productPageController.loadProductDetails);
-router.post('/cart/toggle', productPageController.cartToggle)
+router.post('/cart/toggle', productPageController.cartToggle);
 
-//cartPageController
+// cartPageController
 router.get('/cart', userAuth, cartPageController.loadCart);
 router.patch('/cart/increase-quantity', userAuth, cartPageController.increaseQuantity);
 router.patch('/cart/decrease-quantity', userAuth, cartPageController.decreaseQuantity);
 router.delete('/cart/remove-item', userAuth, cartPageController.removeItem);
 router.delete('/cart/clear', userAuth, cartPageController.clearCart);
 
-//orderController
+// orderController
 router.get('/cart/checkout', userAuth, orderController.loadCheckout);
 router.post('/order/place', userAuth, orderController.confirmOrder);
 router.post('/order/verify-payment', userAuth, orderController.verifyPayment);
-router.get('/retry-payment', userAuth, orderController.paymentFailed)
+router.get('/retry-payment', userAuth, orderController.paymentFailed);
 router.get('/order-confirmation/:orderId', userAuth, orderController.loadConfirmation);
-router.get('/check-invoice/:orderId', userAuth, orderController.checkInvoiceStatus)
-router.get('/download-invoice/', userAuth, orderController.downloadInvoice)
-router.get('/order-history', userAuth, orderController.loadOrderHistory)
-router.post('/cancel-order/:orderId', userAuth, orderController.cancelOrder)
-router.post('/return-order/:orderId', userAuth, orderController.returnOrder)
+router.get('/check-invoice/:orderId', userAuth, orderController.checkInvoiceStatus);
+router.get('/download-invoice/', userAuth, orderController.downloadInvoice);
+router.get('/order-history', userAuth, orderController.loadOrderHistory);
+router.post('/cancel-order/:orderId', userAuth, orderController.cancelOrder);
+router.post('/return-order/:orderId', userAuth, orderController.returnOrder);
 
-//wishlist
-router.get('/wishlist', userAuth, wishlistController.loadWishlist)
-router.post('/wishlist/add-or-remove', userAuth, wishlistController.wishlistPrdct)
+// wishlist
+router.get('/wishlist', userAuth, wishlistController.loadWishlist);
+router.post('/wishlist/add-or-remove', userAuth, wishlistController.wishlistPrdct);
 
-//wallet
-router.get('/wallet', userAuth, walletController.loadWallet)
+// wallet
+router.get('/wallet', userAuth, walletController.loadWallet);
 
-module.exports = router
+module.exports = router;
