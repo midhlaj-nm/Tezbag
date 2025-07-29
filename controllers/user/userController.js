@@ -4,7 +4,8 @@ const Product = require('../../models/productSchema');
 const Gallery = require('../../models/bannerSchema');
 const Admin = require('../../models/adminSchema');
 const Deal = require('../../models/dealSchema');
-const Cart = require('../../models/cartSchema')
+const Cart = require('../../models/cartSchema');
+const Banner = require('../../models/bannerSchema');
 const env = require('dotenv').config();
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
@@ -117,18 +118,17 @@ const loadHomepage = async (req, res, next) => {
         const transformedProducts = products.map(transformProduct);
         const transformedLatestProducts = latestProducts.map(transformProduct);
 
-        // Shuffle featured products
+        // Shuffle featured products (corrected syntax)
         for (let i = transformedProducts.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
-            [transformedProducts[i], transformedProducts[j]] = [transformedProducts[j], transformedProducts[i]];
+            [transformedProducts[i], transformedProducts[j]] = [transformedProducts[j], transformedProducts[i]]; // Corrected swap
         }
 
         // Enrich categories with product count and image
         const categoriesWithData = await Promise.all(
             categories.map(async (category) => {
-                const [productCount, banner] = await Promise.all([
+                const [productCount] = await Promise.all([
                     Product.countDocuments({ category: category._id }),
-                    Gallery.findOne({ categoryId: category._id }).lean()
                 ]);
 
                 return {
@@ -139,24 +139,33 @@ const loadHomepage = async (req, res, next) => {
             })
         );
 
-        let name = ''
-        let total = '0.00₹'
+        // Fetch active banners
+        const banners = await Banner.find({ status: 'Active' }).lean();
+
+        // Group banners by position
+        const bannersByPosition = {
+            'homepage top': banners.filter(banner => banner.position === 'homepage top'),
+            'homepage bottom': banners.filter(banner => banner.position === 'homepage bottom')
+        };
+
+        let name = '';
+        let total = '0.00₹';
 
         if (req.session.user) {
-            const userId = req.session.user
-            const user = await User.findById(userId).select('f_Name l_Name')
-            name = `${user.f_Name} ${user.l_Name}`
-            console.log('This is the name: ', name)
+            const userId = req.session.user;
+            const user = await User.findById(userId).select('f_Name l_Name');
+            name = `${user.f_Name} ${user.l_Name}`;
+            console.log('This is the name: ', name);
 
-            const cart = await Cart.findOne({ userId }).select('total')
-            console.log('this is cart total: ', cart)
+            const cart = await Cart.findOne({ userId }).select('total');
+            console.log('this is cart total: ', cart);
             if (cart) {
                 total = cart.total.toFixed(2) + '₹';
             } else {
                 console.log('No cart found for userId:', userId);
-                total = '0.00₹'; 
+                total = '0.00₹';
             }
-            console.log('This is cart price: ', total)
+            console.log('This is cart price: ', total);
         }
 
         const renderData = {
@@ -167,7 +176,8 @@ const loadHomepage = async (req, res, next) => {
             showFeaturedProducts: transformedProducts.length > 0,
             showTopCategories: categoriesWithData.length > 0,
             name: name || '',
-            total: total || '0.00₹'
+            total: total || '0.00₹',
+            bannersByPosition
         };
 
         const viewName = req.session.user ? 'homepage' : 'beforelogin';
@@ -175,7 +185,7 @@ const loadHomepage = async (req, res, next) => {
 
     } catch (err) {
         console.error('❌ Error loading homepage:', err);
-        res.render('404')
+        res.render('404');
     }
 };
 

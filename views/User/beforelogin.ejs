@@ -8,6 +8,42 @@
   <link rel="stylesheet" href="/User-css/beforelogin.css">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined" rel="stylesheet">
+  <style>
+    /* Fade transition for slideshow */
+    .banner-slideshow {
+      position: relative;
+      width: 100%;
+      height: 350px; /* Match the banner height */
+      overflow: hidden;
+    }
+
+    .banner-slide {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      transition: opacity 0.5s ease-in-out; /* Smooth fade transition */
+      object-fit: cover;
+      border-radius: 9px; /* Match the bottom banner style */
+    }
+
+    .banner-slide.active {
+      opacity: 1; /* Show the active slide */
+    }
+
+    /* Specific styling for homepage bottom split banners */
+    .promo-div {
+      width: 49%; /* Adjust as needed for two-column layout */
+      display: inline-block;
+      vertical-align: top;
+    }
+
+    .left-div {
+      margin-right: 2%; /* Space between left and right divs */
+    }
+  </style>
 </head>
 <body>
   <div id="top" class="container-fluid">
@@ -39,87 +75,38 @@
     </div>
   </div>
 
-  <div class="container-fluid p-0 position-relative">
-    <img src="/BG.png" class="w-100">
-    <div class="text-content">
-      <p id="p1" class="text-success fw-semibold">WELCOME TO TEZBAG</p>
-      <h1 class="fw-bold">Fresh & Healthy <br> Organic Food</h1>
-      <p class="fs-5">Sale up to <span class="text-warning fw-bold">30% OFF</span></p>
-      <p id="p2" class="text-muted">Free shipping on all your orders. We deliver, you enjoy.</p>
-      <a href="/login" class="btn btn-success">Shop Now</a>
-    </div>
-  </div>
-
-<% if (showFeaturedProducts) { %>
-  <section class="featured-products">
-    <div class="container">
-      <div class="header">
-        <h2>Featured Products</h2>
-      </div>
-      <div class="product-list">
-        <% products.slice(0, 4).forEach(product => { %>
-          <% if (product.status !== 'Out Of Stock') { %>
-            <div class="product-card <%= product.status === 'Out Of Stock' ? 'out-of-stock' : '' %>">
-              <span class="out-of-stock-label">
-                <%= product.status === 'Out Of Stock' ? 'Out of Stock' : (product.discountPercentage > 0 ? `-${product.discountPercentage}% off` : '') %>
-              </span>
-              <a href="/product/<%= product._id %>" class="product-link">
-                <img src="<%= product.image || '/default-product.png' %>" alt="<%= product.name %>">
-                <h3><%= product.name %></h3>
-                <p class="price">
-                  <% if (product.largestOffer && product.largestOffer > 0) { %>
-                    <%= product.price.toFixed(2) %>
-                    <% if (product.price < product.regularPrice) { %>
-                      <del class="old-price"><%= product.regularPrice.toFixed(2) %></del>
-                    <% } %>
-                  <% } else { %>
-                    <%= product.regularPrice.toFixed(2) %>
-                    <% if (product.salePrice !== product.regularPrice) { %>
-                      <del class="old-price"><%= product.salePrice.toFixed(2) %></del>
-                    <% } %>
-                  <% } %>
-                </p>
-              </a>
-            </div>
-          <% } %>
-        <% }) %>
-      </div>
-    </div>
-  </section>
-<% } %>
-  <% if (showTopCategories) { %>
-    <section class="top-categories">
-      <div class="container">
-        <div class="header">
-          <h2>Categories</h2>
-        </div>
-        <div class="categories">
-          <% category.forEach(category => { %>
-            <div class="category">
-              <a href="/shop?category=<%= category._id %>" class="category-link">
-                <% if (category.image) { %>
-                  <img src="<%= category.image %>" alt="<%= category.name %>">
-                <% } else { %>
-                  <div class="no-image">No Image</div>
-                <% } %>
-                <h3><%= category.name %></h3>
-                <p><%= category.productCount || 0 %> Products</p>
-              </a>
-            </div>
+  <% if (bannersByPosition && bannersByPosition['homepage top'].length > 0) { %>
+    <div class="container-fluid p-0 position-relative homepage-top-banner">
+      <% if (bannersByPosition['homepage top'].length === 1) { %>
+        <img src="<%= bannersByPosition['homepage top'][0].image %>" class="w-100" alt="<%= bannersByPosition['homepage top'][0].title %>" style="object-fit: cover; height: 350px;">
+      <% } else { %>
+        <div class="banner-slideshow">
+          <% bannersByPosition['homepage top'].forEach(banner => { %>
+            <img src="<%= banner.image %>" class="banner-slide w-100" alt="<%= banner.title %>" style="object-fit: cover; height: 350px;">
           <% }) %>
         </div>
+      <% } %>
+    <% } else { %>
+      <div class="container-fluid p-0 position-relative">
+        <img src="/BG.png" class="w-100" style="object-fit: cover; height: 350px;">
+        <div class="text-content">
+          <p id="p1" class="text-success fw-semibold">WELCOME TO TEZBAG</p>
+          <h1 class="fw-bold">Fresh & Healthy <br> Organic Food</h1>
+          <p class="fs-5">Sale up to <span class="text-warning fw-bold">30% OFF</span></p>
+          <p id="p2" class="text-muted">Free shipping on all your orders. We deliver, you enjoy.</p>
+          <a href="/login" class="btn btn-success">Shop Now</a>
+        </div>
       </div>
-    </section>
-  <% } %>
-<% if (showTodaysItems) { %>
-  <section class="todays-items">
-    <div class="container">
-      <div class="header">
-        <h2>Today's Fresh Items</h2>
-      </div>
-      <section id="todays-fresh-items">
-        <div class="product-row">
-          <% latestProducts.forEach(product => { %>
+    <% } %>
+
+  <% if (showFeaturedProducts) { %>
+    <section class="featured-products">
+      <div class="container">
+        <div class="header">
+          <h2>Featured Products</h2>
+        </div>
+        <div class="product-list">
+          <% products.slice(0, 4).forEach(product => { %>
             <% if (product.status !== 'Out Of Stock') { %>
               <div class="product-card <%= product.status === 'Out Of Stock' ? 'out-of-stock' : '' %>">
                 <span class="out-of-stock-label">
@@ -146,20 +133,114 @@
             <% } %>
           <% }) %>
         </div>
-      </section>
-    </div>
-  </section>
-<% } %>
+      </div>
+    </section>
+  <% } %>
+  <% if (showTopCategories) { %>
+    <section class="top-categories">
+      <div class="container">
+        <div class="header">
+          <h2>Categories</h2>
+        </div>
+        <div class="categories">
+          <% category.forEach(category => { %>
+            <div class="category">
+              <a href="/shop?category=<%= category._id %>" class="category-link">
+                <% if (category.image) { %>
+                  <img src="<%= category.image %>" alt="<%= category.name %>">
+                <% } else { %>
+                  <div class="no-image">No Image</div>
+                <% } %>
+                <h3><%= category.name %></h3>
+                <p><%= category.productCount || 0 %> Products</p>
+              </a>
+            </div>
+          <% }) %>
+        </div>
+      </div>
+    </section>
+  <% } %>
+  <% if (showTodaysItems) { %>
+    <section class="todays-items">
+      <div class="container">
+        <div class="header">
+          <h2>Today's Fresh Items</h2>
+        </div>
+        <section id="todays-fresh-items">
+          <div class="product-row">
+            <% latestProducts.forEach(product => { %>
+              <% if (product.status !== 'Out Of Stock') { %>
+                <div class="product-card <%= product.status === 'Out Of Stock' ? 'out-of-stock' : '' %>">
+                  <span class="out-of-stock-label">
+                    <%= product.status === 'Out Of Stock' ? 'Out of Stock' : (product.discountPercentage > 0 ? `-${product.discountPercentage}% off` : '') %>
+                  </span>
+                  <a href="/product/<%= product._id %>" class="product-link">
+                    <img src="<%= product.image || '/default-product.png' %>" alt="<%= product.name %>">
+                    <h3><%= product.name %></h3>
+                    <p class="price">
+                      <% if (product.largestOffer && product.largestOffer > 0) { %>
+                        <%= product.price.toFixed(2) %>
+                        <% if (product.price < product.regularPrice) { %>
+                          <del class="old-price"><%= product.regularPrice.toFixed(2) %></del>
+                        <% } %>
+                      <% } else { %>
+                        <%= product.regularPrice.toFixed(2) %>
+                        <% if (product.salePrice !== product.regularPrice) { %>
+                          <del class="old-price"><%= product.salePrice.toFixed(2) %></del>
+                        <% } %>
+                      <% } %>
+                    </p>
+                  </a>
+                </div>
+              <% } %>
+            <% }) %>
+          </div>
+        </section>
+      </div>
+    </section>
+  <% } %>
 
-  <section class="offer-banner">
-    <div id="offerdiv" class="container">
-      <div class="promo-div left-div"></div>
-      <div class="promo-div right-div"></div>
-    </div>
-  </section>
+  <% if (bannersByPosition && bannersByPosition['homepage bottom'].length > 0) { %>
+    <section class="offer-banner">
+      <div id="offerdiv" class="container">
+        <div class="promo-div left-div banner-slideshow">
+          <% bannersByPosition['homepage bottom'].slice(0, Math.ceil(bannersByPosition['homepage bottom'].length / 2)).forEach(banner => { %>
+            <img src="<%= banner.image %>" class="banner-slide w-100" alt="<%= banner.title %>" style="object-fit: cover; height: 350px; border-radius: 9px;">
+          <% }) %>
+        </div>
+        <div class="promo-div right-div banner-slideshow">
+          <% bannersByPosition['homepage bottom'].slice(Math.ceil(bannersByPosition['homepage bottom'].length / 2)).forEach(banner => { %>
+            <img src="<%= banner.image %>" class="banner-slide w-100" alt="<%= banner.title %>" style="object-fit: cover; height: 350px; border-radius: 9px;">
+          <% }) %>
+        </div>
+      </div>
+    </section>
+  <% } %>
 
   <%- include("../../views/Partials/user/footer") %>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+  <script>
+    // Banner slideshow functionality with transition
+    document.querySelectorAll('.banner-slideshow').forEach(slideshow => {
+      const slides = slideshow.querySelectorAll('.banner-slide');
+      let currentSlide = 0;
+
+      if (slides.length > 0) {
+        slides[currentSlide].classList.add('active'); // Start with the first slide visible
+
+        setInterval(() => {
+          // Hide the current slide
+          slides[currentSlide].classList.remove('active');
+
+          // Move to the next slide
+          currentSlide = (currentSlide + 1) % slides.length;
+
+          // Show the next slide with fade effect
+          slides[currentSlide].classList.add('active');
+        }, 5000); // Change slide every 5 seconds
+      }
+    });
+  </script>
 </body>
 </html>

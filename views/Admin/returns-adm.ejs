@@ -323,7 +323,7 @@
     <script>
         window.updateOrderStatus = function(orderId, action) {
             fetch('/tezgrani/update-return-status', {
-                    method: 'POST',
+                    method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json'
                     },

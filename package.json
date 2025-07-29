@@ -44,12 +44,5 @@
     "toastr": "^2.1.4",
     "tslib": "^2.6.2",
     "uuid": "^11.1.0"
-  },
-  "devDependencies": {
-    "@eslint/js": "^9.31.0",
-    "eslint": "^8.2.0",
-    "eslint-config-airbnb-base": "^15.0.0",
-    "eslint-plugin-import": "^2.25.2",
-    "globals": "^16.3.0"
   }
 }

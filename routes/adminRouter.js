@@ -9,6 +9,7 @@ const dealsManageController = require('../controllers/admin/dealsManageControlle
 const orderController = require('../controllers/admin/orderController');
 const salesController = require('../controllers/admin/salesController');
 const returnManagementController = require('../controllers/admin/returnManagementController');
+const galleryManagement = require('../controllers/admin/bannerController');
 const adminAuth = require('../middlewares/adminAuth');
 const upload = require('../middlewares/multer');
 
@@ -17,7 +18,7 @@ router.get('/login', adminController.loadLogin);
 router.post('/login', adminController.verifyLogin);
 router.get('/verifyotp', adminController.loadOtp);
 router.post('/verify-otp', adminController.verifyOtp);
-router.get('/resend-otp', adminController.resendOtp);
+router.post('/resend-otp', adminController.resendOtp);
 router.get('/dashboard', adminAuth, adminController.loadDashboard);
 router.patch('/punch-in', adminAuth, adminController.storePunchin);
 router.patch('/punch-out', adminAuth, adminController.storePunchout);
@@ -49,13 +50,19 @@ router.delete('/deals/delete/:dealId', adminAuth, dealsManageController.deleteDe
 router.get('/order-management', adminAuth, orderController.loadOrder);
 router.post('/update-status/:orderId', adminAuth, orderController.updateStatus);
 router.get('/order-details/:orderId', adminAuth, orderController.loadOrderDetails);
-router.post('/cancel-order/:orderId', adminAuth, orderController.cancelOrder);
+router.patch('/cancel-order/:orderId', adminAuth, orderController.cancelOrder);
 
 // returnManagementController
 router.get('/return-management', adminAuth, returnManagementController.loadReturn);
-router.post('/update-return-status', adminAuth, returnManagementController.changeStatus);
+router.patch('/update-return-status', adminAuth, returnManagementController.changeStatus);
 
 // salesController
 router.get('/sales-report', adminAuth, salesController.loadSales);
+
+// galleryManagement
+router.get('/gallery-management', galleryManagement.loadGallery);
+router.post('/banner/save', upload.single('bannerImage'), galleryManagement.saveBanner);
+router.patch('/banner/toggle-status/:bannerId', galleryManagement.toggleBannerStatus);
+router.delete('/banner/delete/:bannerId', galleryManagement.deleteBanner);
 
 module.exports = router;
