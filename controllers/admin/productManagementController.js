@@ -10,13 +10,13 @@ const loadProduct = async (req, res) => {
     const currentPage = parseInt(req.query.page) || 1;
     const search = req.query.search || '';
 
-    let query = {};
+    const query = {};
     if (search) {
       query.productName = { $regex: search, $options: 'i' };
     }
 
     const categories = await Category.find().lean();
-    const unlistedCategoryIds = categories.filter(c => !c.isListed).map(c => c._id);
+    const unlistedCategoryIds = categories.filter((c) => !c.isListed).map((c) => c._id);
     if (unlistedCategoryIds.length > 0) {
       query.category = { $nin: unlistedCategoryIds };
     }
@@ -30,7 +30,7 @@ const loadProduct = async (req, res) => {
       .limit(limit)
       .sort({ createdAt: -1 });
 
-    products.forEach(p => {
+    products.forEach((p) => {
       p.status = p.quantity > 0 ? 'Available' : 'Out Of Stock';
     });
 
@@ -41,7 +41,7 @@ const loadProduct = async (req, res) => {
       categories: listedCategories,
       totalPages,
       search,
-      currentPage
+      currentPage,
     });
   } catch (error) {
     console.error('Error loading products:', error);
@@ -66,7 +66,9 @@ const addProduct = async (req, res, next) => {
       });
     }
 
-    const { productName, category, price, mrp, qty, description, cutStyles } = req.body;
+    const {
+      productName, category, price, mrp, qty, description, cutStyles,
+    } = req.body;
 
     if (!productName || !category || !price || !mrp || !description || !qty) {
       return res.status(400).json({
@@ -80,10 +82,10 @@ const addProduct = async (req, res, next) => {
     const quantity = parseInt(qty);
 
     if (
-      isNaN(regularPrice) || regularPrice <= 0 ||
-      isNaN(salePrice) || salePrice <= 0 ||
-      isNaN(quantity) || quantity < 0 ||
-      regularPrice > salePrice
+      isNaN(regularPrice) || regularPrice <= 0
+      || isNaN(salePrice) || salePrice <= 0
+      || isNaN(quantity) || quantity < 0
+      || regularPrice > salePrice
     ) {
       return res.status(400).json({
         success: false,
@@ -140,9 +142,8 @@ const addProduct = async (req, res, next) => {
 
     if (req.xhr || req.headers.accept.includes('json')) {
       return res.json({ success: true, message: 'Product added successfully.' });
-    } else {
-      return res.redirect('/tezgrani/product-management');
     }
+    return res.redirect('/tezgrani/product-management');
   } catch (err) {
     console.error('Error saving product:', err);
     return req.xhr ? next(err) : res.redirect('/404Error');
@@ -176,7 +177,9 @@ const toggleProductStatus = async (req, res, next) => {
 const editProduct = async (req, res, next) => {
   try {
     const { productId } = req.params;
-    const { productName, category, price, mrp, qty, description, cutStyles } = req.body;
+    const {
+      productName, category, price, mrp, qty, description, cutStyles,
+    } = req.body;
 
     if (!productName || !category || !price || !mrp || !qty || !description) {
       return res.status(400).json({
@@ -190,10 +193,10 @@ const editProduct = async (req, res, next) => {
     const quantity = parseInt(qty);
 
     if (
-      isNaN(regularPrice) || regularPrice <= 0 ||
-      isNaN(salePrice) || salePrice <= 0 ||
-      isNaN(quantity) || quantity < 0 ||
-      regularPrice > salePrice
+      isNaN(regularPrice) || regularPrice <= 0
+      || isNaN(salePrice) || salePrice <= 0
+      || isNaN(quantity) || quantity < 0
+      || regularPrice > salePrice
     ) {
       return res.status(400).json({
         success: false,
@@ -241,7 +244,7 @@ const editProduct = async (req, res, next) => {
     deletedImages = Array.isArray(deletedImages) ? deletedImages : [deletedImages];
 
     const existingImages = product.productImage || [];
-    const updatedImages = existingImages.filter(url => !deletedImages.includes(url));
+    const updatedImages = existingImages.filter((url) => !deletedImages.includes(url));
 
     for (const url of deletedImages) {
       const publicId = url.split('/').slice(-2).join('/').split('.')[0];
@@ -264,7 +267,7 @@ const editProduct = async (req, res, next) => {
       });
     }
 
-    let SKU = product.SKU;
+    let { SKU } = product;
     if (productName !== product.productName || category !== product.category.toString()) {
       SKU = generateSKU(categoryDoc, productName);
     }
@@ -286,9 +289,8 @@ const editProduct = async (req, res, next) => {
 
     if (req.xhr || req.headers.accept.includes('json')) {
       return res.json({ success: true, message: 'Product updated successfully.' });
-    } else {
-      return res.redirect('/tezgrani/product-management');
     }
+    return res.redirect('/tezgrani/product-management');
   } catch (error) {
     console.error('Error editing product:', error);
     return req.xhr ? next(error) : res.redirect('/404Error');

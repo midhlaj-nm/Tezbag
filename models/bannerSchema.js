@@ -1,38 +1,27 @@
-const mongoose = require('mongoose')
-const {Schema} = mongoose;
+const mongoose = require('mongoose');
+
+const { Schema } = mongoose;
 
 const bannerSchema = new Schema({
     title: {
-        type:String,
-        required: true
+        type: String,
+        required: true,
     },
     image: {
         type: String,
-        required: true
+        required: true,
     },
-    description: {
+    position: {
         type: String,
-        required: true
+        required: true,
     },
-    link: {
-        type: String
+    status: {
+        type: String,
+        enum: ['Active', 'Inactive'],
+        default: 'Active',
     },
-    startDate: {
-        type: Date,
-        required: true
-    },
-    endDate: {
-        type: Date,
-        required: false
-    },
-    categoryId: {
-        type: Schema.Types.ObjectId,
-        ref: 'Category',
-        required: false
-      }
-})
+}, { timestamps: true });
 
+const Banner = mongoose.model('Banner', bannerSchema);
 
-const Banner = mongoose.model('Banner',bannerSchema);
-
-module.exports = Banner 
+module.exports = Banner;

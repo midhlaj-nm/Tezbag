@@ -9,4 +9,4 @@ const generateSKU = (category, productName, id) => {
   return sku;
 };
 
-module.exports =  generateSKU ;
+module.exports = generateSKU;

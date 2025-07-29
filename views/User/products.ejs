@@ -2,13 +2,11 @@
 <hr style="margin: 0rem 0rem 1rem 0rem; background-color: #535353;">
 <link rel="stylesheet" href="/User-css/products-user.css">
 
-<!-- Google Fonts for Icons -->
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
 
-<!-- Toastr CSS -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
 
-<!-- breadcrumb -->
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
     <li class="breadcrumb-item"><a href="/">Home</a></li>
@@ -74,7 +72,6 @@
         <% } %>
       </div>
 
-      <!-- Cutting Style Dropdown (Visible only for Meat and Fish) -->
       <% if (product.quantity <= 0) { %>
       <div class="out-of-stock-message" style="color: red; font-weight: bold; font-size: 1.5rem; margin: 15px 0;">
         The Product is out of stock
@@ -92,22 +89,29 @@
       </div>
       <% } %>
 
-      <hr style="border: 1px solid #898989; margin-top: 15px;">
+      <hr style="width: 120%; border: 1px solid #898989; margin-top: 15px;">
       <div class="cart-containerr">
         <div class="quantity-selector">
           <button class="decrease">−</button>
           <span class="quantity">1</span>
           <button class="increase">+</button>
         </div>
-        <button class="add-to-cart">
-          Add to Cart <span class="cart-icon material-icons">shopping_cart</span>
+        <button class="buy-now-btn">
+          Buy Now <span class="cart-icon material-icons">local_mall</span>
         </button>
-        <div class="wishlist">
+        <div class="cart-icon-container" id="shoppingCartIconContainer">
+          <% if (inCart) { %>
+            <svg id="shoppingCartIcon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000000"><path d="M280-80q-33 0-56.5-23.5T200-160q0-33 23.5-56.5T280-240q33 0 56.5 23.5T360-160q0 33-23.5 56.5T280-80Zm400 0q-33 0-56.5-23.5T600-160q0-33 23.5-56.5T680-240q33 0 56.5 23.5T760-160q0 33-23.5 56.5T680-80ZM208-800h590q23 0 35 20.5t1 41.5L692-482q-11 20-29.5 31T622-440H324l-44 80h480v80H280q-45 0-68-39.5t-2-78.5l54-98-144-304H40v-80h130l38 80Z"/></svg>
+          <% } else { %>
+            <svg id="shoppingCartIcon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000000"><path d="M280-80q-33 0-56.5-23.5T200-160q0-33 23.5-56.5T280-240q33 0 56.5 23.5T360-160q0 33-23.5 56.5T280-80Zm400 0q-33 0-56.5-23.5T600-160q0-33 23.5-56.5T680-240q33 0 56.5 23.5T760-160q0 33-23.5 56.5T680-80ZM246-720l96 200h280l110-200H246Zm-38-80h590q23 0 35 20.5t1 41.5L692-482q-11 20-29.5 31T622-440H324l-44 80h480v80H280q-45 0-68-39.5t-2-78.5l54-98-144-304H40v-80h130l38 80Zm134 280h280-280Z"/></svg>
+          <% } %>
+        </div>
+        <div class="wishlist-container">
           <span class="material-icons" id="wishlistIcon">favorite_border</span>
         </div>
       </div>
       <% } %>
-      <hr style="border: 1px solid #898989; margin-top: 10px;">
+      <hr style="width: 120%; border: 1px solid #898989; margin-top: 10px;">
       <div class="product-meta">
         <p>
           <strong>Category:</strong> <span class="veg"><%= product.category?.name || 'Not specified' %></span>
@@ -186,7 +190,6 @@
 
 <%- include("../../views/Partials/user/footer") %>
 
-<!-- Toastr JS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
 <script>
@@ -214,18 +217,24 @@
   const quantitySpan = document.querySelector('.quantity');
   const decreaseBtn = document.querySelector('.decrease');
   const increaseBtn = document.querySelector('.increase');
-  const addToCartBtn = document.querySelector('.add-to-cart');
+  const buyNowBtn = document.querySelector('.buy-now-btn');
+  const shoppingCartIconContainer = document.querySelector('#shoppingCartIconContainer');
   const cuttingStyleSelect = document.querySelector('#cuttingStyle');
-  const wishlistBtn = document.querySelector('.wishlist');
   const wishlistIcon = document.querySelector('#wishlistIcon');
+  
+  // Define SVG content
+  const fullCartSvg = `<svg id="shoppingCartIcon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000000"><path d="M280-80q-33 0-56.5-23.5T200-160q0-33 23.5-56.5T280-240q33 0 56.5 23.5T360-160q0 33-23.5 56.5T280-80Zm400 0q-33 0-56.5-23.5T600-160q0-33 23.5-56.5T680-240q33 0 56.5 23.5T760-160q0 33-23.5 56.5T680-80ZM208-800h590q23 0 35 20.5t1 41.5L692-482q-11 20-29.5 31T622-440H324l-44 80h480v80H280q-45 0-68-39.5t-2-78.5l54-98-144-304H40v-80h130l38 80Z"/></svg>`;
+  const emptyCartSvg = `<svg id="shoppingCartIcon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000000"><path d="M280-80q-33 0-56.5-23.5T200-160q0-33 23.5-56.5T280-240q33 0 56.5 23.5T360-160q0 33-23.5 56.5T280-80Zm400 0q-33 0-56.5-23.5T600-160q0-33 23.5-56.5T680-240q33 0 56.5 23.5T760-160q0 33-23.5 56.5T680-80ZM246-720l96 200h280l110-200H246Zm-38-80h590q23 0 35 20.5t1 41.5L692-482q-11 20-29.5 31T622-440H324l-44 80h480v80H280q-45 0-68-39.5t-2-78.5l54-98-144-304H40v-80h130l38 80Zm134 280h280-280Z"/></svg>`;
 
   let quantity = parseInt(quantitySpan.textContent);
-  const wishlist = <%- JSON.stringify(wishlist) || '[]' %>; // Expose wishlist array
-  let inWishlist = wishlist.includes('<%= product._id.toString() %>'); // Set initial state from server
-
-  // Set initial icon state
+  const wishlist = <%- JSON.stringify(wishlist) || '[]' %>;
+  let inWishlist = wishlist.includes('<%= product._id.toString() %>');
+  let inCart = <%- JSON.stringify(inCart) %>;
+  
+  // Set initial icon states
   wishlistIcon.textContent = inWishlist ? 'favorite' : 'favorite_border';
-
+  // The cart icon is set dynamically in the HTML, no need to set here on load
+  
   decreaseBtn.addEventListener('click', () => {
     if (quantity > 1) {
       quantity--;
@@ -238,28 +247,44 @@
     quantitySpan.textContent = quantity;
   });
 
-  // Add to Cart Logic with Cutting Style
-  addToCartBtn.addEventListener('click', async () => {
+  // Event listener for the "Buy Now" button
+  buyNowBtn.addEventListener('click', () => {
     const productId = '<%= product._id %>';
     const quantity = parseInt(quantitySpan.textContent);
     let cuttingStyle = cuttingStyleSelect ? cuttingStyleSelect.value : null;
 
-    // Validate cutting style for Meat and Fish products
     if (cuttingStyleSelect && !cuttingStyle) {
       toastr.error('Please select a cutting style.');
+      return;
+    }
+
+    let checkoutUrl = `/cart/checkout?productId=${productId}&quantity=${quantity}`;
+    if (cuttingStyle) {
+      checkoutUrl += `&cuttingStyle=${cuttingStyle}`;
+    }
+
+    window.location.href = checkoutUrl;
+  });
+
+  // Event listener for the shopping cart icon container
+  shoppingCartIconContainer.addEventListener('click', async () => {
+    const productId = '<%= product._id %>';
+    const quantity = parseInt(quantitySpan.textContent);
+    let cuttingStyle = cuttingStyleSelect ? cuttingStyleSelect.value : null;
+
+    if (cuttingStyleSelect && !cuttingStyle && !inCart) {
+      toastr.error('Please select a cutting style to add to cart.');
       return;
     }
 
     const cartData = {
       productId,
       quantity,
-      ...(cuttingStyle && {
-        cuttingStyle
-      }),
+      ...(cuttingStyle && { cuttingStyle }),
     };
 
     try {
-      const response = await fetch('/cart/add/${productId}', {
+      const response = await fetch('/cart/toggle', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -270,32 +295,25 @@
       const data = await response.json();
 
       if (data.success) {
-        toastr.success(
-          'Product added to cart successfully! <br><button id="view-cart-btn" style="padding: 5px 10px; background-color: #008ae0; color: white; border: none; border-radius: 3px; cursor: pointer;">View Cart</button>',
-          '', {
-            onShown: function() {
-              // Add click event to the View Cart button
-              document.getElementById('view-cart-btn').addEventListener('click', () => {
-                window.location.href = '/cart';
-              });
-            }
-          }
-        );
+        inCart = data.inCart;
+        // Dynamically update the SVG icon based on the new cart status
+        if (inCart) {
+          shoppingCartIconContainer.innerHTML = fullCartSvg;
+        } else {
+          shoppingCartIconContainer.innerHTML = emptyCartSvg;
+        }
+        toastr.success(data.message);
       } else {
         toastr.error(data.message || 'Unknown error');
-        if (data.redirect) {
-          setTimeout(() => {
-            window.location.href = data.redirect;
-          }, data.delay || 1000); // Default to 1 second if delay is not specified
-        }
       }
     } catch (error) {
-      console.error('Error adding to cart:', error);
-      toastr.error('An error occurred while adding the product to cart.');
+      console.error('Error updating cart:', error);
+      toastr.error('An error occurred while updating the cart.');
     }
   });
 
-  wishlistBtn.addEventListener('click', async () => {
+  // Existing wishlist logic
+  wishlistIcon.addEventListener('click', async () => {
     const productId = '<%= product._id %>';
     console.log(`Attempting to toggle wishlist for product ${productId}`);
 

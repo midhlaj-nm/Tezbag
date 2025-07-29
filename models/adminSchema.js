@@ -1,51 +1,52 @@
 const mongoose = require('mongoose');
+
 const { Schema } = mongoose;
 
 const adminSchema = new Schema({
   f_Name: {
     type: String,
     required: true,
-    trim: true
+    trim: true,
   },
   l_Name: {
     type: String,
     required: true,
-    trim: true
+    trim: true,
   },
   email: {
     type: String,
     required: true,
-    unique: true
+    unique: true,
   },
   password: {
     type: String,
-    required: true
+    required: true,
   },
   oldPasswords: {
     type: [String],
-    default: []
+    default: [],
   },
   isAdmin: {
     type: Boolean,
-    default: true
+    default: true,
   },
   isSuperAdmin: {
     type: Boolean,
-    default: false
+    default: false,
   },
   isBlocked: {
     type: Boolean,
-    default: false
+    default: false,
   },
   createdOn: {
     type: Date,
-    default: Date.now
+    default: Date.now,
   },
   lastLogin: {
-    type: Date
+    type: Date,
   },
   lastLogout: {
-    type: Date
+    type: Date,
   },
 });
 

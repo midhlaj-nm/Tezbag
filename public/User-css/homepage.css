@@ -539,7 +539,7 @@ h2 {
     color: white;
     padding: 50px 0;
     position: relative;
-    background-image: url('/Footer.png'); /* Your image */
+    background-image: url('/Footer.png'); 
     background-repeat: no-repeat;
     background-position: right top;
     background-size: cover; /* Ensures image scales with the footer */

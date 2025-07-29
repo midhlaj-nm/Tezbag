@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+
 const { Schema } = mongoose;
 
 const categorySchema = new Schema({
@@ -6,41 +7,41 @@ const categorySchema = new Schema({
     type: String,
     required: true,
     unique: true,
-    trim: true
+    trim: true,
   },
   slug: {
     type: String,
     unique: true,
     lowercase: true,
-    trim: true
+    trim: true,
   },
   description: {
     type: String,
     required: true,
-    trim: true
+    trim: true,
   },
   isListed: {
     type: Boolean,
-    default: false
+    default: false,
   },
   categoryOffer: {
     type: Number,
     default: 0,
     min: 0,
-    max: 100
+    max: 100,
   },
   image: {
     type: String,
-    default: '' 
+    default: '',
   },
   publicId: {
     type: String,
-    default: '' 
+    default: '',
   },
-    activeDealIds: [{
-        type: Schema.Types.ObjectId,
-        ref: 'Deal'
-    }]
+  activeDealIds: [{
+    type: Schema.Types.ObjectId,
+    ref: 'Deal',
+  }],
 }, { timestamps: true });
 
 const Category = mongoose.model('Category', categorySchema);

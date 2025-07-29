@@ -584,8 +584,14 @@
     let currentSubtotal = parseFloat('<%= subtotal %>');
     let currentShipping = parseFloat('<%= shipping %>');
     let currentTotal = parseFloat('<%= finalTotal %>');
-    let selectedAddressIndex = null;
+    let selectedAddressId = null; // Changed to store address _id
     const walletBalance = parseFloat('<%= wallet.balance %>');
+
+    // New variables for Buy Now flow and Retry flow
+    const productId = '<%= (typeof orderItems !== "undefined" && orderItems[0]) ? orderItems[0].productId : "" %>';
+    const quantity = '<%= (typeof orderItems !== "undefined" && orderItems[0]) ? orderItems[0].quantity : "" %>';
+    const cuttingStyle = '<%= (typeof orderItems !== "undefined" && orderItems[0] && orderItems[0].cuttingStyle) ? orderItems[0].cuttingStyle : "" %>';
+    const retryOrderId = '<%= typeof retryOrder !== "undefined" && retryOrder ? retryOrder._id : "" %>'; // Pass retryOrderId if available
 
     toastr.options = {
       timeOut: 3000,
@@ -613,9 +619,21 @@
         walletOption.classList.add('disabled');
         walletOption.style.pointerEvents = 'none';
         walletRadio.disabled = true;
+        // If wallet was selected but now insufficient, switch to UPI if available, else COD
         if (walletOption.classList.contains('selected')) {
-          document.querySelector('.payment-option[data-payment="cod"]').classList.add('selected');
-          document.querySelector('.payment-option[data-payment="cod"] .payment-radio').checked = true;
+          const upiOption = document.querySelector('.payment-option[data-payment="upi"]');
+          const codOption = document.querySelector('.payment-option[data-payment="cod"]');
+
+          if (!upiOption.classList.contains('disabled')) {
+            upiOption.classList.add('selected');
+            upiOption.querySelector('.payment-radio').checked = true;
+          } else if (!codOption.classList.contains('disabled')) {
+            codOption.classList.add('selected');
+            codOption.querySelector('.payment-radio').checked = true;
+          } else {
+            // Fallback if neither wallet nor UPI/COD is available
+            toastr.warning('No suitable payment method available.');
+          }
         }
       }
     }
@@ -623,13 +641,20 @@
     function checkCODLimit() {
       const codOption = document.querySelector('.payment-option[data-payment="cod"]');
       const codRadio = codOption.querySelector('.payment-radio');
-      if (currentTotal >= 1000) {
+      if (currentTotal >= 1000) { // Assuming COD limit is 1000₹
         codOption.classList.add('disabled');
         codOption.style.pointerEvents = 'none';
         codRadio.disabled = true;
+        // If COD was selected but now exceeds limit, switch to UPI if available
         if (codOption.classList.contains('selected')) {
-          document.querySelector('.payment-option[data-payment="upi"]').classList.add('selected');
-          document.querySelector('.payment-option[data-payment="upi"] .payment-radio').checked = true;
+          const upiOption = document.querySelector('.payment-option[data-payment="upi"]');
+          if (!upiOption.classList.contains('disabled')) {
+            upiOption.classList.add('selected');
+            upiOption.querySelector('.payment-radio').checked = true;
+          } else {
+            // Fallback if neither COD nor UPI is available (wallet might be insufficient too)
+            toastr.warning('No suitable payment method available for this order total.');
+          }
         }
       } else {
         codOption.classList.remove('disabled');
@@ -640,7 +665,10 @@
 
     function applyCoupon(couponCode) {
       const couponItem = document.querySelector(`.coupon-item[data-coupon-code="${couponCode}"]`);
-      if (!couponItem) return;
+      if (!couponItem) {
+        console.log(`Apply Coupon: Coupon item not found for code: ${couponCode}`);
+        return;
+      }
 
       const minPrice = parseFloat(couponItem.dataset.minPrice);
       const maxPrice = parseFloat(couponItem.dataset.maxPrice);
@@ -651,7 +679,10 @@
         return;
       }
 
-      if (appliedCoupon) removeCoupon(appliedCoupon.code);
+      if (appliedCoupon) {
+        console.log(`Apply Coupon: Removing previously applied coupon: ${appliedCoupon.code}`);
+        removeCoupon(appliedCoupon.code);
+      }
 
       document.querySelectorAll('.coupon-item').forEach(item => {
         item.classList.remove('selected');
@@ -675,13 +706,17 @@
       updateTotals();
       addCouponRow(couponCode, offerPrice);
       checkWalletBalance();
-      checkCODLimit(); // Check COD limit after applying coupon
+      checkCODLimit();
       toastr.success(`Coupon ${couponCode} applied successfully! You saved ${offerPrice}₹.`);
+      console.log(`Apply Coupon: Coupon ${couponCode} applied. New total: ${currentTotal}`);
     }
 
     function removeCoupon(couponCode) {
       const couponItem = document.querySelector(`.coupon-item[data-coupon-code="${couponCode}"]`);
-      if (!couponItem) return;
+      if (!couponItem) {
+        console.log(`Remove Coupon: Coupon item not found for code: ${couponCode}`);
+        return;
+      }
 
       couponItem.classList.remove('selected');
       const removeButton = couponItem.querySelector('.coupon-apply-btn');
@@ -695,8 +730,9 @@
         removeCouponRow();
         updateTotals();
         checkWalletBalance();
-        checkCODLimit(); // Check COD limit after removing coupon
+        checkCODLimit();
         toastr.success(`Coupon ${couponCode} removed successfully!`);
+        console.log(`Remove Coupon: Coupon ${couponCode} removed. New total: ${currentTotal}`);
       }
     }
 
@@ -706,32 +742,41 @@
         couponRow = document.createElement('div');
         couponRow.className = 'total-row coupon-row';
         document.querySelector('.summary-totals').insertBefore(couponRow, document.querySelector('.total-row.final'));
+        console.log('Add Coupon Row: New coupon row created.');
       }
       couponRow.innerHTML = `<span>${couponCode}:</span><span>-${offerPrice}₹</span>`;
     }
 
     function removeCouponRow() {
       const couponRow = document.querySelector('.total-row.coupon-row');
-      if (couponRow) couponRow.remove();
+      if (couponRow) {
+        couponRow.remove();
+        console.log('Remove Coupon Row: Coupon row removed.');
+      }
     }
 
     function updateTotals() {
       document.getElementById('subtotal').textContent = `${currentSubtotal.toFixed(2)}₹`;
       document.getElementById('finalTotal').textContent = `${currentTotal.toFixed(2)}₹`;
       checkWalletBalance();
-      checkCODLimit(); // Update COD status whenever totals change
+      checkCODLimit();
+      console.log(`Update Totals: Subtotal: ${currentSubtotal}, Final Total: ${currentTotal}`);
     }
 
     function openAddressModal(index = null) {
       const modalElement = document.getElementById('addressModal');
-      if (!modalElement) return;
+      if (!modalElement) {
+        console.error('Open Address Modal: Address modal element not found.');
+        return;
+      }
       const modal = new bootstrap.Modal(modalElement, {
         backdrop: true,
         keyboard: true
       });
       const modalTitle = document.getElementById('addressModalLabel');
       const makeDefaultCheckbox = document.getElementById('makeDefaultCheckbox');
-      const editIndexInput = document.getElementById('editIndex');
+      const editIndexInput = document.getElementById('editIndex'); // This holds the array index for internal use
+      const editAddressIdInput = document.getElementById('editAddressId'); // This will hold the MongoDB _id
 
       document.querySelectorAll('.errr-msg').forEach(err => {
         err.style.display = 'none';
@@ -739,14 +784,18 @@
       });
 
       if (index !== null) {
+        console.log(`Open Address Modal: Editing address at index: ${index}`);
         modalTitle.textContent = 'Edit Address';
         editIndexInput.value = index;
         const address = savedAddresses[index];
+        editAddressIdInput.value = address._id || ''; // Set the MongoDB _id
         populateForm(address);
         makeDefaultCheckbox.checked = address.isDefault || false;
       } else {
+        console.log('Open Address Modal: Adding new address.');
         modalTitle.textContent = 'Add Address';
         editIndexInput.value = '';
+        editAddressIdInput.value = ''; // Clear for new address
         clearForm();
         makeDefaultCheckbox.checked = false;
       }
@@ -755,7 +804,10 @@
 
     function closeAddressModal() {
       const modal = bootstrap.Modal.getInstance(document.getElementById('addressModal'));
-      if (modal) modal.hide();
+      if (modal) {
+        modal.hide();
+        console.log('Close Address Modal: Address modal hidden.');
+      }
     }
 
     function editAddress(index) {
@@ -763,11 +815,12 @@
     }
 
     function showOrderConfirmModal(index = null, action = 'order') {
-      currentDeleteIndex = index;
+      currentDeleteIndex = index; // Used for address deletion
       const modal = document.getElementById('order-confirm-modal');
       if (modal) {
         modal.style.display = 'flex';
         modal.dataset.action = action;
+        console.log(`Show Order Confirm Modal: Action set to ${action}.`);
       }
     }
 
@@ -777,46 +830,71 @@
         modal.style.display = 'none';
         modal.dataset.action = '';
         currentDeleteIndex = null;
+        console.log('Close Order Confirm Modal: Modal hidden and action cleared.');
       }
     }
 
     function deleteAddress() {
-      if (!currentDeleteIndex) return;
-      fetch(`/account-settings/delete-address/${currentDeleteIndex}`, {
+      if (currentDeleteIndex === null) {
+        console.error('Delete Address: No address index selected for deletion.');
+        return;
+      }
+      const addressToDelete = savedAddresses[currentDeleteIndex];
+      if (!addressToDelete || !addressToDelete._id) {
+        console.error('Delete Address: Address object or _id not found for deletion.');
+        toastr.error('Address information missing for deletion.');
+        return;
+      }
+
+      console.log(`Delete Address: Attempting to delete address with ID: ${addressToDelete._id}`);
+      fetch(`/account-settings/delete-address/${addressToDelete._id}`, { // Use _id in URL
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json'
-          },
-          body: JSON.stringify({
-            index: currentDeleteIndex
-          })
+          }
         })
-        .then(response => response.json())
+        .then(response => {
+          if (!response.ok) {
+            // Handle HTTP errors
+            return response.json().then(err => {
+              throw new Error(err.message || 'Server error');
+            });
+          }
+          return response.json();
+        })
         .then(data => {
           if (data.success) {
             toastr.success('Address deleted successfully');
+            console.log('Delete Address: Address successfully deleted. Reloading page.');
             setTimeout(() => window.location.reload(), 1000);
           } else {
             toastr.error(data.message || 'Failed to delete address');
+            console.error('Delete Address: Server reported failure:', data.message);
           }
         })
         .catch(error => {
           toastr.error('An error occurred while deleting the address');
+          console.error('Delete Address: Fetch error:', error);
         });
+      closeOrderConfirmModal();
     }
 
     function initiateRazorpayPayment(orderId, amount, razorpayKey, razorpayOrderId) {
+      console.log(`Initiate Razorpay: Order ID: ${orderId}, Amount: ${amount}, RZ Key: ${razorpayKey}, RZ Order ID: ${razorpayOrderId}`);
+
       const urlParams = new URLSearchParams(window.location.search);
-      const isRetry = urlParams.get('retry');
+      const isRetryPayment = urlParams.get('retry'); // Use a different var name to avoid confusion with `retryOrderId`
+
       const options = {
         key: razorpayKey,
-        amount: amount * 100,
+        amount: amount * 100, // Amount in paise
         currency: 'INR',
         name: 'TezBag',
-        description: 'Order Payment' + (isRetry ? ' (Retry)' : ''),
+        description: 'Order Payment' + (isRetryPayment ? ' (Retry)' : ''),
         order_id: razorpayOrderId,
         handler: function(response) {
+          console.log('Razorpay Handler: Payment successful, verifying payment.');
           verifyPayment(response, orderId);
         },
         prefill: {
@@ -825,23 +903,35 @@
         },
         notes: {
           orderId: orderId,
-          userId: '<%= userId %>'
+          userId: '<%= userId._id %>' // Use userId._id to match server expectations
         },
         theme: {
           color: '#00B207'
         },
         modal: {
           ondismiss: function() {
-            fetch(`/cancel-order/${orderId}`, {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json'
-                },
-              })
-              .then(res => res.json())
-              .catch(err => {});
+            console.log('Razorpay Modal: Payment dismissed by user.');
+            // Only cancel the order if it's a new order (not a retry)
+            // If it's a retry, the backend already has the order as 'Payment Failed'
+            if (!isRetryPayment) {
+              console.log(`Razorpay Modal: Cancelling order ${orderId} due to dismissal (new order).`);
+              fetch(`/cancel-order/${orderId}`, {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                })
+                .then(res => res.json())
+                .catch(err => {
+                  console.error('Razorpay Modal: Error cancelling order on dismiss:', err);
+                });
+            } else {
+              console.log(`Razorpay Modal: Not cancelling order ${orderId} on dismiss (it's a retry).`);
+            }
+
             const loadingOverlay = document.getElementById('loading-overlay');
             loadingOverlay.style.display = 'none';
+            // Redirect to payment failed/retry page after dismissal
             setTimeout(() => {
               window.location.href = '/retry-payment';
             }, 100);
@@ -854,6 +944,7 @@
     }
 
     async function verifyPayment(paymentResponse, orderId) {
+      console.log(`Verify Payment: Attempting to verify payment for order ID: ${orderId}`);
       try {
         const res = await fetch('/order/verify-payment', {
           method: 'POST',
@@ -868,40 +959,74 @@
         const data = await res.json();
         if (data.success) {
           toastr.success('Payment Successful! Redirecting...');
+          console.log(`Verify Payment: Payment verification successful for order ${orderId}. Redirecting.`);
           setTimeout(() => window.location.href = `/order-confirmation/${orderId}`, 1000);
         } else {
-          fetch(`/cancel-order/${orderId}`, {
+          console.error(`Verify Payment: Payment verification failed for order ${orderId}: ${data.message || 'Unknown error'}`);
+          // If verification fails, ensure the order is marked as failed on backend
+          fetch(`/cancel-order/${orderId}`, { // Using cancel-order to mark it as failed
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json'
               },
             })
             .then(res => res.json())
-            .catch(err => {});
+            .catch(err => {
+              console.error('Verify Payment: Error cancelling/failing order after verification failure:', err);
+            });
           toastr.error(data.message || 'Payment verification failed');
+          // Always redirect to retry page on verification failure
+          setTimeout(() => {
+            window.location.href = '/retry-payment';
+          }, 100);
         }
       } catch (error) {
-        toastr.error('Something went wrong');
+        console.error('Verify Payment: An error occurred during payment verification:', error);
+        toastr.error('Something went wrong during payment verification.');
       }
     }
 
     function placeOrder() {
-      if (selectedAddressIndex === null) {
+      if (selectedAddressId === null) { // Check for selectedAddressId
         toastr.error('Please select a delivery address.');
+        console.log('Place Order: No address selected.');
         return;
       }
+
       const paymentMethod = document.querySelector('input[name="payment"]:checked')?.value || '';
-      const address = savedAddresses[selectedAddressIndex];
+      if (!paymentMethod) {
+        toastr.error('Please select a payment method.');
+        console.log('Place Order: No payment method selected.');
+        return;
+      }
+
       const orderData = {
         paymentMethod,
         orderNotes: document.getElementById('orderNotes').value || '',
-        address: address,
+        addressId: selectedAddressId, // Send only the _id of the address
         coupon: appliedCoupon ? appliedCoupon.code : null,
         finalAmount: currentTotal
       };
 
+      // Include retryOrderId if present (for payment retries of existing orders)
+      if (retryOrderId) {
+        orderData.retryOrderId = retryOrderId;
+        console.log(`Place Order: Including retryOrderId: ${retryOrderId} in order data.`);
+      }
+
+      // Include product details for "Buy Now" orders
+      if (productId) {
+        orderData.productId = productId;
+        orderData.quantity = quantity;
+        if (cuttingStyle) {
+          orderData.cuttingStyle = cuttingStyle;
+        }
+        console.log('Place Order: Including Buy Now product details.');
+      }
+
       const loadingOverlay = document.getElementById('loading-overlay');
       loadingOverlay.style.display = 'flex';
+      console.log('Place Order: Sending order data:', orderData);
 
       fetch('/order/place', {
           method: 'POST',
@@ -910,11 +1035,20 @@
           },
           body: JSON.stringify(orderData)
         })
-        .then(response => response.json())
+        .then(response => {
+          loadingOverlay.style.display = 'none';
+          if (!response.ok) {
+            // If the response is not ok, parse the error message from the backend
+            return response.json().then(err => {
+              throw new Error(err.message || 'Server error');
+            });
+          }
+          return response.json();
+        })
         .then(data => {
+          closeOrderConfirmModal();
           if (data.success) {
-            loadingOverlay.style.display = 'none';
-            closeOrderConfirmModal();
+            console.log(`Place Order: Order placement successful. Order ID: ${data.orderId}, Payment Method: ${paymentMethod}`);
             if (paymentMethod === 'upi') {
               initiateRazorpayPayment(data.orderId, currentTotal, data.razorpayKey, data.razorpayOrderId);
             } else {
@@ -927,23 +1061,28 @@
                 autoplay: true,
                 path: '/Order_success.json'
               });
+              console.log('Place Order: Showing success animation for non-UPI payment.');
               setTimeout(() => {
                 animationContainer.style.display = 'none';
                 window.location.href = `/order-confirmation/${data.orderId}`;
               }, 3700);
             }
           } else {
-            if (data.message === 'Product is out-of-stock') {
+            console.error('Place Order: Failed to place order:', data.message);
+            if (data.message === 'Some products are out of stock') {
               toastr.error(data.message);
-              setTimeout(() => window.location.href = '/shop', 2000);
+              setTimeout(() => window.location.href = '/shop', 2000); // Redirect to shop if out of stock
+            } else if (data.redirect) {
+              toastr.error(data.message || 'Failed to place order. Redirecting...');
+              setTimeout(() => window.location.href = data.redirect, data.delay || 1000); // Use redirect from server
             } else {
               toastr.error(data.message || 'Failed to place order.');
             }
-            loadingOverlay.style.display = 'none';
           }
         })
         .catch(error => {
-          toastr.error('An error occurred while placing the order.');
+          console.error('Place Order: An error occurred while placing the order:', error);
+          toastr.error(error.message || 'An unexpected error occurred. Please try again.');
           loadingOverlay.style.display = 'none';
           closeOrderConfirmModal();
         });
@@ -956,25 +1095,27 @@
     };
 
     async function getCoordinates(pincode) {
+      console.log(`Get Coordinates: Fetching coordinates for pincode: ${pincode}`);
       try {
         const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${pincode}&key=<%= GOOGLE_API_KEY %>`);
         const data = await response.json();
         if (data.status === "OK" && data.results.length > 0) {
           const location = data.results[0].geometry.location;
+          console.log(`Get Coordinates: Coordinates found: ${location.lat}, ${location.lng}`);
           return {
             latitude: location.lat,
             longitude: location.lng
           };
         } else {
+          console.log(`Get Coordinates: No coordinates found for pincode: ${pincode}, Status: ${data.status}`);
           return null;
         }
       } catch (error) {
-        console.error("Geocoding error:", error);
+        console.error("Get Coordinates: Geocoding API error:", error);
         return null;
       }
     }
 
-    // Function to calculate distance using Haversine formula
     function calculateDistance(lat1, lon1, lat2, lon2) {
       const R = 6371; // Earth's radius in kilometers
       const dLat = toRadians(lat2 - lat1);
@@ -983,17 +1124,20 @@
         Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) *
         Math.sin(dLon / 2) * Math.sin(dLon / 2);
       const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-      return R * c;
+      const distance = R * c;
+      console.log(`Calculate Distance: Calculated distance: ${distance.toFixed(2)} km`);
+      return distance;
     }
 
     function toRadians(degrees) {
       return degrees * (Math.PI / 180);
     }
 
-    // Function to check delivery eligibility
     async function checkDeliveryEligibility(pincode) {
+      console.log(`Check Delivery Eligibility: Checking for pincode: ${pincode}`);
       const customerCoords = await getCoordinates(pincode);
       if (!customerCoords) {
+        console.log('Check Delivery Eligibility: Unable to get customer coordinates.');
         return {
           eligible: false,
           message: "Unable to determine delivery location"
@@ -1005,68 +1149,89 @@
         customerCoords.latitude, customerCoords.longitude
       );
 
-      return distance <= 5 ? {
-        eligible: true,
-        message: "Delivery available"
-      } : {
-        eligible: false,
-        message: "Delivery not available beyond 5 km"
+      const eligible = distance <= 5; // Assuming 5 km limit
+      const message = eligible ? "Delivery available" : `Delivery not available beyond 5 km (current: ${distance.toFixed(2)} km)`;
+      console.log(`Check Delivery Eligibility: Result - Eligible: ${eligible}, Message: ${message}`);
+      return {
+        eligible: eligible,
+        message: message
       };
     }
 
-    // Update selectAddress to check delivery eligibility
     async function selectAddress(index) {
       if (index === null || index < 0 || index >= savedAddresses.length) {
-        selectedAddressIndex = null;
+        selectedAddressId = null;
+        console.log('Select Address: Invalid address index or no address selected. selectedAddressId cleared.');
+        updateDeliveryStatus(false, 'Please select a valid address.'); // Show status if no address
         return;
       }
-      selectedAddressIndex = index;
+      const selectedAddr = savedAddresses[index];
+      selectedAddressId = selectedAddr._id; // Store the actual MongoDB _id
+      console.log(`Select Address: Selected address index: ${index}, _id: ${selectedAddressId}`);
+
       document.querySelectorAll('.address-card').forEach(card => card.classList.remove('selected'));
       const selectedCard = document.querySelector(`.address-card[data-index="${index}"]`);
       if (selectedCard) selectedCard.classList.add('selected');
 
-      // Check delivery eligibility when address is selected
-      const address = savedAddresses[index];
-      const deliveryCheck = await checkDeliveryEligibility(address.pinCode);
+      const deliveryCheck = await checkDeliveryEligibility(selectedAddr.pinCode);
       updateDeliveryStatus(deliveryCheck.eligible, deliveryCheck.message);
     }
 
-    // Function to update delivery status and button
     function updateDeliveryStatus(isEligible, message) {
       const deliveryStatusDiv = document.getElementById('delivery-status');
       const placeOrderBtn = document.querySelector('.place-order-btn');
 
+      if (!deliveryStatusDiv) {
+        console.error('Update Delivery Status: delivery-status div not found.');
+        return;
+      }
+      if (!placeOrderBtn) {
+        console.error('Update Delivery Status: place-order-btn not found.');
+        return;
+      }
+
+      deliveryStatusDiv.textContent = message;
       if (!isEligible) {
         deliveryStatusDiv.style.display = 'block';
         placeOrderBtn.disabled = true;
         placeOrderBtn.classList.add('disabled');
+        console.log(`Delivery Status: Not eligible. Message: ${message}`);
       } else {
         deliveryStatusDiv.style.display = 'none';
         placeOrderBtn.disabled = false;
         placeOrderBtn.classList.remove('disabled');
+        console.log(`Delivery Status: Eligible. Message: ${message}`);
       }
     }
 
     document.addEventListener('DOMContentLoaded', () => {
+      console.log('DOM Content Loaded: Initializing checkout script.');
+
       const cancelOrderButton = document.getElementById('order-cancel');
       const confirmOrderButton = document.getElementById('order-confirm');
       if (cancelOrderButton && confirmOrderButton) {
         cancelOrderButton.addEventListener('click', () => closeOrderConfirmModal());
         confirmOrderButton.addEventListener('click', () => {
           const action = document.getElementById('order-confirm-modal').dataset.action;
-          if (action === 'delete') deleteAddress();
-          else if (action === 'order') placeOrder();
-          closeOrderConfirmModal();
+          if (action === 'delete') {
+            deleteAddress();
+          } else if (action === 'order') {
+            placeOrder();
+          }
+          // closeOrderConfirmModal(); // Modal is closed within placeOrder/deleteAddress on success
         });
       }
 
       loadCountries();
       const countrySelect = document.getElementById('modalCountrySelect');
-      countrySelect.addEventListener('change', () => {
-        const selectedCountry = countrySelect.value;
-        if (selectedCountry) loadStates(selectedCountry);
-        else document.getElementById('modalStateSelect').innerHTML = '<option value="" disabled selected hidden>Select State</option>';
-      });
+      if (countrySelect) {
+        countrySelect.addEventListener('change', () => {
+          const selectedCountry = countrySelect.value;
+          if (selectedCountry) loadStates(selectedCountry);
+          else document.getElementById('modalStateSelect').innerHTML = '<option value="" disabled selected hidden>Select State</option>';
+        });
+      }
+
 
       document.querySelectorAll('.address-card').forEach(card => {
         card.addEventListener('click', (e) => {
@@ -1078,27 +1243,47 @@
 
       if (savedAddresses && savedAddresses.length > 0) {
         const defaultAddress = savedAddresses.find(addr => addr.isDefault);
-        if (defaultAddress) selectAddress(savedAddresses.indexOf(defaultAddress));
-        else selectAddress(0);
+        if (defaultAddress) {
+          selectAddress(savedAddresses.indexOf(defaultAddress));
+          console.log('DOM Content Loaded: Selected default address.');
+        } else {
+          selectAddress(0);
+          console.log('DOM Content Loaded: No default address, selected first address.');
+        }
+      } else {
+        // If no addresses, ensure place order button is disabled
+        updateDeliveryStatus(false, 'Please add a delivery address.');
+        console.log('DOM Content Loaded: No saved addresses found.');
       }
+
       checkWalletBalance();
-      checkCODLimit(); // Initial check on page load
+      checkCODLimit();
 
-      // Retry payment logic
+      // Retry payment logic (auto-open Razorpay widget)
       const urlParams = new URLSearchParams(window.location.search);
-      const isRetry = urlParams.get('retry');
-      const orderId = urlParams.get('orderId');
-      const amount = urlParams.get('amount');
-      const razorpayKey = urlParams.get('razorpayKey');
-      const razorpayOrderId = urlParams.get('razorpayOrderId');
+      const isRetryQuery = urlParams.get('retry');
+      const orderIdQuery = urlParams.get('orderId');
+      const amountQuery = urlParams.get('amount');
+      const razorpayKeyQuery = urlParams.get('razorpayKey');
+      const razorpayOrderIdQuery = urlParams.get('razorpayOrderId');
 
-      if (isRetry && orderId && amount && razorpayKey && razorpayOrderId) {
-        initiateRazorpayPayment(orderId, amount, razorpayKey, razorpayOrderId);
+      if (isRetryQuery === 'true' && orderIdQuery && amountQuery && razorpayKeyQuery && razorpayOrderIdQuery) {
+        console.log('DOM Content Loaded: Detected retry payment parameters. Auto-opening Razorpay.');
+        // Ensure the address for the retry order is selected if possible
+        if (retryOrderId) {
+          const retryOrderAddress = savedAddresses.find(addr => addr._id === retryOrder.address);
+          if (retryOrderAddress) {
+            selectAddress(savedAddresses.indexOf(retryOrderAddress));
+            console.log('DOM Content Loaded: Selected address for retry order.');
+          }
+        }
+        initiateRazorpayPayment(orderIdQuery, amountQuery, razorpayKeyQuery, razorpayOrderIdQuery);
       }
     });
 
     function validateAddressForm() {
       let isValid = true;
+      console.log('Validate Address Form: Starting validation.');
 
       const fields = [{
           id: 'modalFirstName',
@@ -1144,7 +1329,7 @@
         },
         {
           id: 'modalZipcode',
-          name: 'zipcode',
+          name: 'pinCode', // Changed to pinCode to match backend
           errId: 'errZipcode',
           label: 'Zip code'
         },
@@ -1158,44 +1343,65 @@
 
       const namePattern = /^[A-Za-z ]+$/;
       const phonePattern = /^\+?[1-9]\d{1,14}$/;
-      const zipPattern = /^[1-9]\d{0,9}$/;
+      const zipPattern = /^[1-9]\d{5}$/; // Standard 6-digit Indian PIN code, starting 1-9
 
       fields.forEach(field => {
         const input = document.getElementById(field.id);
         const errDiv = document.getElementById(field.errId);
-        const val = input.value.trim();
+        const val = input ? input.value.trim() : '';
 
-        errDiv.style.display = 'none';
-        errDiv.innerHTML = '';
+        if (errDiv) { // Ensure errDiv exists
+          errDiv.style.display = 'none';
+          errDiv.innerHTML = '';
+        }
 
         if (!val) {
-          errDiv.innerHTML = `${field.label} is required`;
-          errDiv.style.display = 'block';
+          if (errDiv) {
+            errDiv.innerHTML = `${field.label} is required`;
+            errDiv.style.display = 'block';
+          }
           isValid = false;
+          console.log(`Validate Address Form: ${field.label} is empty.`);
         } else if ((field.id === 'modalFirstName' || field.id === 'modalLastName') && val.length < 2) {
-          errDiv.innerHTML = `Minimum 2 characters required`;
-          errDiv.style.display = 'block';
+          if (errDiv) {
+            errDiv.innerHTML = `Minimum 2 characters required`;
+            errDiv.style.display = 'block';
+          }
           isValid = false;
+          console.log(`Validate Address Form: ${field.label} too short.`);
         } else if ((field.id === 'modalFirstName' || field.id === 'modalLastName') && !namePattern.test(val)) {
-          errDiv.innerHTML = `Only alphabets allowed`;
-          errDiv.style.display = 'block';
+          if (errDiv) {
+            errDiv.innerHTML = `Only alphabets allowed`;
+            errDiv.style.display = 'block';
+          }
           isValid = false;
+          console.log(`Validate Address Form: ${field.label} contains invalid characters.`);
         } else if (field.id === 'modalPhone' && !phonePattern.test(val)) {
-          errDiv.innerHTML = `Please enter a valid phone number`;
-          errDiv.style.display = 'block';
+          if (errDiv) {
+            errDiv.innerHTML = `Please enter a valid phone number (e.g., +919876543210 or 9876543210)`;
+            errDiv.style.display = 'block';
+          }
           isValid = false;
+          console.log(`Validate Address Form: Invalid phone number format.`);
         } else if (field.id === 'modalZipcode' && !zipPattern.test(val)) {
-          errDiv.innerHTML = `Zip code must be 1-10 digits and start with 1-9`;
-          errDiv.style.display = 'block';
+          if (errDiv) {
+            errDiv.innerHTML = `Zip code must be 6 digits and start with 1-9`;
+            errDiv.style.display = 'block';
+          }
           isValid = false;
+          console.log(`Validate Address Form: Invalid zip code format.`);
         }
       });
 
+      console.log(`Validate Address Form: Validation result: ${isValid}`);
       return isValid;
     }
 
     function saveAddress() {
-      if (!validateAddressForm()) return;
+      if (!validateAddressForm()) {
+        console.log('Save Address: Address form validation failed.');
+        return;
+      }
 
       const form = document.getElementById('addressForm');
       const formData = new FormData(form);
@@ -1204,42 +1410,59 @@
         data[key] = value;
       });
       data.isDefault = document.getElementById('makeDefaultCheckbox').checked;
+      data.pinCode = data.zipcode; // Ensure pinCode is sent
+      delete data.zipcode; // Remove if not needed by backend
 
-      const url = document.getElementById('editIndex').value === '' ? '/account-settings/add-address' : '/account-settings/edit-address';
-      const successMessage = document.getElementById('editIndex').value === '' ? 'Address added successfully' : 'Address updated successfully';
+      const editAddressId = document.getElementById('editAddressId').value;
+      const url = editAddressId === '' ? '/account-settings/add-address' : `/account-settings/edit-address/${editAddressId}`; // Use _id for edit
+      const method = editAddressId === '' ? 'POST' : 'PATCH';
+      const successMessage = editAddressId === '' ? 'Address added successfully' : 'Address updated successfully';
+
+      console.log(`Save Address: Sending data to ${url} with method ${method}. Data:`, data);
 
       fetch(url, {
-          method: url === '/account-settings/add-address' ? 'POST' : 'PATCH',
+          method: method,
           headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json'
           },
           body: JSON.stringify(data),
         })
-        .then(response => response.json())
+        .then(response => {
+          if (!response.ok) {
+            return response.json().then(err => {
+              throw new Error(err.message || 'Server error');
+            });
+          }
+          return response.json();
+        })
         .then(data => {
           if (data.success) {
             toastr.success(successMessage);
             const modal = bootstrap.Modal.getInstance(document.getElementById('addressModal'));
-            modal.hide();
+            if (modal) modal.hide();
+            console.log(`Save Address: ${successMessage}. Reloading page.`);
             setTimeout(() => window.location.reload(), 1300);
           } else {
             toastr.error(data.message || 'Failed to save address');
+            console.error('Save Address: Server reported failure:', data.message);
           }
         })
         .catch(error => {
           toastr.error('An error occurred while saving the address');
+          console.error('Save Address: Fetch error:', error);
         });
     }
 
     function populateForm(data) {
+      console.log('Populate Form: Populating address form with data:', data);
       document.getElementById('modalFirstName').value = data.firstName || '';
       document.getElementById('modalLastName').value = data.lastName || '';
       document.getElementById('modalCompany').value = data.company || '';
       document.getElementById('modalStreetAddress').value = data.streetAddress || '';
       document.getElementById('modalCity').value = data.city || '';
       document.getElementById('modalLandmark').value = data.landmark || '';
-      document.getElementById('modalZipcode').value = data.pinCode || '';
+      document.getElementById('modalZipcode').value = data.pinCode || ''; // Use pinCode here
       document.getElementById('modalEmail').value = data.email || '';
       document.getElementById('modalPhone').value = data.phone || '';
       document.getElementById('modalAltPhone').value = data.altPhone || '';
@@ -1249,18 +1472,24 @@
         if (data.state) {
           loadStates(data.country).then(() => {
             document.getElementById('modalStateSelect').value = data.state;
-          });
+            console.log(`Populate Form: Set country: ${data.country}, state: ${data.state}`);
+          }).catch(err => console.error('Populate Form: Error loading states after country selection:', err));
+        } else {
+          // If country is set but state is not, just load states for the country
+          loadStates(data.country).catch(err => console.error('Populate Form: Error loading states for country:', err));
         }
       }
     }
 
     function clearForm() {
+      console.log('Clear Form: Resetting address form.');
       document.getElementById('addressForm').reset();
       document.getElementById('modalStateSelect').innerHTML = '<option value="" disabled selected hidden>Select State</option>';
       document.getElementById('makeDefaultCheckbox').checked = false;
     }
 
     async function loadCountries() {
+      console.log('Load Countries: Fetching countries from API.');
       try {
         const response = await fetch('https://countriesnow.space/api/v0.1/countries', {
           method: 'GET',
@@ -1268,24 +1497,36 @@
             'Accept': 'application/json'
           }
         });
-        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`HTTP error! Status: ${response.status}, Body: ${errorText}`);
+        }
         const data = await response.json();
         const countrySelect = document.getElementById('modalCountrySelect');
-        countrySelect.innerHTML = '<option value="" disabled selected hidden>Select Country</option>';
-        data.data.forEach(country => {
-          const option = document.createElement('option');
-          option.value = country.country;
-          option.textContent = country.country;
-          countrySelect.appendChild(option);
-        });
+        if (countrySelect) {
+          countrySelect.innerHTML = '<option value="" disabled selected hidden>Select Country</option>';
+          data.data.forEach(country => {
+            const option = document.createElement('option');
+            option.value = country.country;
+            option.textContent = country.country;
+            countrySelect.appendChild(option);
+          });
+          console.log('Load Countries: Countries loaded successfully.');
+        } else {
+          console.error('Load Countries: modalCountrySelect element not found.');
+        }
       } catch (error) {
         const countrySelect = document.getElementById('modalCountrySelect');
-        countrySelect.innerHTML = '<option value="" disabled selected hidden>Select Country</option><option value="" disabled>No countries available</option>';
+        if (countrySelect) {
+          countrySelect.innerHTML = '<option value="" disabled selected hidden>Select Country</option><option value="" disabled>No countries available</option>';
+        }
         toastr.error('Failed to load countries. Please try again later.');
+        console.error('Load Countries: Error fetching countries:', error);
       }
     }
 
     async function loadStates(countryName) {
+      console.log(`Load States: Fetching states for country: ${countryName} from API.`);
       try {
         const response = await fetch('https://countriesnow.space/api/v0.1/countries/states', {
           method: 'POST',
@@ -1297,28 +1538,50 @@
             country: countryName
           })
         });
-        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`HTTP error! Status: ${response.status}, Body: ${errorText}`);
+        }
         const data = await response.json();
         const stateSelect = document.getElementById('modalStateSelect');
-        stateSelect.innerHTML = '<option value="" disabled selected hidden>Select State</option>';
-        data.data.states.forEach(state => {
-          const option = document.createElement('option');
-          option.value = state.name;
-          option.textContent = state.name;
-          stateSelect.appendChild(option);
-        });
+        if (stateSelect) {
+          stateSelect.innerHTML = '<option value="" disabled selected hidden>Select State</option>';
+          if (data.data && data.data.states && data.data.states.length > 0) {
+            data.data.states.forEach(state => {
+              const option = document.createElement('option');
+              option.value = state.name;
+              option.textContent = state.name;
+              stateSelect.appendChild(option);
+            });
+            console.log(`Load States: States loaded successfully for ${countryName}.`);
+          } else {
+            console.log(`Load States: No states found for ${countryName}.`);
+            stateSelect.innerHTML = '<option value="" disabled selected hidden>Select State</option><option value="" disabled>No states available</option>';
+          }
+        } else {
+          console.error('Load States: modalStateSelect element not found.');
+        }
       } catch (error) {
         const stateSelect = document.getElementById('modalStateSelect');
-        stateSelect.innerHTML = '<option value="" disabled selected hidden>Select State</option><option value="" disabled>No states available</option>';
+        if (stateSelect) {
+          stateSelect.innerHTML = '<option value="" disabled selected hidden>Select State</option><option value="" disabled>No states available</option>';
+        }
         toastr.error('Failed to load states. Please try again later.');
+        console.error('Load States: Error fetching states:', error);
       }
     }
 
     window.onclick = function(event) {
       const orderModal = document.getElementById('order-confirm-modal');
-      if (event.target === orderModal) closeOrderConfirmModal();
       const addressModal = document.getElementById('addressModal');
-      if (event.target === addressModal) closeAddressModal();
+      if (event.target === orderModal) {
+        closeOrderConfirmModal();
+        console.log('Window Click: Closed order confirm modal.');
+      }
+      if (event.target === addressModal) {
+        closeAddressModal();
+        console.log('Window Click: Closed address modal.');
+      }
     };
   </script>
 </body>

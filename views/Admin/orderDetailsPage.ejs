@@ -147,7 +147,7 @@
     document.getElementById('confirm-action').addEventListener('click', function() {
       document.getElementById('confirm-modal').style.display = 'none';
       fetch(`/tezgrani/cancel-order/<%= order.orderId %>`, {
-          method: 'POST',
+          method: 'PATCH',
           headers: {
             'Content-Type': 'application/json'
           },
