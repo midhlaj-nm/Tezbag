@@ -7,7 +7,7 @@ require('dotenv').config();
 passport.use('google-login', new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: '/auth/google/callback/login'
+    callbackURL: 'https://www.tezbag.shop/auth/google/callback/login'
   },
   async (accessToken, refreshToken, profile, done) => {
     try {
