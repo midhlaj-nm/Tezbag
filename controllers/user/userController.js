@@ -1,7 +1,7 @@
 const User = require('../../models/userSchema');
 const Category = require('../../models/categorySchema');
 const Product = require('../../models/productSchema');
-const Gallery = require('../../models/bannerSchema');
+const Wallet = require('../../models/walletSchema');
 const Admin = require('../../models/adminSchema');
 const Deal = require('../../models/dealSchema');
 const Cart = require('../../models/cartSchema');
@@ -35,19 +35,16 @@ function generateOtp() {
 const loadHomepage = async (req, res, next) => {
     try {
         console.log('Session user:', req.session.user);
-        // Fetch categories and unblocked products
         const [categories, products] = await Promise.all([
             Category.find({ isListed: true }).lean(),
             Product.find({ isBlocked: false }).lean()
         ]);
 
-        // Get Vegetables and Fruits categories
         const [vegetableCategory, fruitCategory] = await Promise.all([
             Category.findOne({ name: 'Vegetables', isListed: true }),
             Category.findOne({ name: 'Fruits', isListed: true })
         ]);
 
-        // Fetch latest products for today's items
         const categoryIds = [vegetableCategory, fruitCategory]
             .filter(Boolean)
             .map(cat => cat._id);
@@ -63,13 +60,11 @@ const loadHomepage = async (req, res, next) => {
                 .lean();
         }
 
-        // Fetch active deals with offerType="Percentage" and status="Active"
         const activeDeals = await Deal.find({
             offerType: 'percentage',
             status: 'Active'
         }).lean();
 
-        // Separate product-specific and category-specific deals
         const productDeals = activeDeals.filter(deal => deal.appliedTo === 'products').reduce((acc, deal) => {
             deal.selectedItems.forEach(itemId => {
                 acc[itemId] = deal.offerPrice;
@@ -84,21 +79,18 @@ const loadHomepage = async (req, res, next) => {
             return acc;
         }, {});
 
-        // Helper to transform product for frontend
         const transformProduct = (product) => {
             const productOffer = productDeals[product._id.toString()] || 0;
             const categoryOffer = categoryDeals[product.category?.toString()] || 0;
             const largestOffer = Math.max(productOffer, categoryOffer);
 
             let discountPercentage = 0;
-            let finalPrice = product.regularPrice; // Main price is regularPrice
+            let finalPrice = product.regularPrice;
 
-            // If a deal applies, use the largest offer and update the price
             if (largestOffer > 0) {
                 discountPercentage = largestOffer;
                 finalPrice = product.regularPrice * (1 - largestOffer / 100);
             } else {
-                // If no deal applies, calculate discount using the specified logic
                 const priceDifference = product.salePrice - product.regularPrice;
                 discountPercentage = product.salePrice > 0 ? Math.round((priceDifference / product.salePrice) * 100) : 0;
             }
@@ -118,13 +110,11 @@ const loadHomepage = async (req, res, next) => {
         const transformedProducts = products.map(transformProduct);
         const transformedLatestProducts = latestProducts.map(transformProduct);
 
-        // Shuffle featured products (corrected syntax)
         for (let i = transformedProducts.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
-            [transformedProducts[i], transformedProducts[j]] = [transformedProducts[j], transformedProducts[i]]; // Corrected swap
+            [transformedProducts[i], transformedProducts[j]] = [transformedProducts[j], transformedProducts[i]];
         }
 
-        // Enrich categories with product count and image
         const categoriesWithData = await Promise.all(
             categories.map(async (category) => {
                 const [productCount] = await Promise.all([
@@ -139,10 +129,7 @@ const loadHomepage = async (req, res, next) => {
             })
         );
 
-        // Fetch active banners
         const banners = await Banner.find({ status: 'Active' }).lean();
-
-        // Group banners by position
         const bannersByPosition = {
             'homepage top': banners.filter(banner => banner.position === 'homepage top'),
             'homepage bottom': banners.filter(banner => banner.position === 'homepage bottom')
@@ -194,6 +181,11 @@ const loadHomepage = async (req, res, next) => {
 // ===========================
 const login_user = async (req, res) => {
     try {
+        // Check if user is already logged in
+        if (req.session.user) {
+            return res.redirect('/');
+        }
+
         let message = req.flash('message')[0] || null;
         let messageType = req.flash('messageType')[0] || null;
 
@@ -245,7 +237,6 @@ const logpost = async (req, res, next) => {
             return res.redirect('/login');
         }
 
-        // Successful login
         req.session.user = findUser._id;
 
         if (rememberMe === "on") {
@@ -293,7 +284,7 @@ const loadVerifyEmailPost = async (req, res) => {
         req.session.resetOtp = otp;
         req.session.resetEmail = email;
         req.session.otpType = "reset";
-        req.session.resetFlowOrigin = "forget-password"; // Add this to track the origin
+        req.session.resetFlowOrigin = "forget-password";
 
         const emailSent = await sendVeriEmail(email, otp);
         if (!emailSent) {
@@ -322,25 +313,21 @@ const verifyOtpPost = async (req, res, next) => {
         console.log("🔐 Entered OTP:", otp);
         console.log("📦 Session OTP:", sessionOtp);
 
-        // Check if OTP was sent and is 4 digits
         if (!otp || otp.length !== 4) {
             console.warn("⚠️ OTP is missing or not 4 digits");
             return res.json({ success: false, message: "OTP must be 4 digits." });
         }
 
-        // Check if session OTP exists
         if (!sessionOtp) {
             console.warn("⚠️ No OTP stored in session (session might have expired)");
             return res.json({ success: false, message: "Timeout. Try again" });
         }
 
-        // Validate OTP
         if (otp !== sessionOtp) {
             console.warn("❌ Invalid OTP entered");
             return res.json({ success: false, message: "Invalid OTP." });
         }
 
-        // OTP Verified
         console.log("✅ OTP Verified Successfully");
         delete req.session.resetOtp;
 
@@ -351,7 +338,7 @@ const verifyOtpPost = async (req, res, next) => {
 
     } catch (error) {
         console.error("💥 Error in verifyOtpPost:", error);
-        next(error); // Fixed: Pass error to next() properly
+        next(error);
     }
 };
 
@@ -360,7 +347,6 @@ const verifyOtpPost = async (req, res, next) => {
 // ===========================
 const loadResetPassPage = async (req, res) => {
     try {
-        // Check if resetEmail exists in session (part of the password reset flow)
         if (!req.session.resetEmail) {
             req.flash('message', 'Session expired. Please start the password reset process again.');
             req.flash('messageType', 'error');
@@ -429,10 +415,9 @@ const resetPasswordPost = async (req, res, next) => {
             return res.redirect('/reset-password');
         }
 
-        // Store current password in oldPasswords array
         if (user.password) {
             if (!user.oldPasswords) user.oldPasswords = [];
-            if (user.oldPasswords.length >= 3) user.oldPasswords.shift(); // Keep only last 3
+            if (user.oldPasswords.length >= 3) user.oldPasswords.shift();
             user.oldPasswords.push(user.password);
         }
 
@@ -442,18 +427,16 @@ const resetPasswordPost = async (req, res, next) => {
         user.password = hashedPassword;
         await user.save();
 
-        // Clear session variables
         delete req.session.resetEmail;
         req.session.otpType = null;
-        req.session.resetFlowOrigin = req.session.resetFlowOrigin || "forget-password"; // Default to forget-password if not set
+        req.session.resetFlowOrigin = req.session.resetFlowOrigin || "forget-password";
 
         console.log("✅ Password successfully updated for", email);
         req.flash('message', 'Password updated successfully.');
         req.flash('messageType', 'success');
 
-        // Determine redirect URL based on the origin of the flow
         const redirectUrl = req.session.resetFlowOrigin === "account-settings" ? "/account-settings" : "/login";
-        req.session.resetFlowOrigin = null; // Clear the origin
+        req.session.resetFlowOrigin = null;
 
         return res.redirect(redirectUrl);
 
@@ -468,6 +451,11 @@ const resetPasswordPost = async (req, res, next) => {
 // ===========================
 const register = async (req, res) => {
     try {
+        // Check if user is already logged in
+        if (req.session.user) {
+            return res.redirect('/');
+        }
+
         let message = req.flash('message')[0] || null;
         let messageType = req.flash('messageType')[0] || null;
 
@@ -476,7 +464,10 @@ const register = async (req, res) => {
             messageType = 'error';
         }
 
-        res.render('register', { message, messageType });
+        // Pass the referral code from params to the view (null if not present)
+        const referralCode = req.params.code || null;
+
+        res.render('register', { message, messageType, referralCode });
     } catch (err) {
         console.error('❌ Error loading register page:', err);
         res.redirect('/404Error');
@@ -520,7 +511,7 @@ async function sendVeriEmail(email, otp) {
 // ===========================
 const regpost = async (req, res, next) => {
     try {
-        const { f_name, l_name, email, password, cPassword } = req.body;
+        const { f_name, l_name, email, password, cPassword, referralCode } = req.body;
 
         console.log("📥 Registration attempt:");
         console.log("👤 First Name:", f_name);
@@ -528,11 +519,12 @@ const regpost = async (req, res, next) => {
         console.log("📧 Email:", email);
         console.log("🔑 Password:", password);
         console.log("🔐 Confirm Password:", cPassword);
+        console.log("📋 Referral Code:", referralCode);
 
         if (password !== cPassword) {
             console.log("⚠️ Passwords do not match");
             req.flash('message', 'Passwords do not match. Please re-enter.');
-            return res.redirect('/register');
+            return res.redirect(`/register${req.params.code ? '/' + req.params.code : ''}`);
         }
 
         const findUser = await User.findOne({ email });
@@ -540,7 +532,7 @@ const regpost = async (req, res, next) => {
             console.log("🚫 Email already registered:", email);
             req.flash('message', 'This email ID is already registered. Try logging in.');
             req.flash('messageType', 'error');
-            return res.redirect('/login');
+            return res.redirect(`/register${req.params.code ? '/' + req.params.code : ''}`);
         }
 
         const findAdmin = await Admin.findOne({ email });
@@ -548,7 +540,27 @@ const regpost = async (req, res, next) => {
             console.log("🚫 Entry denied because of Admin's email:", email);
             req.flash('message', 'Cannot register using an admin\'s email. Please use a different email.');
             req.flash('messageType', 'error');
-            return res.redirect('/register');
+            return res.redirect(`/register${req.params.code ? '/' + req.params.code : ''}`);
+        }
+
+        let redeemed = false;
+        let referralValidationMessage = null;
+        if (referralCode) {
+            const referrer = await User.findOne({ referralCode }).select('referralCode referralCount');
+            if (referrer) {
+                if (referrer.referralCount >= 10) {
+                    referralValidationMessage = 'This referral code has reached its limit.';
+                } else {
+                    redeemed = true;
+                }
+            } else {
+                referralValidationMessage = 'Invalid Referral Code';
+            }
+        }
+
+        if (referralValidationMessage) {
+            req.flash('message', referralValidationMessage);
+            return res.redirect(`/register${req.params.code ? '/' + req.params.code : ''}`);
         }
 
         const otp = generateOtp();
@@ -558,11 +570,11 @@ const regpost = async (req, res, next) => {
         if (!emailSent) {
             console.log("📤 Email sending failed for:", email);
             req.flash('message', 'Something went wrong while sending OTP. Try again later.');
-            return res.redirect('/register');
+            return res.redirect(`/register${req.params.code ? '/' + req.params.code : ''}`);
         }
 
         req.session.userOtp = otp;
-        req.session.userData = { f_name, l_name, email, password };
+        req.session.userData = { f_name, l_name, email, password, referralCode, redeemed };
         console.log("📦 Stored user data in session:");
         console.log("🧾", req.session.userData);
 
@@ -570,7 +582,8 @@ const regpost = async (req, res, next) => {
         res.redirect('/otp-page');
     } catch (error) {
         console.error("❌ Registration error:", error);
-        next(error);
+        req.flash('message', 'An error occurred during registration. Please try again.');
+        res.redirect(`/register${req.params.code ? '/' + req.params.code : ''}`);
     }
 };
 
@@ -581,11 +594,10 @@ const otpver = async (req, res, next) => {
     try {
         console.log("📲 Opening OTP Page");
 
-        // Check if the required session data exists based on otpType
         const otpType = req.session.otpType;
         if (!otpType) {
             req.flash('message', 'Session expired. Please try again.');
-            return res.redirect('/register'); // Default to registration page if otpType is missing
+            return res.redirect('/register');
         }
 
         if (otpType === "registration" && !req.session.userOtp) {
@@ -601,9 +613,7 @@ const otpver = async (req, res, next) => {
         const message = req.flash('message');
         res.render('otppage', { message, otpType });
 
-        // Clear otpType after rendering to prevent reuse
         delete req.session.otpType;
-
     } catch (err) {
         console.error("❌ Error opening OTP page:", err);
         next(err);
@@ -634,25 +644,21 @@ const verifyOtp = async (req, res, next) => {
         console.log("🔐 Entered OTP:", otp);
         console.log("📦 Session OTP:", newSessionOtp);
 
-        // Check if OTP was sent and is 4 digits
         if (!otp || otp.length !== 4) {
             console.warn("⚠️ OTP is missing or not 4 digits");
             return res.json({ success: false, message: "OTP must be 4 digits." });
         }
 
-        // Check if session OTP exists
         if (!newSessionOtp) {
             console.warn("⚠️ No OTP stored in session (session might have expired)");
             return res.json({ success: false, message: "Timeout. Try again" });
         }
 
-        // Validate OTP
         if (otp !== newSessionOtp) {
             console.warn("⚠️ Invalid OTP entered");
             return res.json({ success: false, message: "Invalid OTP" });
         }
 
-        // Check if user data exists in session
         const user = req.session.userData;
         if (!user) {
             console.warn("⚠️ No user data in session (session might have expired)");
@@ -661,15 +667,77 @@ const verifyOtp = async (req, res, next) => {
 
         const passwordHash = await securePass(user.password);
 
+        let referralCode = '';
+        async function getReferralCode() {
+            const code = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let isUnique = false;
+
+            while (!isUnique) {
+                referralCode = '';
+                for (let i = 0; i < 6; i++) {
+                    referralCode += code.charAt(Math.floor(Math.random() * code.length));
+                }
+                const existingUser = await User.findOne({ referralCode });
+                isUnique = !existingUser;
+            }
+            return referralCode;
+        }
+
+        referralCode = await getReferralCode();
+
         const saveUserData = new User({
             f_Name: user.f_name,
             l_Name: user.l_name,
             email: user.email,
-            password: passwordHash
+            password: passwordHash,
+            referralCode,
+            redeemed: user.redeemed || false
         });
 
         const savedUser = await saveUserData.save();
         console.log("✅ User registered successfully:", savedUser.email);
+
+        let userWallet = await Wallet.findOne({ user: savedUser._id });
+        if (!userWallet) {
+            userWallet = new Wallet({ user: savedUser._id });
+            await userWallet.save();
+        }
+
+        // Add referral bonus for new user if redeemed
+        if (user.redeemed) {
+            userWallet.balance += 20;
+            userWallet.transactions.push({
+                type: 'credit',
+                amount: 20,
+                reason: 'Welcome Bonus',
+                date: new Date()
+            });
+            await userWallet.save();
+
+            // Find referrer by the provided referral code
+            const referrer = await User.findOne({ referralCode: user.referralCode }).select('referralCount');
+            if (referrer) {
+                referrer.referralCount += 1;
+                if (referrer.referralCount >= 10) {
+                    referrer.referralCode = null; // Invalidate referral code by setting it to null
+                }
+                await referrer.save();
+
+                let referrerWallet = await Wallet.findOne({ user: referrer._id });
+                if (!referrerWallet) {
+                    referrerWallet = new Wallet({ user: referrer._id });
+                    await referrerWallet.save();
+                }
+                referrerWallet.balance += 10;
+                referrerWallet.transactions.push({
+                    type: 'credit',
+                    amount: 10,
+                    reason: 'Referral Reward',
+                    date: new Date()
+                });
+                await referrerWallet.save();
+            }
+        }
 
         req.session.user = savedUser._id;
         delete req.session.userOtp;
@@ -732,9 +800,7 @@ const resendOtp = async (req, res, next) => {
 // ===========================
 const logout = async (req, res) => {
     try {
-        // Clear the user property (optional, as destroy will handle this)
         req.session.user = null;
-        // Redirect to login page
         res.redirect('/');
     } catch (error) {
         console.error("❌ Logout error:", error);

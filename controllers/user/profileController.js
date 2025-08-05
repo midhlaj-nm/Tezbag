@@ -51,12 +51,12 @@ const loadDashboard = async (req, res) => {
 
         // Check if userId exists in session
         if (!userId) {
-            return res.redirect('/login'); // Redirect to login if session is invalid
+            return res.redirect('/login'); 
         }
 
         // Fetch user details
         const user = await User.findById(userId)
-            .select('f_Name l_Name email')
+            .select('f_Name l_Name email referralCode')
             .lean();
 
         // Check if user exists
@@ -86,12 +86,18 @@ const loadDashboard = async (req, res) => {
                   phone: firstAddress.phone || ''
               }
             : 'Not provided';
+        
+        
+        const code = user.referralCode
+
+        referralUrl = `/register/${code}`
 
         res.render('dashboard', {
             userName,
             userEmail,
             orders: orders || [],
-            address: addressDetails
+            address: addressDetails,
+            referralUrl
         });
     } catch (error) {
         console.error('❌ Error loading dashboard:', error);

@@ -156,49 +156,29 @@
     color: #000000;
 }
 
-.view-all {
-    color: #00B207;
-    text-decoration: none;
-    font-weight: 500;
-}
-
 .order-table {
     width: 100%;
     border-collapse: collapse;
 }
 
-.order-table thead {
-    background-color: #f5f5f5;
+.recent-order-flex{
+  display: flex;
+  justify-content: space-between;
 }
 
-.order-table th {
-    padding: 12px 15px;
-    text-align: left;
-    font-size: 14px;
-    color: #666;
-    font-weight: 500;
+.refer-btn{
+    background-color: #00B207;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+  border: none;
+  cursor: pointer;
 }
 
-.order-table td {
-    padding: 15px;
-    border-bottom: 1px solid #eee;
-    color: #333;
-    font-size: 14px;
-}
-
-.view-details {
-    color: #00B207;
-    text-decoration: none;
-    font-weight: 500;
-}
-
-.view-details:hover,.view-all:hover{
-    text-decoration: none; /* still no underline on hover */
-    color: #008b05; /* no color change on hover */
-}
-
-.order-table tbody tr:last-child td {
-    border-bottom: none;
+.refer-btn:hover{
+    background-color: #008C04;
 }
 
 /* CSS for the modal */

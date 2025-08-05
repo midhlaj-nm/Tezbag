@@ -17,6 +17,7 @@ router.get('/404Error', userController.load404);
 router.get('/login', userController.login_user);
 router.post('/login', userController.logpost);
 router.get('/register', userController.register);
+router.get('/register/:code', userController.register);
 router.post('/register', userController.regpost);
 
 // OTP & Verification
