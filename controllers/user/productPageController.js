@@ -135,6 +135,10 @@ const loadProductDetails = async (req, res, next) => {
       return res.redirect('/');
     }
 
+    if(!productId){
+      return res.status(404)
+    }
+
     const activeDeals = await Deal.find({
       offerType: 'percentage',
       status: 'Active'

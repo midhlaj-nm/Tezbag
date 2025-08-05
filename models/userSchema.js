@@ -43,12 +43,18 @@ const userSchema = new Schema({
     type: Date,
     default: Date.now,
   },
-  referalCode: {
+  referralCode: {
     type: String,
+    unique: true,
   },
   redeemed: {
     type: Boolean,
+    default: false
   },
+  referralCount: {
+    type: Number,
+    default: 0
+  }
 });
 
 const User = mongoose.model('User', userSchema);
