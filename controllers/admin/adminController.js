@@ -9,6 +9,10 @@ const bcrypt = require('bcrypt');
 // Render login page
 const loadLogin = async (req, res) => {
   try {
+    // Check if admin is already logged in
+    if (req.session.admin) {
+      return res.redirect('/tezgrani/dashboard');
+    }
     const message = req.flash('message')[0] || null;
     console.log("📥 Rendering Admin Login Page");
     return res.render('login-adm', { message });
@@ -121,6 +125,10 @@ const verifyLogin = async (req, res, next) => {
 // Render OTP page
 const loadOtp = async (req, res) => {
   try {
+    // Check if admin is already logged in
+    if (req.session.admin) {
+      return res.redirect('/tezgrani/dashboard');
+    }
     const message = req.flash('message')[0] || null;
     console.log("📥 Rendering OTP Page");
     return res.render('otp-adm', { message });
@@ -175,7 +183,6 @@ const verifyOtp = async (req, res) => {
     next(err)
   }
 };
-
 
 // Resend OTP
 const resendOtp = async (req, res, next) => {
@@ -390,9 +397,8 @@ const storePunchin = async (req, res, next) => {
 
 const storePunchout = async (req, res, next) => {
   try {
-
     const adminId = req.session.admin;
-    console.log("🧑‍💻 Punch-In by admin:", adminId)
+    console.log("🧑‍💻 Punch-Out by admin:", adminId);
 
     if (!adminId) return next({ status: 401, message: "Unauthorized" });
 
@@ -402,14 +408,13 @@ const storePunchout = async (req, res, next) => {
       { new: true }
     );
 
-    console.log("✅ Punch-in time updated:", updatedAdmin_out.lastLogout);
+    console.log("✅ Punch-out time updated:", updatedAdmin_out.lastLogout);
 
-    res.status(200).json({ message: "Punch-In Updated", time: updatedAdmin_out.lastLogout });
-
+    res.status(200).json({ message: "Punch-Out Updated", time: updatedAdmin_out.lastLogout });
   } catch (error) {
-    next(error)
+    next(error);
   }
-}
+};
 
 const logoutAdmin = async (req, res) => {
   try {

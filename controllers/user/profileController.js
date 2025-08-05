@@ -167,13 +167,27 @@ const addAddress = async (req, res) => {
             city,
             country,
             state,
-            landmark: landMark,
-            zipcode: pinCode,
+            landmark, // Use landmark directly, no renaming
+            pinCode,  // Use pinCode to match form field
             email,
             phone,
             altPhone,
             isDefault
         } = req.body;
+
+        // Validate required fields
+        const requiredFields = { firstName, lastName, streetAddress, city, country, state, landmark, pinCode, phone };
+        for (const [key, value] of Object.entries(requiredFields)) {
+            if (!value || value.trim() === '') {
+                return res.status(400).json({ success: false, message: `${key} is required` });
+            }
+        }
+
+        // Validate pinCode format
+        const zipPattern = /^[1-9]\d{5}$/;
+        if (!zipPattern.test(pinCode)) {
+            return res.status(400).json({ success: false, message: 'Zip code must be a 6-digit number starting with 1-9' });
+        }
 
         // Find the user's address document
         let addressDoc = await Address.findOne({ userId });
@@ -218,7 +232,7 @@ const addAddress = async (req, res) => {
             city,
             country,
             state,
-            landMark,
+            landMark: landmark, // Use landmark as landMark to match schema
             pinCode,
             email,
             phone,
@@ -229,15 +243,13 @@ const addAddress = async (req, res) => {
         if (addressDoc) {
             // If the user already has an address document, append the new address
             if (newAddress.isDefault) {
-                // If the new address is set as default, unset the previous default
-                for (let i = 0; i < addressDoc.address.length; i++) {
-                    addressDoc.address[i].isDefault = false; // Use array indexing to modify subdocuments
-                }
+                // Unset previous default
+                addressDoc.address.forEach(addr => (addr.isDefault = false));
             }
             addressDoc.address.push(newAddress);
             await addressDoc.save();
         } else {
-            // If no address document exists, create a new one
+            // Create a new address document
             addressDoc = new Address({
                 userId,
                 address: [newAddress]
@@ -248,7 +260,7 @@ const addAddress = async (req, res) => {
         res.json({ success: true, message: 'Address added successfully' });
     } catch (error) {
         console.error('❌ Error adding address:', error);
-        res.status(500).json({ success: false, message: 'Failed to add address' });
+        res.status(500).json({ success: false, message: error.message || 'Failed to add address' });
     }
 };
 
@@ -339,13 +351,13 @@ const deleteAddress = async (req, res) => {
 
         const { index } = req.params; // Changed from req.body to req.params
         if (index === undefined || index < 0) {
-            return res.status(400).json({ success: false, message: 'Invalid address index' });
+            return res.render('404');
         }
 
         // Find the user's address document
         const addressDoc = await Address.findOne({ userId });
         if (!addressDoc || !addressDoc.address[index]) {
-            return res.status(404).json({ success: false, message: 'Address not found' });
+            return res.status(400).json({ success: false, message: 'Address not found' });
         }
 
         // Check if the address being deleted is the default
