@@ -243,14 +243,19 @@
   });
 
   increaseBtn.addEventListener('click', () => {
-    quantity++;
-    quantitySpan.textContent = quantity;
+    // Client-side stock check when increasing quantity
+    const maxQuantity = parseInt('<%= product.quantity %>');
+    if (quantity < maxQuantity) {
+      quantity++;
+      quantitySpan.textContent = quantity;
+    }
   });
 
   // Event listener for the "Buy Now" button
   buyNowBtn.addEventListener('click', () => {
     const productId = '<%= product._id %>';
-    const quantity = parseInt(quantitySpan.textContent);
+    const userRequestedQuantity = parseInt(quantitySpan.textContent);
+    const stockQuantity = parseInt('<%= product.quantity %>');
     let cuttingStyle = cuttingStyleSelect ? cuttingStyleSelect.value : null;
 
     if (cuttingStyleSelect && !cuttingStyle) {
@@ -258,7 +263,13 @@
       return;
     }
 
-    let checkoutUrl = `/cart/checkout?productId=${productId}&quantity=${quantity}`;
+    // Client-side stock check before navigating
+    if (userRequestedQuantity > stockQuantity) {
+      toastr.error('Insufficient Stock.');
+      return;
+    }
+
+    let checkoutUrl = `/cart/checkout?productId=${productId}&quantity=${userRequestedQuantity}`;
     if (cuttingStyle) {
       checkoutUrl += `&cuttingStyle=${cuttingStyle}`;
     }
@@ -269,7 +280,8 @@
   // Event listener for the shopping cart icon container
   shoppingCartIconContainer.addEventListener('click', async () => {
     const productId = '<%= product._id %>';
-    const quantity = parseInt(quantitySpan.textContent);
+    const userRequestedQuantity = parseInt(quantitySpan.textContent);
+    const stockQuantity = parseInt('<%= product.quantity %>');
     let cuttingStyle = cuttingStyleSelect ? cuttingStyleSelect.value : null;
 
     if (cuttingStyleSelect && !cuttingStyle && !inCart) {
@@ -277,9 +289,15 @@
       return;
     }
 
+    // Client-side stock check for "Add to Cart"
+    if (userRequestedQuantity > stockQuantity) {
+      toastr.error('Insufficient Stock.');
+      return;
+    }
+
     const cartData = {
       productId,
-      quantity,
+      quantity: userRequestedQuantity,
       ...(cuttingStyle && { cuttingStyle }),
     };
 

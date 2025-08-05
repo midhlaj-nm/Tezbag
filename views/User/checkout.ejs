@@ -17,284 +17,843 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.13/lottie.min.js"></script>
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-</head>
-<style>
-  #toast-container>.toast {
-    opacity: 1;
-  }
+  <style>
+    #toast-container>.toast {
+      opacity: 1;
+    }
 
-  .toast-success {
-    background-color: #4CAF50;
-  }
+    .toast-success {
+      background-color: #4CAF50;
+    }
 
-  .toast-error {
-    background-color: #e92e20;
-  }
+    .toast-error {
+      background-color: #e92e20;
+    }
 
-  .modal {
-    display: none;
-    position: fixed;
-    z-index: 1055;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0, 0, 0, 0.5);
-  }
-
-  .modal.show {
-    display: flex !important;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .modal-dialog {
-    position: relative;
-    width: auto;
-    margin: 0 auto;
-    max-width: 600px;
-    pointer-events: none;
-  }
-
-  .modal-content {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    pointer-events: auto;
-    background-color: #fff;
-    background-clip: padding-box;
-    border: 1px solid rgba(0, 0, 0, .125);
-    border-radius: 0.5rem;
-    outline: 0;
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, .15);
-  }
-
-  .modal-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 1rem 1rem;
-    border-bottom: 1px solid #dee2e6;
-    border-top-left-radius: calc(0.5rem - 1px);
-    border-top-right-radius: calc(0.5rem - 1px);
-  }
-
-  .modal-title {
-    margin: 0;
-    line-height: 1.5;
-    font-size: 1.25rem;
-    font-weight: 600;
-  }
-
-  .close-btn {
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-    color: #000;
-    opacity: 0.5;
-    line-height: 1;
-    padding: 0;
-    width: 1em;
-    height: 1em;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .close-btn:hover {
-    opacity: 0.75;
-  }
-
-  .modal-body {
-    position: relative;
-    flex: 1 1 auto;
-    padding: 1rem;
-    max-height: 60vh;
-    overflow-y: auto;
-  }
-
-  .modal-footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 1rem;
-    border-top: 1px solid #dee2e6;
-    border-bottom-right-radius: calc(0.5rem - 1px);
-    border-bottom-left-radius: calc(0.5rem - 1px);
-  }
-
-  .form-group {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-  }
-
-  .input-wrapper {
-    flex: 1;
-    min-width: 200px;
-  }
-
-  .input-wrapper.full-width {
-    flex: 1 1 100%;
-  }
-
-  .input-wrapper label {
-    display: block;
-    font-weight: 500;
-    margin-bottom: 0.5rem;
-    color: #333;
-  }
-
-  .input-wrapper input,
-  .input-wrapper select {
-    width: 100%;
-    padding: 0.75rem;
-    border: 1px solid #ced4da;
-    border-radius: 0.375rem;
-    font-size: 1rem;
-    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-  }
-
-  .input-wrapper input:focus,
-  .input-wrapper select:focus {
-    border-color: #28a745;
-    outline: 0;
-    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
-  }
-
-  .optional {
-    color: #6c757d;
-    font-weight: 400;
-  }
-
-  .errr-msg {
-    color: #dc3545;
-    font-size: 0.875rem;
-    margin-top: 0.25rem;
-    display: none;
-  }
-
-  .errr-msg.show {
-    display: block;
-  }
-
-  .default-checkbox-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .default-checkbox-wrapper input[type="checkbox"] {
-    width: 1.125rem;
-    height: 1.125rem;
-    accent-color: #28a745;
-  }
-
-  .default-checkbox-wrapper label {
-    margin: 0;
-    font-size: 0.875rem;
-    cursor: pointer;
-  }
-
-  .btn {
-    display: inline-block;
-    font-weight: 400;
-    text-align: center;
-    vertical-align: middle;
-    cursor: pointer;
-    border: 1px solid transparent;
-    padding: 0.375rem 0.75rem;
-    font-size: 1rem;
-    line-height: 1.5;
-    border-radius: 0.375rem;
-    transition: all 0.15s ease-in-out;
-    text-decoration: none;
-  }
-
-  .btn-success {
-    color: #fff;
-    background-color: #28a745;
-    border-color: #28a745;
-  }
-
-  .btn-success:hover {
-    background-color: #218838;
-    border-color: #1e7e34;
-  }
-
-  .btn-secondary {
-    color: #fff;
-    background-color: #6c757d;
-    border-color: #6c757d;
-  }
-
-  .btn-secondary:hover {
-    background-color: #5a6268;
-    border-color: #545b62;
-  }
-
-  .demo-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-  }
-
-  .demo-button {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    margin: 10px;
-  }
-
-  .demo-button:hover {
-    background-color: #0056b3;
-  }
-
-  .errr-msg {
-    color: red;
-    font-size: 0.9rem;
-    display: none;
-    margin-top: 5px;
-    font-family: 'Poppins', sans-serif;
-  }
-
-  @media (max-width: 768px) {
-    .modal-dialog {
-      margin: 1rem;
-      max-width: calc(100% - 2rem);
+    /* Updated Modal Styles */
+    .modal {
+      font-family: 'Poppins', sans-serif;
     }
 
     .modal-content {
-      width: 100%;
+      border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
     }
-  }
 
-  .delivery-status {
-    background-color: #f8d7da91;
-    color: #721c24;
-    border: 1px solid #721c24;
-    padding: 10px;
-    border-radius: 5px;
-    margin-bottom: 2rem;
-    text-align: center;
-    font-family: 'Poppins', sans-serif;
-    font-size: 1.4rem;
-  }
+    .modal-header {
+      border-bottom: 1px solid #dee2e6;
+      padding: 1rem 1.5rem;
+    }
 
-  .place-order-btn.disabled {
-    background-color: #6c757d !important;
-    cursor: not-allowed;
-    border-color: #6c757d !important;
-  }
-</style>
+    .modal-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .modal-body {
+      padding: 1.5rem;
+      text-align: center;
+    }
+
+    .modal-footer {
+      border-top: 1px solid #dee2e6;
+      padding: 1rem;
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+    }
+
+    .btn-no,
+    .btn-yes {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.5rem 1.5rem;
+      border-radius: 5px;
+      border: none;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .btn-no {
+      background-color: #dc3545;
+      color: white;
+    }
+
+    .btn-no:hover {
+      background-color: #c82333;
+    }
+
+    .btn-yes {
+      background-color: #00B207;
+      color: white;
+    }
+
+    .btn-yes:hover {
+      background-color: #009006;
+    }
+
+    .delivery-status {
+      background-color: #f8d7da91;
+      color: #721c24;
+      border: 1px solid #721c24;
+      padding: 10px;
+      border-radius: 5px;
+      margin-bottom: 2rem;
+      text-align: center;
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .place-order-btn.disabled {
+      background-color: #6c757d !important;
+      cursor: not-allowed;
+      border-color: #6c757d !important;
+    }
+
+    /* Address Modal Specific Styles */
+    #addressModal .modal-dialog {
+      max-width: 600px;
+      margin: 1.75rem auto;
+    }
+
+    #addressModal .modal-content {
+      border-radius: 8px;
+      border: none;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    #addressModal .modal-header {
+      border-bottom: 1px solid #dee2e6;
+      padding: 1rem 1.5rem;
+    }
+
+    #addressModal .modal-body {
+      padding: 1.5rem;
+    }
+
+    #addressModal .form-group {
+      margin-bottom: 1rem;
+    }
+
+    #addressModal .form-control {
+      border-radius: 4px;
+      border: 1px solid #ced4da;
+      padding: 0.5rem 0.75rem;
+      height: auto;
+    }
+
+    #addressModal .form-label {
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      color: #333;
+    }
+
+    #addressModal .btn-close {
+      opacity: 1;
+      padding: 1rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .input-wrapper {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .input-wrapper.full-width {
+      flex: 1 1 100%;
+    }
+
+    .input-wrapper label {
+      text-align: left;
+      display: block;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      color: #333;
+    }
+
+    .input-wrapper input,
+    .input-wrapper select {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #ced4da;
+      border-radius: 0.375rem;
+      font-size: 1rem;
+      transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
+
+    .input-wrapper input:focus,
+    .input-wrapper select:focus {
+      border-color: #28a745;
+      outline: 0;
+      box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+    }
+
+    .optional {
+      color: #6c757d;
+      font-weight: 400;
+    }
+
+    .errr-msg {
+      color: #ff172e;
+      font-size: 0.9rem;
+      margin-top: 5px;
+      padding-left: 2px;
+      font-weight: 500;
+      display: none;
+      text-align: left;
+    }
+
+    .errr-msg.show {
+      display: block;
+    }
+
+    .default-checkbox-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .default-checkbox-wrapper input[type="checkbox"] {
+      width: 1.125rem;
+      height: 1.125rem;
+      accent-color: #28a745;
+    }
+
+    .default-checkbox-wrapper label {
+      margin: 0;
+      font-size: 0.875rem;
+      cursor: pointer;
+    }
+
+    .btn-success {
+      color: #fff;
+      background-color: #28a745;
+      border-color: #28a745;
+    }
+
+    .btn-success:hover {
+      background-color: #218838;
+      border-color: #1e7e34;
+    }
+
+    /* General Styles */
+    body {
+      font-family: 'Poppins', sans-serif;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    .breadcrumb {
+      display: flex;
+      flex-wrap: wrap;
+      list-style: none;
+      padding: 0;
+      margin: 1rem 0 1rem 3rem;
+      background: none;
+    }
+
+    .breadcrumb-item {
+      font-size: 14px;
+      color: #6c757d;
+      display: flex;
+      align-items: center;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .breadcrumb-item+.breadcrumb-item::before {
+      content: "/";
+      color: #adb5bd;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .breadcrumb-item a {
+      all: unset;
+      cursor: pointer;
+      color: #2f2f2f;
+      font-weight: 500;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .breadcrumb-item a:hover {
+      color: #000000;
+      text-decoration: underline;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .breadcrumb-item.active {
+      color: #575757;
+      font-weight: 500;
+      pointer-events: none;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .checkout-container {
+      max-width: 1090px;
+      margin: 0 auto;
+      padding: 20px;
+      width: 90%;
+    }
+
+    .checkout-title {
+      text-align: center;
+      font-size: 2rem;
+      font-weight: 600;
+      margin-bottom: 2rem;
+      color: #333;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .delivery-section {
+      border: 1px solid #ddd;
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      margin-bottom: 2rem;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .section-title {
+      font-size: 2rem;
+      font-weight: 500;
+      color: #333;
+      margin: 0 0 10px 0;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .add-address-btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 25px;
+      font-weight: 600;
+      font-size: 14px;
+      color: white;
+      background-color: #28a745;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .add-address-btn:hover {
+      background-color: #218838;
+    }
+
+    .addresses-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .address-card {
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      padding: 20px;
+      background-color: #fff;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .address-card:hover {
+      border-color: #28a745;
+    }
+
+    .address-card.selected {
+      border-color: #28a745;
+      background-color: #f0fff0;
+    }
+
+    .default-badge {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background-color: #28a745;
+      color: white;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 500;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .address-info h4 {
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 8px;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .address-info p {
+      color: #666;
+      margin-bottom: 5px;
+      font-size: 14px;
+      line-height: 1.4;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .address-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid #eee;
+    }
+
+    .action-btn {
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background-color: #fff;
+      cursor: pointer;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .action-btn:hover {
+      background-color: #f8f9fa;
+    }
+
+    .edit-btn:hover {
+      border-color: #28a745;
+      color: #28a745;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .delete-btn:hover {
+      border-color: #dc3545;
+      color: #dc3545;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .use-btn {
+      background-color: #00B207;
+      color: #ffffff;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .use-btn:hover {
+      background-color: #009006;
+    }
+
+    .no-address {
+      text-align: center;
+      padding: 40px 20px;
+      color: #666;
+      background-color: #f8f9fa;
+      border-radius: 12px;
+      border: 2px dashed #ddd;
+    }
+
+    .no-address svg {
+      font-size: 48px;
+      color: #ccc;
+      margin-bottom: 15px;
+    }
+
+    .no-address h3 {
+      font-size: 18px;
+      margin-bottom: 10px;
+      color: #333;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .no-address p {
+      margin-bottom: 20px;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .coupon-section {
+      border: 1px solid #ddd;
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      margin-bottom: 2rem;
+    }
+
+    .coupon-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .coupon-item {
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.3s;
+    }
+
+    .coupon-item:hover {
+      border-color: #00B207;
+      background-color: #f8fff8;
+    }
+
+    .coupon-item.selected {
+      border-color: #00B207;
+      background-color: #f0fff0;
+    }
+
+    .coupon-details {
+      flex: 1;
+    }
+
+    .coupon-code {
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 0.3rem;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .coupon-description {
+      color: #666;
+      font-size: 0.9rem;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .coupon-apply-btn {
+      background: #00B207;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .coupon-apply-btn:hover {
+      background: #009006;
+    }
+
+    .coupon-apply-btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+
+    .additional-info-section {
+      border: 1px solid #ddd;
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      margin-bottom: 2rem;
+    }
+
+    .additional-info-label {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 0.8rem;
+      display: block;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .notes-textarea {
+      width: 100%;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 1rem;
+      font-size: 1rem;
+      resize: vertical;
+      min-height: 100px;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .notes-textarea:focus {
+      border-color: #00B207;
+      outline: none;
+    }
+
+    .notes-textarea::placeholder {
+      color: #999;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .payment-methods {
+      display: grid;
+      gap: 0.8rem;
+      margin-top: 1rem;
+    }
+
+    .payment-option {
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      padding: 0.8rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .payment-option:hover {
+      border-color: #00B207;
+      background-color: #f8fff8;
+    }
+
+    .payment-option.selected {
+      border-color: #00B207;
+      background-color: #f0fff0;
+    }
+
+    .payment-option.disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      background-color: #f8f9fa;
+      border-color: #ddd;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .payment-option.disabled:hover {
+      border-color: #ddd;
+      background-color: #f8f9fa;
+    }
+
+    .payment-radio {
+      margin-right: 0.3rem;
+    }
+
+    .payment-icon {
+      font-size: 1.2rem;
+    }
+
+    .order-summary {
+      height: fit-content;
+      position: sticky;
+      top: 2rem;
+      border: 1px solid #ddd;
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+    }
+
+    .summary-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .summary-item:last-child {
+      border-bottom: none;
+    }
+
+    .item-image {
+      width: 60px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+
+    .item-details {
+      flex: 1;
+    }
+
+    .item-name {
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 0.3rem;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .item-quantity {
+      color: #999;
+      font-size: 0.85rem;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .item-total {
+      font-weight: 600;
+      color: #00B207;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .summary-totals {
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 2px solid #eee;
+    }
+
+    .total-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.8rem;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .total-row.final {
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: #333;
+      border-top: 1px solid #eee;
+      padding-top: 0.8rem;
+      margin-top: 1rem;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .shipping-free {
+      color: #00B207;
+      font-weight: 600;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .payment-method-section {
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 2px solid #eee;
+    }
+
+    .payment-method-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 1rem;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .place-order-btn {
+      width: 100%;
+      background: #00B207;
+      color: white;
+      border: none;
+      padding: 1rem;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-top: 1.5rem;
+      transition: all 0.3s;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .place-order-btn:hover {
+      background: #009006;
+      transform: translateY(-2px);
+    }
+
+    .place-order-btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .loading-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 2000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .loading-spinner {
+      border: 8px solid #f3f3f3;
+      border-top: 8px solid #00B207;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .checkout-container {
+        padding: 10px;
+      }
+
+      .checkout-title {
+        font-size: 1.5rem;
+        font-family: 'Poppins', sans-serif;
+      }
+
+      .delivery-section,
+      .order-summary,
+      .coupon-section,
+      .additional-info-section {
+        margin-bottom: 1rem;
+        padding: 20px;
+      }
+
+      .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+
+      .order-summary {
+        position: static;
+      }
+
+      .coupon-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+      }
+
+      .coupon-apply-btn {
+        width: 100%;
+        font-family: 'Poppins', sans-serif;
+      }
+
+      .addresses-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .place-order-btn {
+        margin-top: 1rem;
+        padding: 0.8rem;
+      }
+
+      .modal-dialog {
+        margin: 1rem;
+        max-width: calc(100% - 2rem);
+      }
+    }
+  </style>
+</head>
 
 <body>
   <nav aria-label="breadcrumb">
@@ -407,7 +966,7 @@
                 <div class="item-name"><%= item.name %></div>
                 <div class="item-quantity">Qty: <%= item.quantity %></div>
                 <% if (item.cuttingStyle) { %>
-                <div class="item-cutting-style" style=" font-size: small; font-weight: 300;"><%= item.cuttingStyle %></div>
+                <div class="item-cutting-style" style="font-size: small; font-weight: 300;"><%= item.cuttingStyle %></div>
                 <% } %>
               </div>
               <div class="item-total"><%= item.total.toFixed(2) %>₹</div>
@@ -470,7 +1029,7 @@
         <div class="modal-body">
           <form id="addressForm" novalidate>
             <input type="hidden" id="editIndex" name="index">
-
+            <input type="hidden" id="editAddressId" name="addressId">
             <div class="form-group">
               <div class="input-wrapper">
                 <label for="modalFirstName">First name</label>
@@ -526,7 +1085,7 @@
               </div>
               <div class="input-wrapper">
                 <label for="modalZipcode">Zip Code</label>
-                <input type="text" id="modalZipcode" name="zipcode" placeholder="Zip Code">
+                <input type="text" id="modalZipcode" name="pinCode" placeholder="Zip Code">
                 <div id="errZipcode" class="errr-msg"></div>
               </div>
             </div>
@@ -561,12 +1120,20 @@
     </div>
   </div>
 
-  <div id="order-confirm-modal" class="modal" style="display:none;">
-    <div class="modaal-content">
-      <h3>Are you sure?</h3>
-      <div class="modal-buttons">
-        <button id="order-cancel" class="btn-no">NO</button>
-        <button id="order-confirm" class="btn-yes">YES</button>
+  <div class="modal" id="orderConfirmModal" tabindex="-1" aria-labelledby="orderConfirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="orderConfirmModalLabel">Confirm Action</h5>
+          <button type="button" class="close-btn" data-bs-dismiss="modal" aria-label="Close">×</button>
+        </div>
+        <div class="modal-body">
+          Are you sure you want to proceed?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-no" id="order-cancel" data-bs-dismiss="modal">No</button>
+          <button type="button" class="btn-yes" id="order-confirm">Yes</button>
+        </div>
       </div>
     </div>
   </div>
@@ -577,1013 +1144,806 @@
     <div class="loading-spinner"></div>
   </div>
 
-  <script>
+<script>
     const savedAddresses = <%- JSON.stringify(savedAddresses) %>;
     let appliedCoupon = null;
     let currentDeleteIndex = null;
     let currentSubtotal = parseFloat('<%= subtotal %>');
     let currentShipping = parseFloat('<%= shipping %>');
     let currentTotal = parseFloat('<%= finalTotal %>');
-    let selectedAddressId = null; // Changed to store address _id
+    let selectedAddressId = null;
     const walletBalance = parseFloat('<%= wallet.balance %>');
-
-    // New variables for Buy Now flow and Retry flow
-    const productId = '<%= (typeof orderItems !== "undefined" && orderItems[0]) ? orderItems[0].productId : "" %>';
-    const quantity = '<%= (typeof orderItems !== "undefined" && orderItems[0]) ? orderItems[0].quantity : "" %>';
-    const cuttingStyle = '<%= (typeof orderItems !== "undefined" && orderItems[0] && orderItems[0].cuttingStyle) ? orderItems[0].cuttingStyle : "" %>';
-    const retryOrderId = '<%= typeof retryOrder !== "undefined" && retryOrder ? retryOrder._id : "" %>'; // Pass retryOrderId if available
-
+    const isCartCheckout = <%- isCartCheckout %>;
+    let productId = '';
+    let quantity = '';
+    let cuttingStyle = '';
+    if (!isCartCheckout) {
+        productId = '<%= (typeof orderItems !== "undefined" && orderItems[0]) ? orderItems[0].productId : "" %>';
+        quantity = '<%= (typeof orderItems !== "undefined" && orderItems[0]) ? orderItems[0].quantity : "" %>';
+        cuttingStyle = '<%= (typeof orderItems !== "undefined" && orderItems[0] && orderItems[0].cuttingStyle) ? orderItems[0].cuttingStyle : "" %>';
+    }
+    const retryOrderId = '<%= typeof retryOrder !== "undefined" && retryOrder ? retryOrder._id : "" %>';
     toastr.options = {
-      timeOut: 3000,
-      preventDuplicates: true
+        timeOut: 3000,
+        preventDuplicates: true
     };
-
-    document.querySelectorAll('.payment-option').forEach(option => {
-      option.addEventListener('click', function() {
-        if (!this.classList.contains('disabled')) {
-          document.querySelectorAll('.payment-option').forEach(opt => opt.classList.remove('selected'));
-          this.classList.add('selected');
-          this.querySelector('.payment-radio').checked = true;
+    let orderConfirmModal = null;
+    document.addEventListener('DOMContentLoaded', () => {
+        orderConfirmModal = new bootstrap.Modal(document.getElementById('orderConfirmModal'), {
+            backdrop: true,
+            keyboard: true
+        });
+        const cancelOrderButton = document.getElementById('order-cancel');
+        const confirmOrderButton = document.getElementById('order-confirm');
+        if (cancelOrderButton && confirmOrderButton) {
+            cancelOrderButton.addEventListener('click', () => closeOrderConfirmModal());
+            confirmOrderButton.addEventListener('click', () => {
+                const action = document.getElementById('orderConfirmModal').dataset.action;
+                if (action === 'delete') {
+                    deleteAddress();
+                } else if (action === 'order') {
+                    placeOrder(isCartCheckout);
+                }
+            });
         }
-      });
-    });
-
-    function checkWalletBalance() {
-      const walletOption = document.querySelector('.payment-option[data-payment="wallet"]');
-      const walletRadio = walletOption.querySelector('.payment-radio');
-      if (walletBalance >= currentTotal) {
-        walletOption.classList.remove('disabled');
-        walletOption.style.pointerEvents = 'auto';
-        walletRadio.disabled = false;
-      } else {
-        walletOption.classList.add('disabled');
-        walletOption.style.pointerEvents = 'none';
-        walletRadio.disabled = true;
-        // If wallet was selected but now insufficient, switch to UPI if available, else COD
-        if (walletOption.classList.contains('selected')) {
-          const upiOption = document.querySelector('.payment-option[data-payment="upi"]');
-          const codOption = document.querySelector('.payment-option[data-payment="cod"]');
-
-          if (!upiOption.classList.contains('disabled')) {
-            upiOption.classList.add('selected');
-            upiOption.querySelector('.payment-radio').checked = true;
-          } else if (!codOption.classList.contains('disabled')) {
-            codOption.classList.add('selected');
-            codOption.querySelector('.payment-radio').checked = true;
-          } else {
-            // Fallback if neither wallet nor UPI/COD is available
-            toastr.warning('No suitable payment method available.');
-          }
+        document.querySelectorAll('.payment-option').forEach(option => {
+            option.addEventListener('click', function() {
+                if (!this.classList.contains('disabled')) {
+                    document.querySelectorAll('.payment-option').forEach(opt => opt.classList.remove('selected'));
+                    this.classList.add('selected');
+                    this.querySelector('.payment-radio').checked = true;
+                }
+            });
+        });
+        loadCountries();
+        const countrySelect = document.getElementById('modalCountrySelect');
+        if (countrySelect) {
+            countrySelect.addEventListener('change', () => {
+                const selectedCountry = countrySelect.value;
+                if (selectedCountry) loadStates(selectedCountry);
+                else document.getElementById('modalStateSelect').innerHTML = '<option value="" disabled selected hidden>Select State</option>';
+            });
         }
-      }
-    }
-
-    function checkCODLimit() {
-      const codOption = document.querySelector('.payment-option[data-payment="cod"]');
-      const codRadio = codOption.querySelector('.payment-radio');
-      if (currentTotal >= 1000) { // Assuming COD limit is 1000₹
-        codOption.classList.add('disabled');
-        codOption.style.pointerEvents = 'none';
-        codRadio.disabled = true;
-        // If COD was selected but now exceeds limit, switch to UPI if available
-        if (codOption.classList.contains('selected')) {
-          const upiOption = document.querySelector('.payment-option[data-payment="upi"]');
-          if (!upiOption.classList.contains('disabled')) {
-            upiOption.classList.add('selected');
-            upiOption.querySelector('.payment-radio').checked = true;
-          } else {
-            // Fallback if neither COD nor UPI is available (wallet might be insufficient too)
-            toastr.warning('No suitable payment method available for this order total.');
-          }
+        document.querySelectorAll('.address-card').forEach(card => {
+            card.addEventListener('click', (e) => {
+                const index = card.getAttribute('data-index');
+                selectAddress(index);
+                e.preventDefault();
+            });
+        });
+        if (savedAddresses && savedAddresses.length > 0) {
+            const defaultAddress = savedAddresses.find(addr => addr.isDefault);
+            if (defaultAddress) {
+                selectAddress(savedAddresses.indexOf(defaultAddress));
+            } else {
+                selectAddress(0);
+            }
+        } else {
+            updateDeliveryStatus(false, 'Please add a delivery address.');
         }
-      } else {
-        codOption.classList.remove('disabled');
-        codOption.style.pointerEvents = 'auto';
-        codRadio.disabled = false;
-      }
-    }
-
-    function applyCoupon(couponCode) {
-      const couponItem = document.querySelector(`.coupon-item[data-coupon-code="${couponCode}"]`);
-      if (!couponItem) {
-        console.log(`Apply Coupon: Coupon item not found for code: ${couponCode}`);
-        return;
-      }
-
-      const minPrice = parseFloat(couponItem.dataset.minPrice);
-      const maxPrice = parseFloat(couponItem.dataset.maxPrice);
-      const offerPrice = parseFloat(couponItem.dataset.offerPrice);
-
-      if (currentSubtotal < minPrice || currentSubtotal > maxPrice) {
-        toastr.error(`This coupon is only valid for orders between ${minPrice}₹ and ${maxPrice}₹. Your current subtotal is ${currentSubtotal}₹.`);
-        return;
-      }
-
-      if (appliedCoupon) {
-        console.log(`Apply Coupon: Removing previously applied coupon: ${appliedCoupon.code}`);
-        removeCoupon(appliedCoupon.code);
-      }
-
-      document.querySelectorAll('.coupon-item').forEach(item => {
-        item.classList.remove('selected');
-        const button = item.querySelector('.coupon-apply-btn');
-        button.disabled = false;
-        button.textContent = 'Apply';
-        button.onclick = () => applyCoupon(item.dataset.couponCode);
-      });
-
-      couponItem.classList.add('selected');
-      const applyButton = couponItem.querySelector('.coupon-apply-btn');
-      applyButton.textContent = 'Remove';
-      applyButton.onclick = () => removeCoupon(couponCode);
-      appliedCoupon = {
-        code: couponCode,
-        offerPrice
-      };
-
-      currentTotal -= offerPrice;
-      if (currentTotal < 0) currentTotal = 0;
-      updateTotals();
-      addCouponRow(couponCode, offerPrice);
-      checkWalletBalance();
-      checkCODLimit();
-      toastr.success(`Coupon ${couponCode} applied successfully! You saved ${offerPrice}₹.`);
-      console.log(`Apply Coupon: Coupon ${couponCode} applied. New total: ${currentTotal}`);
-    }
-
-    function removeCoupon(couponCode) {
-      const couponItem = document.querySelector(`.coupon-item[data-coupon-code="${couponCode}"]`);
-      if (!couponItem) {
-        console.log(`Remove Coupon: Coupon item not found for code: ${couponCode}`);
-        return;
-      }
-
-      couponItem.classList.remove('selected');
-      const removeButton = couponItem.querySelector('.coupon-apply-btn');
-      removeButton.textContent = 'Apply';
-      removeButton.disabled = false;
-      removeButton.onclick = () => applyCoupon(couponCode);
-
-      if (appliedCoupon && appliedCoupon.code === couponCode) {
-        currentTotal += appliedCoupon.offerPrice;
-        appliedCoupon = null;
-        removeCouponRow();
-        updateTotals();
         checkWalletBalance();
         checkCODLimit();
-        toastr.success(`Coupon ${couponCode} removed successfully!`);
-        console.log(`Remove Coupon: Coupon ${couponCode} removed. New total: ${currentTotal}`);
-      }
+        const urlParams = new URLSearchParams(window.location.search);
+        const isRetryQuery = urlParams.get('retry');
+        const orderIdQuery = urlParams.get('orderId');
+        const amountQuery = urlParams.get('amount');
+        const razorpayKeyQuery = urlParams.get('razorpayKey');
+        const razorpayOrderIdQuery = urlParams.get('razorpayOrderId');
+        if (isRetryQuery === 'true' && orderIdQuery && amountQuery && razorpayKeyQuery && razorpayOrderIdQuery) {
+            if (retryOrderId) {
+                const retryOrderAddress = savedAddresses.find(addr => addr._id === retryOrder.address);
+                if (retryOrderAddress) {
+                    selectAddress(savedAddresses.indexOf(retryOrderAddress));
+                }
+            }
+            initiateRazorpayPayment(orderIdQuery, amountQuery, razorpayKeyQuery, razorpayOrderIdQuery);
+        }
+    });
+    function checkWalletBalance() {
+        const walletOption = document.querySelector('.payment-option[data-payment="wallet"]');
+        const walletRadio = walletOption.querySelector('.payment-radio');
+        if (walletBalance >= currentTotal) {
+            walletOption.classList.remove('disabled');
+            walletOption.style.pointerEvents = 'auto';
+            walletRadio.disabled = false;
+        } else {
+            walletOption.classList.add('disabled');
+            walletOption.style.pointerEvents = 'none';
+            walletRadio.disabled = true;
+            if (walletOption.classList.contains('selected')) {
+                const upiOption = document.querySelector('.payment-option[data-payment="upi"]');
+                const codOption = document.querySelector('.payment-option[data-payment="cod"]');
+                if (!upiOption.classList.contains('disabled')) {
+                    upiOption.classList.add('selected');
+                    upiOption.querySelector('.payment-radio').checked = true;
+                } else if (!codOption.classList.contains('disabled')) {
+                    codOption.classList.add('selected');
+                    codOption.querySelector('.payment-radio').checked = true;
+                } else {
+                    toastr.warning('No suitable payment method available.');
+                }
+            }
+        }
     }
-
-    function addCouponRow(couponCode, offerPrice) {
-      let couponRow = document.querySelector('.total-row.coupon-row');
-      if (!couponRow) {
-        couponRow = document.createElement('div');
-        couponRow.className = 'total-row coupon-row';
-        document.querySelector('.summary-totals').insertBefore(couponRow, document.querySelector('.total-row.final'));
-        console.log('Add Coupon Row: New coupon row created.');
-      }
-      couponRow.innerHTML = `<span>${couponCode}:</span><span>-${offerPrice}₹</span>`;
+    function checkCODLimit() {
+        const codOption = document.querySelector('.payment-option[data-payment="cod"]');
+        const codRadio = codOption.querySelector('.payment-radio');
+        if (currentTotal >= 1000) {
+            codOption.classList.add('disabled');
+            codOption.style.pointerEvents = 'none';
+            codRadio.disabled = true;
+            if (codOption.classList.contains('selected')) {
+                const upiOption = document.querySelector('.payment-option[data-payment="upi"]');
+                if (!upiOption.classList.contains('disabled')) {
+                    upiOption.classList.add('selected');
+                    upiOption.querySelector('.payment-radio').checked = true;
+                } else {
+                    toastr.warning('No suitable payment method available for this order total.');
+                }
+            }
+        } else {
+            codOption.classList.remove('disabled');
+            codOption.style.pointerEvents = 'auto';
+            codRadio.disabled = false;
+        }
     }
-
-    function removeCouponRow() {
-      const couponRow = document.querySelector('.total-row.coupon-row');
-      if (couponRow) {
-        couponRow.remove();
-        console.log('Remove Coupon Row: Coupon row removed.');
-      }
-    }
-
-    function updateTotals() {
-      document.getElementById('subtotal').textContent = `${currentSubtotal.toFixed(2)}₹`;
-      document.getElementById('finalTotal').textContent = `${currentTotal.toFixed(2)}₹`;
-      checkWalletBalance();
-      checkCODLimit();
-      console.log(`Update Totals: Subtotal: ${currentSubtotal}, Final Total: ${currentTotal}`);
-    }
-
-    function openAddressModal(index = null) {
-      const modalElement = document.getElementById('addressModal');
-      if (!modalElement) {
-        console.error('Open Address Modal: Address modal element not found.');
-        return;
-      }
-      const modal = new bootstrap.Modal(modalElement, {
-        backdrop: true,
-        keyboard: true
-      });
-      const modalTitle = document.getElementById('addressModalLabel');
-      const makeDefaultCheckbox = document.getElementById('makeDefaultCheckbox');
-      const editIndexInput = document.getElementById('editIndex'); // This holds the array index for internal use
-      const editAddressIdInput = document.getElementById('editAddressId'); // This will hold the MongoDB _id
-
-      document.querySelectorAll('.errr-msg').forEach(err => {
-        err.style.display = 'none';
-        err.innerHTML = '';
-      });
-
-      if (index !== null) {
-        console.log(`Open Address Modal: Editing address at index: ${index}`);
-        modalTitle.textContent = 'Edit Address';
-        editIndexInput.value = index;
-        const address = savedAddresses[index];
-        editAddressIdInput.value = address._id || ''; // Set the MongoDB _id
-        populateForm(address);
-        makeDefaultCheckbox.checked = address.isDefault || false;
-      } else {
-        console.log('Open Address Modal: Adding new address.');
-        modalTitle.textContent = 'Add Address';
-        editIndexInput.value = '';
-        editAddressIdInput.value = ''; // Clear for new address
-        clearForm();
-        makeDefaultCheckbox.checked = false;
-      }
-      modal.show();
-    }
-
-    function closeAddressModal() {
-      const modal = bootstrap.Modal.getInstance(document.getElementById('addressModal'));
-      if (modal) {
-        modal.hide();
-        console.log('Close Address Modal: Address modal hidden.');
-      }
-    }
-
-    function editAddress(index) {
-      openAddressModal(index);
-    }
-
-    function showOrderConfirmModal(index = null, action = 'order') {
-      currentDeleteIndex = index; // Used for address deletion
-      const modal = document.getElementById('order-confirm-modal');
-      if (modal) {
-        modal.style.display = 'flex';
-        modal.dataset.action = action;
-        console.log(`Show Order Confirm Modal: Action set to ${action}.`);
-      }
-    }
-
-    function closeOrderConfirmModal() {
-      const modal = document.getElementById('order-confirm-modal');
-      if (modal) {
-        modal.style.display = 'none';
-        modal.dataset.action = '';
-        currentDeleteIndex = null;
-        console.log('Close Order Confirm Modal: Modal hidden and action cleared.');
-      }
-    }
-
-    function deleteAddress() {
-      if (currentDeleteIndex === null) {
-        console.error('Delete Address: No address index selected for deletion.');
-        return;
-      }
-      const addressToDelete = savedAddresses[currentDeleteIndex];
-      if (!addressToDelete || !addressToDelete._id) {
-        console.error('Delete Address: Address object or _id not found for deletion.');
-        toastr.error('Address information missing for deletion.');
-        return;
-      }
-
-      console.log(`Delete Address: Attempting to delete address with ID: ${addressToDelete._id}`);
-      fetch(`/account-settings/delete-address/${addressToDelete._id}`, { // Use _id in URL
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          }
-        })
-        .then(response => {
-          if (!response.ok) {
-            // Handle HTTP errors
-            return response.json().then(err => {
-              throw new Error(err.message || 'Server error');
-            });
-          }
-          return response.json();
-        })
-        .then(data => {
-          if (data.success) {
-            toastr.success('Address deleted successfully');
-            console.log('Delete Address: Address successfully deleted. Reloading page.');
-            setTimeout(() => window.location.reload(), 1000);
-          } else {
-            toastr.error(data.message || 'Failed to delete address');
-            console.error('Delete Address: Server reported failure:', data.message);
-          }
-        })
-        .catch(error => {
-          toastr.error('An error occurred while deleting the address');
-          console.error('Delete Address: Fetch error:', error);
+    function applyCoupon(couponCode) {
+        const couponItem = document.querySelector(`.coupon-item[data-coupon-code="${couponCode}"]`);
+        if (!couponItem) return;
+        const minPrice = parseFloat(couponItem.dataset.minPrice);
+        const maxPrice = parseFloat(couponItem.dataset.maxPrice);
+        const offerPrice = parseFloat(couponItem.dataset.offerPrice);
+        if (currentSubtotal < minPrice || currentSubtotal > maxPrice) {
+            toastr.error(`This coupon is only valid for orders between ${minPrice}₹ and ${maxPrice}₹. Your current subtotal is ${currentSubtotal}₹.`);
+            return;
+        }
+        if (appliedCoupon) {
+            removeCoupon(appliedCoupon.code);
+        }
+        document.querySelectorAll('.coupon-item').forEach(item => {
+            item.classList.remove('selected');
+            const button = item.querySelector('.coupon-apply-btn');
+            button.disabled = false;
+            button.textContent = 'Apply';
+            button.onclick = () => applyCoupon(item.dataset.couponCode);
         });
-      closeOrderConfirmModal();
+        couponItem.classList.add('selected');
+        const applyButton = couponItem.querySelector('.coupon-apply-btn');
+        applyButton.textContent = 'Remove';
+        applyButton.onclick = () => removeCoupon(couponCode);
+        appliedCoupon = {
+            code: couponCode,
+            offerPrice
+        };
+        currentTotal -= offerPrice;
+        if (currentTotal < 0) currentTotal = 0;
+        updateTotals();
+        addCouponRow(couponCode, offerPrice);
+        checkWalletBalance();
+        checkCODLimit();
+        toastr.success(`Coupon ${couponCode} applied successfully! You saved ${offerPrice}₹.`);
     }
-
+    function removeCoupon(couponCode) {
+        const couponItem = document.querySelector(`.coupon-item[data-coupon-code="${couponCode}"]`);
+        if (!couponItem) return;
+        couponItem.classList.remove('selected');
+        const removeButton = couponItem.querySelector('.coupon-apply-btn');
+        removeButton.textContent = 'Apply';
+        removeButton.disabled = false;
+        removeButton.onclick = () => applyCoupon(couponCode);
+        if (appliedCoupon && appliedCoupon.code === couponCode) {
+            currentTotal += appliedCoupon.offerPrice;
+            appliedCoupon = null;
+            removeCouponRow();
+            updateTotals();
+            checkWalletBalance();
+            checkCODLimit();
+            toastr.success(`Coupon ${couponCode} removed successfully!`);
+        }
+    }
+    function addCouponRow(couponCode, offerPrice) {
+        let couponRow = document.querySelector('.total-row.coupon-row');
+        if (!couponRow) {
+            couponRow = document.createElement('div');
+            couponRow.className = 'total-row coupon-row';
+            document.querySelector('.summary-totals').insertBefore(couponRow, document.querySelector('.total-row.final'));
+        }
+        couponRow.innerHTML = `<span>${couponCode}:</span><span>-${offerPrice}₹</span>`;
+    }
+    function removeCouponRow() {
+        const couponRow = document.querySelector('.total-row.coupon-row');
+        if (couponRow) {
+            couponRow.remove();
+        }
+    }
+    function updateTotals() {
+        document.getElementById('subtotal').textContent = `${currentSubtotal.toFixed(2)}₹`;
+        document.getElementById('finalTotal').textContent = `${currentTotal.toFixed(2)}₹`;
+        checkWalletBalance();
+        checkCODLimit();
+    }
+    function openAddressModal(index = null) {
+        const modalElement = document.getElementById('addressModal');
+        if (!modalElement) return;
+        const modal = new bootstrap.Modal(modalElement, {
+            backdrop: true,
+            keyboard: true
+        });
+        const modalTitle = document.getElementById('addressModalLabel');
+        const makeDefaultCheckbox = document.getElementById('makeDefaultCheckbox');
+        const editIndexInput = document.getElementById('editIndex');
+        const editAddressIdInput = document.getElementById('editAddressId');
+        document.querySelectorAll('.errr-msg').forEach(err => {
+            err.style.display = 'none';
+            err.innerHTML = '';
+        });
+        if (index !== null) {
+            modalTitle.textContent = 'Edit Address';
+            editIndexInput.value = index;
+            const address = savedAddresses[index];
+            editAddressIdInput.value = address._id || '';
+            populateForm(address);
+            makeDefaultCheckbox.checked = address.isDefault || false;
+        } else {
+            modalTitle.textContent = 'Add Address';
+            editIndexInput.value = '';
+            editAddressIdInput.value = '';
+            clearForm();
+            makeDefaultCheckbox.checked = false;
+        }
+        modal.show();
+    }
+    function closeAddressModal() {
+        const modal = bootstrap.Modal.getInstance(document.getElementById('addressModal'));
+        if (modal) {
+            modal.hide();
+        }
+    }
+    function editAddress(index) {
+        openAddressModal(index);
+    }
+    function showOrderConfirmModal(index = null, action = 'order') {
+        currentDeleteIndex = index;
+        const modal = document.getElementById('orderConfirmModal');
+        if (modal) {
+            modal.dataset.action = action;
+            orderConfirmModal.show();
+        }
+    }
+    function closeOrderConfirmModal() {
+        if (orderConfirmModal) {
+            orderConfirmModal.hide();
+            document.getElementById('orderConfirmModal').dataset.action = '';
+            currentDeleteIndex = null;
+        }
+    }
+    function deleteAddress() {
+        if (currentDeleteIndex === null) {
+            toastr.error('No address selected for deletion.');
+            return;
+        }
+        const addressToDelete = savedAddresses[currentDeleteIndex];
+        if (!addressToDelete || !addressToDelete._id) {
+            toastr.error('Address information missing for deletion.');
+            return;
+        }
+        fetch(`/account-settings/delete-address/${addressToDelete._id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => {
+                if (!response.ok) return response.json().then(err => {
+                    throw new Error(err.message || 'Server error');
+                });
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    toastr.success('Address deleted successfully');
+                    setTimeout(() => window.location.reload(), 1000);
+                } else {
+                    toastr.error(data.message || 'Failed to delete address');
+                }
+            })
+            .catch(error => {
+                toastr.error('An error occurred while deleting the address');
+            });
+        closeOrderConfirmModal();
+    }
     function initiateRazorpayPayment(orderId, amount, razorpayKey, razorpayOrderId) {
-      console.log(`Initiate Razorpay: Order ID: ${orderId}, Amount: ${amount}, RZ Key: ${razorpayKey}, RZ Order ID: ${razorpayOrderId}`);
-
-      const urlParams = new URLSearchParams(window.location.search);
-      const isRetryPayment = urlParams.get('retry'); // Use a different var name to avoid confusion with `retryOrderId`
-
-      const options = {
-        key: razorpayKey,
-        amount: amount * 100, // Amount in paise
-        currency: 'INR',
-        name: 'TezBag',
-        description: 'Order Payment' + (isRetryPayment ? ' (Retry)' : ''),
-        order_id: razorpayOrderId,
-        handler: function(response) {
-          console.log('Razorpay Handler: Payment successful, verifying payment.');
-          verifyPayment(response, orderId);
-        },
-        prefill: {
-          name: '<%= userId.f_Name %>',
-          email: '<%= userId.email %>',
-        },
-        notes: {
-          orderId: orderId,
-          userId: '<%= userId._id %>' // Use userId._id to match server expectations
-        },
-        theme: {
-          color: '#00B207'
-        },
-        modal: {
-          ondismiss: function() {
-            console.log('Razorpay Modal: Payment dismissed by user.');
-            // Only cancel the order if it's a new order (not a retry)
-            // If it's a retry, the backend already has the order as 'Payment Failed'
-            if (!isRetryPayment) {
-              console.log(`Razorpay Modal: Cancelling order ${orderId} due to dismissal (new order).`);
-              fetch(`/cancel-order/${orderId}`, {
-                  method: 'POST',
-                  headers: {
+        const urlParams = new URLSearchParams(window.location.search);
+        const isRetryPayment = urlParams.get('retry');
+        const options = {
+            key: razorpayKey,
+            amount: amount * 100,
+            currency: 'INR',
+            name: 'TezBag',
+            description: 'Order Payment' + (isRetryPayment ? ' (Retry)' : ''),
+            order_id: razorpayOrderId,
+            handler: function(response) {
+                verifyPayment(response, orderId);
+            },
+            prefill: {
+                name: '<%= userId.f_Name %>',
+                email: '<%= userId.email %>'
+            },
+            notes: {
+                orderId: orderId,
+                userId: '<%= userId._id %>'
+            },
+            theme: {
+                color: '#00B207'
+            },
+            modal: {
+                ondismiss: function() {
+                    if (!isRetryPayment) {
+                        fetch(`/cancel-order/${orderId}`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                }
+                            })
+                            .catch(err => console.error('Error cancelling order on dismiss:', err));
+                    }
+                    const loadingOverlay = document.getElementById('loading-overlay');
+                    loadingOverlay.style.display = 'none';
+                    setTimeout(() => {
+                        window.location.href = '/retry-payment';
+                    }, 100);
+                }
+            }
+        };
+        const rzp = new Razorpay(options);
+        rzp.open();
+    }
+    async function verifyPayment(paymentResponse, orderId) {
+        try {
+            const res = await fetch('/order/verify-payment', {
+                method: 'POST',
+                headers: {
                     'Content-Type': 'application/json'
-                  },
+                },
+                body: JSON.stringify({
+                    paymentResponse,
+                    orderId
                 })
-                .then(res => res.json())
-                .catch(err => {
-                  console.error('Razorpay Modal: Error cancelling order on dismiss:', err);
+            });
+            const data = await res.json();
+            if (data.success) {
+                toastr.success('Payment Successful! Redirecting...');
+                setTimeout(() => window.location.href = `/order-confirmation/${orderId}`, 1000);
+            } else {
+                fetch(`/cancel-order/${orderId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .catch(err => console.error('Error cancelling/failing order after verification failure:', err));
+                toastr.error(data.message || 'Payment verification failed');
+                setTimeout(() => {
+                    window.location.href = '/retry-payment';
+                }, 100);
+            }
+        } catch (error) {
+            toastr.error('Something went wrong during payment verification.');
+        }
+    }
+    function placeOrder(isCartCheckout) {
+        if (selectedAddressId === null) {
+            toastr.error('Please select a delivery address.');
+            return;
+        }
+        const paymentMethod = document.querySelector('input[name="payment"]:checked')?.value || '';
+        if (!paymentMethod) {
+            toastr.error('Please select a payment method.');
+            return;
+        }
+        const orderData = {
+            paymentMethod,
+            orderNotes: document.getElementById('orderNotes').value || '',
+            addressId: selectedAddressId,
+            coupon: appliedCoupon ? appliedCoupon.code : null,
+            finalAmount: currentTotal,
+            isCartCheckout: isCartCheckout
+        };
+        if (!isCartCheckout && productId && !retryOrderId) {
+            orderData.productId = productId;
+            orderData.quantity = quantity;
+            if (cuttingStyle) orderData.cuttingStyle = cuttingStyle;
+        }
+        if (retryOrderId) {
+            orderData.retryOrderId = retryOrderId;
+        }
+        const loadingOverlay = document.getElementById('loading-overlay');
+        loadingOverlay.style.display = 'flex';
+        fetch('/order/place', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(orderData)
+            })
+            .then(response => {
+                loadingOverlay.style.display = 'none';
+                if (!response.ok) return response.json().then(err => {
+                    throw new Error(err.message || 'Server error');
+                });
+                return response.json();
+            })
+            .then(data => {
+                closeOrderConfirmModal();
+                if (data.success) {
+                    if (paymentMethod === 'upi') {
+                        initiateRazorpayPayment(data.orderId, currentTotal, data.razorpayKey, data.razorpayOrderId);
+                    } else {
+                        const animationContainer = document.getElementById('order-success-animation');
+                        animationContainer.style.display = 'block';
+                        lottie.loadAnimation({
+                            container: animationContainer,
+                            renderer: 'svg',
+                            loop: false,
+                            autoplay: true,
+                            path: '/Order_success.json'
+                        });
+                        setTimeout(() => {
+                            animationContainer.style.display = 'none';
+                            window.location.href = `/order-confirmation/${data.orderId}`;
+                        }, 3700);
+                    }
+                } else {
+                    if (data.message === 'Some products are out of stock') {
+                        toastr.error(data.message);
+                        setTimeout(() => window.location.href = '/shop', 2000);
+                    } else if (data.redirect) {
+                        toastr.error(data.message || 'Failed to place order. Redirecting...');
+                        setTimeout(() => window.location.href = data.redirect, data.delay || 1000);
+                    } else {
+                        toastr.error(data.message || 'Failed to place order.');
+                    }
+                }
+            })
+            .catch(error => {
+                toastr.error(error.message || 'An unexpected error occurred. Please try again.');
+                loadingOverlay.style.display = 'none';
+                closeOrderConfirmModal();
+            });
+    }
+    const shopCoords = {
+        latitude: 10.553513235812982,
+        longitude: 76.05424695935642
+    };
+    async function getCoordinates(pincode) {
+        try {
+            const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${pincode}&key=<%= GOOGLE_API_KEY %>`);
+            const data = await response.json();
+            if (data.status === "OK" && data.results.length > 0) {
+                const location = data.results[0].geometry.location;
+                return {
+                    latitude: location.lat,
+                    longitude: location.lng
+                };
+            }
+            return null;
+        } catch (error) {
+            return null;
+        }
+    }
+    function calculateDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371;
+        const dLat = toRadians(lat2 - lat1);
+        const dLon = toRadians(lon2 - lon1);
+        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
+    }
+    function toRadians(degrees) {
+        return degrees * (Math.PI / 180);
+    }
+    async function checkDeliveryEligibility(pincode) {
+        const customerCoords = await getCoordinates(pincode);
+        if (!customerCoords) {
+            return {
+                eligible: false,
+                message: "Delivery Not Available For This Location"
+            };
+        }
+        const distance = calculateDistance(
+            shopCoords.latitude, shopCoords.longitude,
+            customerCoords.latitude, customerCoords.longitude
+        );
+        const eligible = distance <= 5;
+        const message = eligible ? "Delivery available" : `Delivery not available beyond 5 km (current: ${distance.toFixed(2)} km)`;
+        return {
+            eligible: eligible,
+            message: message
+        };
+    }
+    async function selectAddress(index) {
+        if (index === null || index < 0 || index >= savedAddresses.length) {
+            selectedAddressId = null;
+            updateDeliveryStatus(false, 'Please select a valid address.');
+            return;
+        }
+        const selectedAddr = savedAddresses[index];
+        selectedAddressId = selectedAddr._id;
+        document.querySelectorAll('.address-card').forEach(card => card.classList.remove('selected'));
+        const selectedCard = document.querySelector(`.address-card[data-index="${index}"]`);
+        if (selectedCard) selectedCard.classList.add('selected');
+        const deliveryCheck = await checkDeliveryEligibility(selectedAddr.pinCode);
+        updateDeliveryStatus(deliveryCheck.eligible, deliveryCheck.message);
+    }
+    function updateDeliveryStatus(isEligible, message) {
+        const deliveryStatusDiv = document.getElementById('delivery-status');
+        const placeOrderBtn = document.querySelector('.place-order-btn');
+        if (!deliveryStatusDiv || !placeOrderBtn) return;
+        deliveryStatusDiv.textContent = message;
+        if (!isEligible) {
+            deliveryStatusDiv.style.display = 'flex';
+            placeOrderBtn.disabled = true;
+            placeOrderBtn.classList.add('disabled');
+        } else {
+            deliveryStatusDiv.style.display = 'none';
+            placeOrderBtn.disabled = false;
+            placeOrderBtn.classList.remove('disabled');
+        }
+    }
+    function validateAddressForm() {
+        let isValid = true;
+        const fields = [{
+            id: 'modalFirstName',
+            name: 'firstName',
+            errId: 'errFirstName',
+            label: 'First name'
+        }, {
+            id: 'modalLastName',
+            name: 'lastName',
+            errId: 'errModalLastName',
+            label: 'Last name'
+        }, {
+            id: 'modalStreetAddress',
+            name: 'streetAddress',
+            errId: 'errStreetAddress',
+            label: 'Street address'
+        }, {
+            id: 'modalCity',
+            name: 'city',
+            errId: 'errCity',
+            label: 'City'
+        }, {
+            id: 'modalCountrySelect',
+            name: 'country',
+            errId: 'errCountry',
+            label: 'Country'
+        }, {
+            id: 'modalStateSelect',
+            name: 'state',
+            errId: 'errState',
+            label: 'State'
+        }, {
+            id: 'modalLandmark',
+            name: 'landmark',
+            errId: 'errLandmark',
+            label: 'Landmark'
+        }, {
+            id: 'modalZipcode',
+            name: 'pinCode',
+            errId: 'errZipcode',
+            label: 'Zip code'
+        }, {
+            id: 'modalPhone',
+            name: 'phone',
+            errId: 'errPhone',
+            label: 'Phone number'
+        }];
+        const namePattern = /^[A-Za-z ]+$/;
+        const phonePattern = /^\+?[1-9]\d{1,14}$/;
+        const zipPattern = /^[1-9]\d{5}$/;
+        fields.forEach(field => {
+            const input = document.getElementById(field.id);
+            const errDiv = document.getElementById(field.errId);
+            const val = input ? input.value.trim() : '';
+            if (errDiv) {
+                errDiv.style.display = 'none';
+                errDiv.innerHTML = '';
+            }
+            if (!val) {
+                if (errDiv) {
+                    errDiv.innerHTML = `${field.label} is required`;
+                    errDiv.style.display = 'block';
+                }
+                isValid = false;
+            } else if ((field.id === 'modalFirstName' || field.id === 'modalLastName') && val.length < 2) {
+                if (errDiv) {
+                    errDiv.innerHTML = `Minimum 2 characters required`;
+                    errDiv.style.display = 'block';
+                }
+                isValid = false;
+            } else if ((field.id === 'modalFirstName' || field.id === 'modalLastName') && !namePattern.test(val)) {
+                if (errDiv) {
+                    errDiv.innerHTML = `Only alphabets allowed`;
+                    errDiv.style.display = 'block';
+                }
+                isValid = false;
+            } else if (field.id === 'modalPhone' && !phonePattern.test(val)) {
+                if (errDiv) {
+                    errDiv.innerHTML = `Please enter a valid phone number (e.g., +919876543210 or 9876543210)`;
+                    errDiv.style.display = 'block';
+                }
+                isValid = false;
+            } else if (field.id === 'modalZipcode' && !zipPattern.test(val)) {
+                if (errDiv) {
+                    errDiv.innerHTML = `Zip code must be 6 digits and start with 1-9`;
+                    errDiv.style.display = 'block';
+                }
+                isValid = false;
+            }
+        });
+        return isValid;
+    }
+    function saveAddress() {
+        if (!validateAddressForm()) {
+            return;
+        }
+        const form = document.getElementById('addressForm');
+        const formData = new FormData(form);
+        const data = {};
+        formData.forEach((value, key) => {
+            data[key] = value.trim()
+        });
+        data.isDefault = document.getElementById('makeDefaultCheckbox').checked;
+        const editAddressId = document.getElementById('editAddressId').value;
+        const url = editAddressId === '' ? '/account-settings/add-address' : `/account-settings/edit-address/${editAddressId}`;
+        const method = editAddressId === '' ? 'POST' : 'PATCH';
+        const successMessage = editAddressId === '' ? 'Address added successfully' : 'Address updated successfully';
+        fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(data),
+            })
+            .then(async response => {
+                if (!response.ok) {
+                    const contentType = response.headers.get('content-type');
+                    if (contentType && contentType.includes('application/json')) {
+                        const err = await response.json();
+                        throw new Error(err.message || 'Server error');
+                    } else {
+                        const text = await response.text();
+                        throw new Error('Unexpected server response');
+                    }
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    toastr.success(successMessage);
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('addressModal'));
+                    if (modal) modal.hide();
+                    setTimeout(() => window.location.reload(), 1300);
+                } else {
+                    toastr.error(data.message || 'Failed to save address');
+                }
+            })
+            .catch(error => {
+                toastr.error(error.message || 'An error occurred while saving the address');
+            });
+    }
+    function populateForm(data) {
+        document.getElementById('modalFirstName').value = data.firstName || '';
+        document.getElementById('modalLastName').value = data.lastName || '';
+        document.getElementById('modalCompany').value = data.company || '';
+        document.getElementById('modalStreetAddress').value = data.streetAddress || '';
+        document.getElementById('modalCity').value = data.city || '';
+        document.getElementById('modalLandmark').value = data.landmark || '';
+        document.getElementById('modalZipcode').value = data.pinCode || '';
+        document.getElementById('modalEmail').value = data.email || '';
+        document.getElementById('modalPhone').value = data.phone || '';
+        document.getElementById('modalAltPhone').value = data.altPhone || '';
+        if (data.country) {
+            document.getElementById('modalCountrySelect').value = data.country;
+            if (data.state) {
+                loadStates(data.country).then(() => {
+                    document.getElementById('modalStateSelect').value = data.state;
                 });
             } else {
-              console.log(`Razorpay Modal: Not cancelling order ${orderId} on dismiss (it's a retry).`);
+                loadStates(data.country);
             }
-
-            const loadingOverlay = document.getElementById('loading-overlay');
-            loadingOverlay.style.display = 'none';
-            // Redirect to payment failed/retry page after dismissal
-            setTimeout(() => {
-              window.location.href = '/retry-payment';
-            }, 100);
-          }
         }
-      };
-
-      const rzp = new Razorpay(options);
-      rzp.open();
     }
-
-    async function verifyPayment(paymentResponse, orderId) {
-      console.log(`Verify Payment: Attempting to verify payment for order ID: ${orderId}`);
-      try {
-        const res = await fetch('/order/verify-payment', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            paymentResponse,
-            orderId
-          })
-        });
-        const data = await res.json();
-        if (data.success) {
-          toastr.success('Payment Successful! Redirecting...');
-          console.log(`Verify Payment: Payment verification successful for order ${orderId}. Redirecting.`);
-          setTimeout(() => window.location.href = `/order-confirmation/${orderId}`, 1000);
-        } else {
-          console.error(`Verify Payment: Payment verification failed for order ${orderId}: ${data.message || 'Unknown error'}`);
-          // If verification fails, ensure the order is marked as failed on backend
-          fetch(`/cancel-order/${orderId}`, { // Using cancel-order to mark it as failed
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json'
-              },
-            })
-            .then(res => res.json())
-            .catch(err => {
-              console.error('Verify Payment: Error cancelling/failing order after verification failure:', err);
-            });
-          toastr.error(data.message || 'Payment verification failed');
-          // Always redirect to retry page on verification failure
-          setTimeout(() => {
-            window.location.href = '/retry-payment';
-          }, 100);
-        }
-      } catch (error) {
-        console.error('Verify Payment: An error occurred during payment verification:', error);
-        toastr.error('Something went wrong during payment verification.');
-      }
-    }
-
-    function placeOrder() {
-      if (selectedAddressId === null) { // Check for selectedAddressId
-        toastr.error('Please select a delivery address.');
-        console.log('Place Order: No address selected.');
-        return;
-      }
-
-      const paymentMethod = document.querySelector('input[name="payment"]:checked')?.value || '';
-      if (!paymentMethod) {
-        toastr.error('Please select a payment method.');
-        console.log('Place Order: No payment method selected.');
-        return;
-      }
-
-      const orderData = {
-        paymentMethod,
-        orderNotes: document.getElementById('orderNotes').value || '',
-        addressId: selectedAddressId, // Send only the _id of the address
-        coupon: appliedCoupon ? appliedCoupon.code : null,
-        finalAmount: currentTotal
-      };
-
-      // Include retryOrderId if present (for payment retries of existing orders)
-      if (retryOrderId) {
-        orderData.retryOrderId = retryOrderId;
-        console.log(`Place Order: Including retryOrderId: ${retryOrderId} in order data.`);
-      }
-
-      // Include product details for "Buy Now" orders
-      if (productId) {
-        orderData.productId = productId;
-        orderData.quantity = quantity;
-        if (cuttingStyle) {
-          orderData.cuttingStyle = cuttingStyle;
-        }
-        console.log('Place Order: Including Buy Now product details.');
-      }
-
-      const loadingOverlay = document.getElementById('loading-overlay');
-      loadingOverlay.style.display = 'flex';
-      console.log('Place Order: Sending order data:', orderData);
-
-      fetch('/order/place', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(orderData)
-        })
-        .then(response => {
-          loadingOverlay.style.display = 'none';
-          if (!response.ok) {
-            // If the response is not ok, parse the error message from the backend
-            return response.json().then(err => {
-              throw new Error(err.message || 'Server error');
-            });
-          }
-          return response.json();
-        })
-        .then(data => {
-          closeOrderConfirmModal();
-          if (data.success) {
-            console.log(`Place Order: Order placement successful. Order ID: ${data.orderId}, Payment Method: ${paymentMethod}`);
-            if (paymentMethod === 'upi') {
-              initiateRazorpayPayment(data.orderId, currentTotal, data.razorpayKey, data.razorpayOrderId);
-            } else {
-              const animationContainer = document.getElementById('order-success-animation');
-              animationContainer.style.display = 'block';
-              lottie.loadAnimation({
-                container: animationContainer,
-                renderer: 'svg',
-                loop: false,
-                autoplay: true,
-                path: '/Order_success.json'
-              });
-              console.log('Place Order: Showing success animation for non-UPI payment.');
-              setTimeout(() => {
-                animationContainer.style.display = 'none';
-                window.location.href = `/order-confirmation/${data.orderId}`;
-              }, 3700);
-            }
-          } else {
-            console.error('Place Order: Failed to place order:', data.message);
-            if (data.message === 'Some products are out of stock') {
-              toastr.error(data.message);
-              setTimeout(() => window.location.href = '/shop', 2000); // Redirect to shop if out of stock
-            } else if (data.redirect) {
-              toastr.error(data.message || 'Failed to place order. Redirecting...');
-              setTimeout(() => window.location.href = data.redirect, data.delay || 1000); // Use redirect from server
-            } else {
-              toastr.error(data.message || 'Failed to place order.');
-            }
-          }
-        })
-        .catch(error => {
-          console.error('Place Order: An error occurred while placing the order:', error);
-          toastr.error(error.message || 'An unexpected error occurred. Please try again.');
-          loadingOverlay.style.display = 'none';
-          closeOrderConfirmModal();
-        });
-    }
-
-    // Define shop's location
-    const shopCoords = {
-      latitude: 10.553513235812982,
-      longitude: 76.05424695935642
-    };
-
-    async function getCoordinates(pincode) {
-      console.log(`Get Coordinates: Fetching coordinates for pincode: ${pincode}`);
-      try {
-        const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${pincode}&key=<%= GOOGLE_API_KEY %>`);
-        const data = await response.json();
-        if (data.status === "OK" && data.results.length > 0) {
-          const location = data.results[0].geometry.location;
-          console.log(`Get Coordinates: Coordinates found: ${location.lat}, ${location.lng}`);
-          return {
-            latitude: location.lat,
-            longitude: location.lng
-          };
-        } else {
-          console.log(`Get Coordinates: No coordinates found for pincode: ${pincode}, Status: ${data.status}`);
-          return null;
-        }
-      } catch (error) {
-        console.error("Get Coordinates: Geocoding API error:", error);
-        return null;
-      }
-    }
-
-    function calculateDistance(lat1, lon1, lat2, lon2) {
-      const R = 6371; // Earth's radius in kilometers
-      const dLat = toRadians(lat2 - lat1);
-      const dLon = toRadians(lon2 - lon1);
-      const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-        Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) *
-        Math.sin(dLon / 2) * Math.sin(dLon / 2);
-      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-      const distance = R * c;
-      console.log(`Calculate Distance: Calculated distance: ${distance.toFixed(2)} km`);
-      return distance;
-    }
-
-    function toRadians(degrees) {
-      return degrees * (Math.PI / 180);
-    }
-
-    async function checkDeliveryEligibility(pincode) {
-      console.log(`Check Delivery Eligibility: Checking for pincode: ${pincode}`);
-      const customerCoords = await getCoordinates(pincode);
-      if (!customerCoords) {
-        console.log('Check Delivery Eligibility: Unable to get customer coordinates.');
-        return {
-          eligible: false,
-          message: "Unable to determine delivery location"
-        };
-      }
-
-      const distance = calculateDistance(
-        shopCoords.latitude, shopCoords.longitude,
-        customerCoords.latitude, customerCoords.longitude
-      );
-
-      const eligible = distance <= 5; // Assuming 5 km limit
-      const message = eligible ? "Delivery available" : `Delivery not available beyond 5 km (current: ${distance.toFixed(2)} km)`;
-      console.log(`Check Delivery Eligibility: Result - Eligible: ${eligible}, Message: ${message}`);
-      return {
-        eligible: eligible,
-        message: message
-      };
-    }
-
-    async function selectAddress(index) {
-      if (index === null || index < 0 || index >= savedAddresses.length) {
-        selectedAddressId = null;
-        console.log('Select Address: Invalid address index or no address selected. selectedAddressId cleared.');
-        updateDeliveryStatus(false, 'Please select a valid address.'); // Show status if no address
-        return;
-      }
-      const selectedAddr = savedAddresses[index];
-      selectedAddressId = selectedAddr._id; // Store the actual MongoDB _id
-      console.log(`Select Address: Selected address index: ${index}, _id: ${selectedAddressId}`);
-
-      document.querySelectorAll('.address-card').forEach(card => card.classList.remove('selected'));
-      const selectedCard = document.querySelector(`.address-card[data-index="${index}"]`);
-      if (selectedCard) selectedCard.classList.add('selected');
-
-      const deliveryCheck = await checkDeliveryEligibility(selectedAddr.pinCode);
-      updateDeliveryStatus(deliveryCheck.eligible, deliveryCheck.message);
-    }
-
-    function updateDeliveryStatus(isEligible, message) {
-      const deliveryStatusDiv = document.getElementById('delivery-status');
-      const placeOrderBtn = document.querySelector('.place-order-btn');
-
-      if (!deliveryStatusDiv) {
-        console.error('Update Delivery Status: delivery-status div not found.');
-        return;
-      }
-      if (!placeOrderBtn) {
-        console.error('Update Delivery Status: place-order-btn not found.');
-        return;
-      }
-
-      deliveryStatusDiv.textContent = message;
-      if (!isEligible) {
-        deliveryStatusDiv.style.display = 'block';
-        placeOrderBtn.disabled = true;
-        placeOrderBtn.classList.add('disabled');
-        console.log(`Delivery Status: Not eligible. Message: ${message}`);
-      } else {
-        deliveryStatusDiv.style.display = 'none';
-        placeOrderBtn.disabled = false;
-        placeOrderBtn.classList.remove('disabled');
-        console.log(`Delivery Status: Eligible. Message: ${message}`);
-      }
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      console.log('DOM Content Loaded: Initializing checkout script.');
-
-      const cancelOrderButton = document.getElementById('order-cancel');
-      const confirmOrderButton = document.getElementById('order-confirm');
-      if (cancelOrderButton && confirmOrderButton) {
-        cancelOrderButton.addEventListener('click', () => closeOrderConfirmModal());
-        confirmOrderButton.addEventListener('click', () => {
-          const action = document.getElementById('order-confirm-modal').dataset.action;
-          if (action === 'delete') {
-            deleteAddress();
-          } else if (action === 'order') {
-            placeOrder();
-          }
-          // closeOrderConfirmModal(); // Modal is closed within placeOrder/deleteAddress on success
-        });
-      }
-
-      loadCountries();
-      const countrySelect = document.getElementById('modalCountrySelect');
-      if (countrySelect) {
-        countrySelect.addEventListener('change', () => {
-          const selectedCountry = countrySelect.value;
-          if (selectedCountry) loadStates(selectedCountry);
-          else document.getElementById('modalStateSelect').innerHTML = '<option value="" disabled selected hidden>Select State</option>';
-        });
-      }
-
-
-      document.querySelectorAll('.address-card').forEach(card => {
-        card.addEventListener('click', (e) => {
-          const index = card.getAttribute('data-index');
-          selectAddress(index);
-          e.preventDefault();
-        });
-      });
-
-      if (savedAddresses && savedAddresses.length > 0) {
-        const defaultAddress = savedAddresses.find(addr => addr.isDefault);
-        if (defaultAddress) {
-          selectAddress(savedAddresses.indexOf(defaultAddress));
-          console.log('DOM Content Loaded: Selected default address.');
-        } else {
-          selectAddress(0);
-          console.log('DOM Content Loaded: No default address, selected first address.');
-        }
-      } else {
-        // If no addresses, ensure place order button is disabled
-        updateDeliveryStatus(false, 'Please add a delivery address.');
-        console.log('DOM Content Loaded: No saved addresses found.');
-      }
-
-      checkWalletBalance();
-      checkCODLimit();
-
-      // Retry payment logic (auto-open Razorpay widget)
-      const urlParams = new URLSearchParams(window.location.search);
-      const isRetryQuery = urlParams.get('retry');
-      const orderIdQuery = urlParams.get('orderId');
-      const amountQuery = urlParams.get('amount');
-      const razorpayKeyQuery = urlParams.get('razorpayKey');
-      const razorpayOrderIdQuery = urlParams.get('razorpayOrderId');
-
-      if (isRetryQuery === 'true' && orderIdQuery && amountQuery && razorpayKeyQuery && razorpayOrderIdQuery) {
-        console.log('DOM Content Loaded: Detected retry payment parameters. Auto-opening Razorpay.');
-        // Ensure the address for the retry order is selected if possible
-        if (retryOrderId) {
-          const retryOrderAddress = savedAddresses.find(addr => addr._id === retryOrder.address);
-          if (retryOrderAddress) {
-            selectAddress(savedAddresses.indexOf(retryOrderAddress));
-            console.log('DOM Content Loaded: Selected address for retry order.');
-          }
-        }
-        initiateRazorpayPayment(orderIdQuery, amountQuery, razorpayKeyQuery, razorpayOrderIdQuery);
-      }
-    });
-
-    function validateAddressForm() {
-      let isValid = true;
-      console.log('Validate Address Form: Starting validation.');
-
-      const fields = [{
-          id: 'modalFirstName',
-          name: 'firstName',
-          errId: 'errFirstName',
-          label: 'First name'
-        },
-        {
-          id: 'modalLastName',
-          name: 'lastName',
-          errId: 'errModalLastName',
-          label: 'Last name'
-        },
-        {
-          id: 'modalStreetAddress',
-          name: 'streetAddress',
-          errId: 'errStreetAddress',
-          label: 'Street address'
-        },
-        {
-          id: 'modalCity',
-          name: 'city',
-          errId: 'errCity',
-          label: 'City'
-        },
-        {
-          id: 'modalCountrySelect',
-          name: 'country',
-          errId: 'errCountry',
-          label: 'Country'
-        },
-        {
-          id: 'modalStateSelect',
-          name: 'state',
-          errId: 'errState',
-          label: 'State'
-        },
-        {
-          id: 'modalLandmark',
-          name: 'landmark',
-          errId: 'errLandmark',
-          label: 'Landmark'
-        },
-        {
-          id: 'modalZipcode',
-          name: 'pinCode', // Changed to pinCode to match backend
-          errId: 'errZipcode',
-          label: 'Zip code'
-        },
-        {
-          id: 'modalPhone',
-          name: 'phone',
-          errId: 'errPhone',
-          label: 'Phone number'
-        }
-      ];
-
-      const namePattern = /^[A-Za-z ]+$/;
-      const phonePattern = /^\+?[1-9]\d{1,14}$/;
-      const zipPattern = /^[1-9]\d{5}$/; // Standard 6-digit Indian PIN code, starting 1-9
-
-      fields.forEach(field => {
-        const input = document.getElementById(field.id);
-        const errDiv = document.getElementById(field.errId);
-        const val = input ? input.value.trim() : '';
-
-        if (errDiv) { // Ensure errDiv exists
-          errDiv.style.display = 'none';
-          errDiv.innerHTML = '';
-        }
-
-        if (!val) {
-          if (errDiv) {
-            errDiv.innerHTML = `${field.label} is required`;
-            errDiv.style.display = 'block';
-          }
-          isValid = false;
-          console.log(`Validate Address Form: ${field.label} is empty.`);
-        } else if ((field.id === 'modalFirstName' || field.id === 'modalLastName') && val.length < 2) {
-          if (errDiv) {
-            errDiv.innerHTML = `Minimum 2 characters required`;
-            errDiv.style.display = 'block';
-          }
-          isValid = false;
-          console.log(`Validate Address Form: ${field.label} too short.`);
-        } else if ((field.id === 'modalFirstName' || field.id === 'modalLastName') && !namePattern.test(val)) {
-          if (errDiv) {
-            errDiv.innerHTML = `Only alphabets allowed`;
-            errDiv.style.display = 'block';
-          }
-          isValid = false;
-          console.log(`Validate Address Form: ${field.label} contains invalid characters.`);
-        } else if (field.id === 'modalPhone' && !phonePattern.test(val)) {
-          if (errDiv) {
-            errDiv.innerHTML = `Please enter a valid phone number (e.g., +919876543210 or 9876543210)`;
-            errDiv.style.display = 'block';
-          }
-          isValid = false;
-          console.log(`Validate Address Form: Invalid phone number format.`);
-        } else if (field.id === 'modalZipcode' && !zipPattern.test(val)) {
-          if (errDiv) {
-            errDiv.innerHTML = `Zip code must be 6 digits and start with 1-9`;
-            errDiv.style.display = 'block';
-          }
-          isValid = false;
-          console.log(`Validate Address Form: Invalid zip code format.`);
-        }
-      });
-
-      console.log(`Validate Address Form: Validation result: ${isValid}`);
-      return isValid;
-    }
-
-    function saveAddress() {
-      if (!validateAddressForm()) {
-        console.log('Save Address: Address form validation failed.');
-        return;
-      }
-
-      const form = document.getElementById('addressForm');
-      const formData = new FormData(form);
-      const data = {};
-      formData.forEach((value, key) => {
-        data[key] = value;
-      });
-      data.isDefault = document.getElementById('makeDefaultCheckbox').checked;
-      data.pinCode = data.zipcode; // Ensure pinCode is sent
-      delete data.zipcode; // Remove if not needed by backend
-
-      const editAddressId = document.getElementById('editAddressId').value;
-      const url = editAddressId === '' ? '/account-settings/add-address' : `/account-settings/edit-address/${editAddressId}`; // Use _id for edit
-      const method = editAddressId === '' ? 'POST' : 'PATCH';
-      const successMessage = editAddressId === '' ? 'Address added successfully' : 'Address updated successfully';
-
-      console.log(`Save Address: Sending data to ${url} with method ${method}. Data:`, data);
-
-      fetch(url, {
-          method: method,
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          },
-          body: JSON.stringify(data),
-        })
-        .then(response => {
-          if (!response.ok) {
-            return response.json().then(err => {
-              throw new Error(err.message || 'Server error');
-            });
-          }
-          return response.json();
-        })
-        .then(data => {
-          if (data.success) {
-            toastr.success(successMessage);
-            const modal = bootstrap.Modal.getInstance(document.getElementById('addressModal'));
-            if (modal) modal.hide();
-            console.log(`Save Address: ${successMessage}. Reloading page.`);
-            setTimeout(() => window.location.reload(), 1300);
-          } else {
-            toastr.error(data.message || 'Failed to save address');
-            console.error('Save Address: Server reported failure:', data.message);
-          }
-        })
-        .catch(error => {
-          toastr.error('An error occurred while saving the address');
-          console.error('Save Address: Fetch error:', error);
-        });
-    }
-
-    function populateForm(data) {
-      console.log('Populate Form: Populating address form with data:', data);
-      document.getElementById('modalFirstName').value = data.firstName || '';
-      document.getElementById('modalLastName').value = data.lastName || '';
-      document.getElementById('modalCompany').value = data.company || '';
-      document.getElementById('modalStreetAddress').value = data.streetAddress || '';
-      document.getElementById('modalCity').value = data.city || '';
-      document.getElementById('modalLandmark').value = data.landmark || '';
-      document.getElementById('modalZipcode').value = data.pinCode || ''; // Use pinCode here
-      document.getElementById('modalEmail').value = data.email || '';
-      document.getElementById('modalPhone').value = data.phone || '';
-      document.getElementById('modalAltPhone').value = data.altPhone || '';
-
-      if (data.country) {
-        document.getElementById('modalCountrySelect').value = data.country;
-        if (data.state) {
-          loadStates(data.country).then(() => {
-            document.getElementById('modalStateSelect').value = data.state;
-            console.log(`Populate Form: Set country: ${data.country}, state: ${data.state}`);
-          }).catch(err => console.error('Populate Form: Error loading states after country selection:', err));
-        } else {
-          // If country is set but state is not, just load states for the country
-          loadStates(data.country).catch(err => console.error('Populate Form: Error loading states for country:', err));
-        }
-      }
-    }
-
     function clearForm() {
-      console.log('Clear Form: Resetting address form.');
-      document.getElementById('addressForm').reset();
-      document.getElementById('modalStateSelect').innerHTML = '<option value="" disabled selected hidden>Select State</option>';
-      document.getElementById('makeDefaultCheckbox').checked = false;
+        document.getElementById('addressForm').reset();
+        document.getElementById('modalStateSelect').innerHTML = '<option value="" disabled selected hidden>Select State</option>';
+        document.getElementById('makeDefaultCheckbox').checked = false;
     }
-
     async function loadCountries() {
-      console.log('Load Countries: Fetching countries from API.');
-      try {
-        const response = await fetch('https://countriesnow.space/api/v0.1/countries', {
-          method: 'GET',
-          headers: {
-            'Accept': 'application/json'
-          }
-        });
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(`HTTP error! Status: ${response.status}, Body: ${errorText}`);
-        }
-        const data = await response.json();
-        const countrySelect = document.getElementById('modalCountrySelect');
-        if (countrySelect) {
-          countrySelect.innerHTML = '<option value="" disabled selected hidden>Select Country</option>';
-          data.data.forEach(country => {
-            const option = document.createElement('option');
-            option.value = country.country;
-            option.textContent = country.country;
-            countrySelect.appendChild(option);
-          });
-          console.log('Load Countries: Countries loaded successfully.');
-        } else {
-          console.error('Load Countries: modalCountrySelect element not found.');
-        }
-      } catch (error) {
-        const countrySelect = document.getElementById('modalCountrySelect');
-        if (countrySelect) {
-          countrySelect.innerHTML = '<option value="" disabled selected hidden>Select Country</option><option value="" disabled>No countries available</option>';
-        }
-        toastr.error('Failed to load countries. Please try again later.');
-        console.error('Load Countries: Error fetching countries:', error);
-      }
-    }
-
-    async function loadStates(countryName) {
-      console.log(`Load States: Fetching states for country: ${countryName} from API.`);
-      try {
-        const response = await fetch('https://countriesnow.space/api/v0.1/countries/states', {
-          method: 'POST',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            country: countryName
-          })
-        });
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(`HTTP error! Status: ${response.status}, Body: ${errorText}`);
-        }
-        const data = await response.json();
-        const stateSelect = document.getElementById('modalStateSelect');
-        if (stateSelect) {
-          stateSelect.innerHTML = '<option value="" disabled selected hidden>Select State</option>';
-          if (data.data && data.data.states && data.data.states.length > 0) {
-            data.data.states.forEach(state => {
-              const option = document.createElement('option');
-              option.value = state.name;
-              option.textContent = state.name;
-              stateSelect.appendChild(option);
+        try {
+            const response = await fetch('https://countriesnow.space/api/v0.1/countries', {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json'
+                }
             });
-            console.log(`Load States: States loaded successfully for ${countryName}.`);
-          } else {
-            console.log(`Load States: No states found for ${countryName}.`);
-            stateSelect.innerHTML = '<option value="" disabled selected hidden>Select State</option><option value="" disabled>No states available</option>';
-          }
-        } else {
-          console.error('Load States: modalStateSelect element not found.');
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`HTTP error! Status: ${response.status}, Body: ${errorText}`);
+            }
+            const data = await response.json();
+            const countrySelect = document.getElementById('modalCountrySelect');
+            if (countrySelect) {
+                countrySelect.innerHTML = '<option value="" disabled selected hidden>Select Country</option>';
+                data.data.forEach(country => {
+                    const option = document.createElement('option');
+                    option.value = country.country;
+                    option.textContent = country.country;
+                    countrySelect.appendChild(option);
+                });
+            }
+        } catch (error) {
+            const countrySelect = document.getElementById('modalCountrySelect');
+            if (countrySelect) {
+                countrySelect.innerHTML = '<option value="" disabled selected hidden>Select Country</option><option value="" disabled>No countries available</option>';
+            }
+            toastr.error('Failed to load countries. Please try again later.');
         }
-      } catch (error) {
-        const stateSelect = document.getElementById('modalStateSelect');
-        if (stateSelect) {
-          stateSelect.innerHTML = '<option value="" disabled selected hidden>Select State</option><option value="" disabled>No states available</option>';
-        }
-        toastr.error('Failed to load states. Please try again later.');
-        console.error('Load States: Error fetching states:', error);
-      }
     }
-
+    async function loadStates(countryName) {
+        try {
+            const response = await fetch('https://countriesnow.space/api/v0.1/countries/states', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    country: countryName
+                })
+            });
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`HTTP error! Status: ${response.status}, Body: ${errorText}`);
+            }
+            const data = await response.json();
+            const stateSelect = document.getElementById('modalStateSelect');
+            if (stateSelect) {
+                stateSelect.innerHTML = '<option value="" disabled selected hidden>Select State</option>';
+                if (data.data && data.data.states && data.data.states.length > 0) {
+                    data.data.states.forEach(state => {
+                        const option = document.createElement('option');
+                        option.value = state.name;
+                        option.textContent = state.name;
+                        stateSelect.appendChild(option);
+                    });
+                } else {
+                    stateSelect.innerHTML = '<option value="" disabled selected hidden>Select State</option><option value="" disabled>No states available</option>';
+                }
+            }
+        } catch (error) {
+            const stateSelect = document.getElementById('modalStateSelect');
+            if (stateSelect) {
+                stateSelect.innerHTML = '<option value="" disabled selected hidden>Select State</option><option value="" disabled>No states available</option>';
+            }
+            toastr.error('Failed to load states. Please try again later.');
+        }
+    }
     window.onclick = function(event) {
-      const orderModal = document.getElementById('order-confirm-modal');
-      const addressModal = document.getElementById('addressModal');
-      if (event.target === orderModal) {
-        closeOrderConfirmModal();
-        console.log('Window Click: Closed order confirm modal.');
-      }
-      if (event.target === addressModal) {
-        closeAddressModal();
-        console.log('Window Click: Closed address modal.');
-      }
+        const orderModal = document.getElementById('orderConfirmModal');
+        const addressModal = document.getElementById('addressModal');
+        if (event.target === orderModal) {
+            closeOrderConfirmModal();
+        }
+        if (event.target === addressModal) {
+            closeAddressModal();
+        }
     };
-  </script>
+</script>
 </body>
 
 </html>

@@ -80,7 +80,7 @@ const loadOrder = async (req, res) => {
     });
   } catch (error) {
     console.error('Error in loadOrder:', error); // Essential debug
-    res.status(404);
+    res.render('404');
   }
 };
 
@@ -104,7 +104,7 @@ const updateStatus = async (req, res, next) => {
 
     if (!order) {
       console.warn(`Order with ID ${orderId} not found for status update.`);
-      return res.status(404).json({ success: false, message: 'Order not found' });
+      return res.render('404').json({ success: false, message: 'Order not found' });
     }
 
     res.json({ success: true, message: 'Status updated successfully' });
@@ -160,7 +160,7 @@ const loadOrderDetails = async (req, res) => {
     });
   } catch (error) {
     console.error('Error loading order details:', error); // Essential debug
-    res.status(404);
+    res.render('404');
   }
 };
 

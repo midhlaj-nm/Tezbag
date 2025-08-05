@@ -125,6 +125,9 @@ const loadshop = async (req, res, next) => {
 const loadProductDetails = async (req, res, next) => {
   try {
     const productId = req.params.id;
+    if(productId === null || productId === undefined){
+      return res.render('404')
+    }
     const product = await Product.findById(productId).populate('category').lean();
     if (!product || product.isBlocked || (product.category && !product.category.isListed)) {
       return res.redirect('/shop');
@@ -214,119 +217,128 @@ const loadProductDetails = async (req, res, next) => {
 };
 
 const cartToggle = async (req, res, next) => {
-    try {
-        const { productId, quantity, cuttingStyle } = req.body;
-        const userId = req.session.user;
+  try {
+    const { productId, quantity, cuttingStyle } = req.body;
+    const userId = req.session.user;
 
-        if (!userId) {
-            return res.status(401).json({
-                success: false,
-                message: 'Please log in to add products to your cart.',
-                redirect: '/login'
-            });
-        }
-
-        const product = await Product.findById(productId)
-            .populate('category', 'name categoryOffer isListed');
-
-        if (!product) {
-            return res.status(404).json({ success: false, message: 'Product not found' });
-        }
-
-        if (product.isBlocked || !product.category || !product.category.isListed) {
-            return res.status(400).json({
-                success: false,
-                message: 'Product is currently unavailable',
-                redirect: '/shop',
-                delay: 1000
-            });
-        }
-
-        const categoryName = product.category?.name;
-        const requiresCuttingStyle = categoryName === 'Meat' || categoryName === 'Fish';
-        if (requiresCuttingStyle && (!cuttingStyle || cuttingStyle.trim() === '')) {
-            return res.status(400).json({ success: false, message: 'Cutting style is required for this product' });
-        }
-
-        let cart = await Cart.findOne({ userId });
-
-        if (!cart) {
-            cart = new Cart({ userId, items: [], total: 0 });
-        }
-        
-        // Find the item, considering the cutting style for unique identification
-        const existingItemIndex = cart.items.findIndex(item =>
-            item.productId.toString() === productId &&
-            item.cuttingStyle === (cuttingStyle || null)
-        );
-
-        let inCartStatus = false;
-        let message = '';
-
-        if (existingItemIndex > -1) {
-            // Remove the product if it already exists
-            cart.items.splice(existingItemIndex, 1);
-            inCartStatus = false;
-            message = 'Product removed from cart!';
-
-            // Also, remove from wishlist if it was there (logic from addToCart)
-            await Wishlist.updateOne(
-                { userId },
-                { $pull: { products: { productId } } }
-            );
-
-        } else {
-            // Add the product if it doesn't exist
-            const productOffer = product.productOffer || 0;
-            const categoryOffer = product.category?.categoryOffer || 0;
-            const largestOffer = Math.max(productOffer, categoryOffer);
-            const price = largestOffer > 0
-                ? product.regularPrice * (1 - largestOffer / 100)
-                : product.regularPrice;
-
-            cart.items.push({
-                productId,
-                quantity,
-                price,
-                totalPrice: price * quantity,
-                cuttingStyle: cuttingStyle || null,
-            });
-
-            inCartStatus = true;
-            message = 'Product added to cart!';
-
-            // Check if the product is in the wishlist and remove it
-            await Wishlist.updateOne(
-                { userId },
-                { $pull: { products: { productId } } }
-            );
-        }
-
-        // Recalculate cart total every time
-        cart.total = cart.items.reduce((total, item) => total + item.totalPrice, 0);
-
-        await cart.save();
-
-        const cartItems = cart.items.map(item => ({
-            ...item,
-            product: {
-                ...item.productId,
-                image: Array.isArray(item.productId.productImage) ? item.productId.productImage[0] : item.productId.productImage || '/default-product.png'
-            }
-        }));
-
-        res.status(200).json({
-            success: true,
-            inCart: inCartStatus,
-            message: message,
-            cartItems,
-            cartTotal: cart.total
-        });
-
-    } catch (error) {
-        console.error('❌ Error toggling cart:', error);
-        next({ status: 500, message: 'An error occurred while updating the cart' });
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: 'Please log in to add products to your cart.',
+        redirect: '/login'
+      });
     }
+
+    const product = await Product.findById(productId)
+      .populate('category', 'name categoryOffer isListed');
+
+    if (!product) {
+      return res.status(404).json({ success: false, message: 'Product not found' });
+    }
+
+    if (product.isBlocked || !product.category || !product.category.isListed) {
+      return res.status(400).json({
+        success: false,
+        message: 'Product is currently unavailable',
+        redirect: '/shop',
+        delay: 1000
+      });
+    }
+
+    const categoryName = product.category?.name;
+    const requiresCuttingStyle = categoryName === 'Meat' || categoryName === 'Fish';
+    if (requiresCuttingStyle && (!cuttingStyle || cuttingStyle.trim() === '')) {
+      return res.status(400).json({ success: false, message: 'Cutting style is required for this product' });
+    }
+
+    // Validate quantity against available stock
+    const requestedQuantity = parseInt(quantity) || 1; // Default to 1 if quantity is invalid
+    if (requestedQuantity > product.quantity) {
+      return res.status(400).json({
+        success: false,
+        message: 'Insufficient Stock.',
+        redirect: '/shop',
+        delay: 2000
+      });
+    }
+
+    let cart = await Cart.findOne({ userId });
+
+    if (!cart) {
+      cart = new Cart({ userId, items: [], total: 0 });
+    }
+    
+    // Find the item, considering the cutting style for unique identification
+    const existingItemIndex = cart.items.findIndex(item =>
+      item.productId.toString() === productId &&
+      item.cuttingStyle === (cuttingStyle || null)
+    );
+
+    let inCartStatus = false;
+    let message = '';
+
+    if (existingItemIndex > -1) {
+      // Remove the product if it already exists
+      cart.items.splice(existingItemIndex, 1);
+      inCartStatus = false;
+      message = 'Product removed from cart!';
+
+      // Also, remove from wishlist if it was there
+      await Wishlist.updateOne(
+        { userId },
+        { $pull: { products: { productId } } }
+      );
+    } else {
+      // Add the product if it doesn't exist
+      const productOffer = product.productOffer || 0;
+      const categoryOffer = product.category?.categoryOffer || 0;
+      const largestOffer = Math.max(productOffer, categoryOffer);
+      const price = largestOffer > 0
+        ? product.regularPrice * (1 - largestOffer / 100)
+        : product.regularPrice;
+
+      cart.items.push({
+        productId,
+        quantity: requestedQuantity, // Use validated quantity
+        price,
+        totalPrice: price * requestedQuantity,
+        cuttingStyle: cuttingStyle || null,
+      });
+
+      inCartStatus = true;
+      message = 'Product added to cart!';
+      
+      // Remove from wishlist if it was there
+      await Wishlist.updateOne(
+        { userId },
+        { $pull: { products: { productId } } }
+      );
+    }
+
+    // Recalculate cart total every time
+    cart.total = cart.items.reduce((total, item) => total + item.totalPrice, 0);
+
+    await cart.save();
+
+    const cartItems = cart.items.map(item => ({
+      ...item,
+      product: {
+        ...item.productId,
+        image: Array.isArray(item.productId.productImage) ? item.productId.productImage[0] : item.productId.productImage || '/default-product.png'
+      }
+    }));
+
+    res.status(200).json({
+      success: true,
+      inCart: inCartStatus,
+      message: message,
+      cartItems,
+      cartTotal: cart.total
+    });
+  } catch (error) {
+    console.error('❌ Error toggling cart:', error);
+    next({ status: 500, message: 'An error occurred while updating the cart' });
+  }
 };
 
 module.exports = { loadshop, loadProductDetails, cartToggle };

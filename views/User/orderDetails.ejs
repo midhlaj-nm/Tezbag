@@ -52,7 +52,7 @@
           <% } else if (order.status === 'Request Declined') { %>
           <button class="btn btn-cancelled" id="cancelButton" disabled>Return Declined</button>
           <% } else if (order.status === 'Payment Failed') { %>
-          <button class="btn btn-cancelled" id="cancelButton" disabled>Cancel Order</button>
+          <button class="btn btn-secondary" id="retryPaymentBtn">Retry Payment</button>
           <% } else if (order.status === 'Pending' || order.status === 'Processing' || order.status === 'Shipped') { %>
           <button class="btn btn-secondary" id="cancelButton" onclick="openCancelModal('<%= orderId %>')">Cancel Order</button>
           <% } else if (order.status === 'Delivered') { %>
@@ -194,38 +194,53 @@
     </div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.js"></script>
     <script>
       // Modal Functions
       function openCancelModal(orderId) {
-        document.getElementById('cancelModal').style.display = 'block';
+        const modal = document.getElementById('cancelModal');
+        if (modal) modal.style.display = 'block';
       }
 
       function openReturnModal(orderId) {
-        document.getElementById('returnModal').style.display = 'block';
+        const modal = document.getElementById('returnModal');
+        if (modal) modal.style.display = 'block';
       }
 
       function closeModal(type) {
-        document.getElementById(type === 'cancel' ? 'cancelModal' : 'returnModal').style.display = 'none';
-        document.getElementById(`${type}CustomReason`).style.display = 'none';
-        document.getElementById(`${type}CustomInput`).value = '';
-        if (type === 'return') document.getElementById('err1').style.display = 'none';
+        const modal = document.getElementById(type === 'cancel' ? 'cancelModal' : 'returnModal');
+        if (modal) modal.style.display = 'none';
+        const customReason = document.getElementById(`${type}CustomReason`);
+        if (customReason) customReason.style.display = 'none';
+        const customInput = document.getElementById(`${type}CustomInput`);
+        if (customInput) customInput.value = '';
+        if (type === 'return') {
+          const errMsg = document.getElementById('err1');
+          if (errMsg) errMsg.style.display = 'none';
+        }
       }
 
       function toggleCustomReason(type) {
         const select = document.getElementById(type === 'cancel' ? 'cancelReason' : 'returnReason');
         const customReason = document.getElementById(`${type}CustomReason`);
-        if (select.value === 'other') customReason.style.display = 'block';
-        else {
-          customReason.style.display = 'none';
-          document.getElementById(`${type}CustomInput`).value = '';
+        if (select && customReason) {
+          if (select.value === 'other') customReason.style.display = 'block';
+          else {
+            customReason.style.display = 'none';
+            const customInput = document.getElementById(`${type}CustomInput`);
+            if (customInput) customInput.value = '';
+          }
         }
-        if (type === 'return') document.getElementById('err1').style.display = 'none';
+        if (type === 'return') {
+          const errMsg = document.getElementById('err1');
+          if (errMsg) errMsg.style.display = 'none';
+        }
       }
 
       function confirmCancel(orderId) {
-        const reason = document.getElementById('cancelReason').value;
-        const customReason = document.getElementById('cancelCustomInput').value;
+        const reason = document.getElementById('cancelReason')?.value;
+        const customReason = document.getElementById('cancelCustomInput')?.value;
         const finalReason = reason === 'other' ? customReason : reason;
         fetch(`/cancel-order/${orderId}`, {
             method: 'POST',
@@ -252,13 +267,15 @@
       }
 
       function confirmReturn(orderId) {
-        const reason = document.getElementById('returnReason').value;
-        const customReason = document.getElementById('returnCustomInput').value;
+        const reason = document.getElementById('returnReason')?.value;
+        const customReason = document.getElementById('returnCustomInput')?.value;
         const finalReason = reason === 'other' ? customReason : reason;
         const errorMessage = document.getElementById('err1');
-        if (!reason || (reason === 'other' && !customReason.trim())) {
-          errorMessage.style.display = 'block';
-          errorMessage.textContent = "A valid reason is required for return.";
+        if (!reason || (reason === 'other' && !customReason?.trim())) {
+          if (errorMessage) {
+            errorMessage.style.display = 'block';
+            errorMessage.textContent = "A valid reason is required for return.";
+          }
           return;
         }
         fetch(`/return-order/${orderId}`, {
@@ -298,21 +315,23 @@
         const downloadInvoice = document.getElementById('downloadInvoice');
         const invoicePdf = "<%= invoicePdf || '' %>"; // Default to empty string if undefined
         const invoiceNumber = "<%= invoiceNumber %>";
+        const orderStatus = "<%= order.status %>"; // Embed order status
+        const createdAt = "<%= createdAt %>"; // Embed createdAt
 
         // Check if invoicePdf is a valid URL
         const isPdfReady = invoicePdf.includes('https://');
 
         // Timer logic for 10 seconds
-        if (!isPdfReady) {
+        if (!isPdfReady && downloadTimer) {
           let timeLeft = 10;
-          downloadTimer.textContent = `Download Invoice ${timeLeft}s...`;
+          downloadTimer.textContent = `Download Invoice (${timeLeft}s)`;
           const timer = setInterval(() => {
             timeLeft--;
-            downloadTimer.textContent = `Download Invoice ${timeLeft}s...`;
+            if (downloadTimer) downloadTimer.textContent = `Download Invoice (${timeLeft}s)`;
             if (timeLeft <= 0) {
               clearInterval(timer);
-              downloadTimer.style.display = 'none';
-              downloadInvoice.style.display = 'inline-block';
+              if (downloadTimer) downloadTimer.style.display = 'none';
+              if (downloadInvoice) downloadInvoice.style.display = 'inline-block';
               refreshInvoiceStatus(); // Refresh button state after 10 seconds
             }
           }, 1000);
@@ -327,31 +346,33 @@
               if (data.success && data.invoicePdf && data.invoicePdf.includes('https://')) {
                 clearInterval(pollInterval);
                 const filename = data.invoiceNumber ? data.invoiceNumber.replace(/ /g, '_') + '.pdf' : `${orderId}_invoice.pdf`;
-                downloadInvoice.href = `/download-invoice?url=${encodeURIComponent(data.invoicePdf)}&filename=${filename}`;
-                if (timeLeft <= 0) {
-                  downloadInvoice.style.display = 'inline-block';
-                  downloadInvoice.classList.remove('disabled');
-                } else {
-                  clearInterval(timer); // Stop timer if PDF is ready early
-                  downloadTimer.style.display = 'none';
-                  downloadInvoice.style.display = 'inline-block';
-                  downloadInvoice.classList.remove('disabled');
+                if (downloadInvoice) {
                   downloadInvoice.href = `/download-invoice?url=${encodeURIComponent(data.invoicePdf)}&filename=${filename}`;
+                  if (timeLeft <= 0) {
+                    downloadInvoice.style.display = 'inline-block';
+                    downloadInvoice.classList.remove('disabled');
+                  } else {
+                    clearInterval(timer); // Stop timer if PDF is ready early
+                    if (downloadTimer) downloadTimer.style.display = 'none';
+                    downloadInvoice.style.display = 'inline-block';
+                    downloadInvoice.classList.remove('disabled');
+                    downloadInvoice.href = `/download-invoice?url=${encodeURIComponent(data.invoicePdf)}&filename=${filename}`;
+                  }
                 }
               }
               if (++pollCount >= maxPolls) {
                 clearInterval(pollInterval);
-                downloadTimer.textContent = 'Invoice generation failed. Contact support.';
+                if (downloadTimer) downloadTimer.textContent = 'Invoice generation failed. Contact support.';
               }
             } catch (error) {
               console.error('Polling error:', error);
               if (++pollCount >= maxPolls) {
                 clearInterval(pollInterval);
-                downloadTimer.textContent = 'Error fetching invoice. Contact support.';
+                if (downloadTimer) downloadTimer.textContent = 'Error fetching invoice. Contact support.';
               }
             }
           }, 5000);
-        } else {
+        } else if (downloadInvoice) {
           const filename = invoiceNumber ? invoiceNumber.replace(/ /g, '_') + '.pdf' : `${orderId}_invoice.pdf`;
           downloadInvoice.href = `/download-invoice?url=${encodeURIComponent(invoicePdf)}&filename=${filename}`;
           downloadInvoice.style.display = 'inline-block';
@@ -365,16 +386,47 @@
             .then(data => {
               if (data.success && data.invoicePdf && data.invoicePdf.includes('https://')) {
                 const filename = data.invoiceNumber ? data.invoiceNumber.replace(/ /g, '_') + '.pdf' : `${orderId}_invoice.pdf`;
-                downloadInvoice.href = `/download-invoice?url=${encodeURIComponent(data.invoicePdf)}&filename=${filename}`;
-                downloadInvoice.classList.remove('disabled');
+                if (downloadInvoice) {
+                  downloadInvoice.href = `/download-invoice?url=${encodeURIComponent(data.invoicePdf)}&filename=${filename}`;
+                  downloadInvoice.classList.remove('disabled');
+                }
               } else {
-                downloadInvoice.style.display = 'none';
-                downloadTimer.style.display = 'inline-block';
-                downloadTimer.textContent = 'Invoice not ready yet. Refreshing...';
-                setTimeout(refreshInvoiceStatus, 5000); // Small refresh every 5 seconds
+                if (downloadInvoice) downloadInvoice.style.display = 'none';
+                if (downloadTimer) {
+                  downloadTimer.style.display = 'inline-block';
+                  downloadTimer.textContent = 'Invoice not ready yet. Refreshing...';
+                  setTimeout(refreshInvoiceStatus, 5000); // Small refresh every 5 seconds
+                }
               }
             })
             .catch(error => console.error('Refresh error:', error));
+        }
+
+        // Retry Payment Timer Logic for Payment Failed orders
+        const retryPaymentBtn = document.getElementById('retryPaymentBtn');
+        if (retryPaymentBtn && orderStatus === 'Payment Failed' && createdAt) {
+          const paymentFailedTime = new Date(createdAt).getTime();
+          const currentTime = new Date().getTime();
+          const timeElapsed = (currentTime - paymentFailedTime) / (1000 * 60); // Convert to minutes
+
+          if (timeElapsed <= 3) {
+            retryPaymentBtn.addEventListener('click', () => {
+              const url = `/cart/checkout?retry=true&orderId=<%= orderId %>&amount=<%= finalAmount %>&razorpayKey=<%= razorpayKey %>&razorpayOrderId=<%= razorpayOrderId %>`;
+              window.location.href = url;
+            });
+          } else {
+            retryPaymentBtn.className = 'btn btn-cancelled';
+            retryPaymentBtn.disabled = true;
+          }
+
+          // Set timer to disable and change class after 3 minutes from page load if still within window
+          const timeLeft = 3 - timeElapsed;
+          if (timeLeft > 0) {
+            setTimeout(() => {
+              retryPaymentBtn.className = 'btn btn-cancelled';
+              retryPaymentBtn.disabled = true;
+            }, timeLeft * 60 * 1000);
+          }
         }
       };
     </script>
