@@ -1,4 +1,4 @@
-const pdf = require('html-pdf');
+const puppeteer = require('puppeteer');
 const ejs = require('ejs');
 const path = require('path');
 const streamifier = require('streamifier');
@@ -33,21 +33,16 @@ const pdfGenerator = async (invoice, order) => {
   const htmlContent = await ejs.renderFile(templatePath, data);
   console.log('Rendered HTML content length:', htmlContent.length);
 
-  const pdfBuffer = await new Promise((resolve, reject) => {
-    console.log('Attempting to create PDF buffer...');
-    pdf.create(htmlContent, { format: 'A4' }).toBuffer((err, buffer) => {
-      if (err) {
-        console.error('PDF creation error:', err);
-        reject(err);
-      } else if (!buffer || buffer.length === 0) {
-        console.error('PDF buffer is empty or invalid');
-        reject(new Error('Failed to generate PDF buffer'));
-      } else {
-        console.log('PDF buffer created successfully, size:', buffer.length);
-        resolve(buffer);
-      }
-    });
+  const browser = await puppeteer.launch({
+    args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    headless: 'new',
   });
+  const page = await browser.newPage();
+  await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
+  const pdfBuffer = await page.pdf({ format: 'A4', printBackground: true });
+  await browser.close();
+
+  console.log('PDF buffer created successfully, size:', pdfBuffer.length);
 
   const pdfStream = streamifier.createReadStream(pdfBuffer);
   const fileName = `${invoice.invoiceNumber}.pdf`;
@@ -55,7 +50,10 @@ const pdfGenerator = async (invoice, order) => {
   const uploadResult = await new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(
       {
-        resource_type: 'raw', folder: 'invoices', public_id: fileName.replace('.pdf', ''), format: 'pdf',
+        resource_type: 'raw',
+        folder: 'invoices',
+        public_id: fileName.replace('.pdf', ''),
+        format: 'pdf',
       },
       (error, result) => {
         if (error) {
