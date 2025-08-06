@@ -1,4 +1,3 @@
-const { cache } = require('hbs');
 const mongoose = require('mongoose');
 const env = require('dotenv').config();
 
