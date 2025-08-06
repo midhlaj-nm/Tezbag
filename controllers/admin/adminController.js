@@ -187,7 +187,8 @@ const verifyOtp = async (req, res) => {
 // Resend OTP
 const resendOtp = async (req, res, next) => {
   try {
-    console.log("🔁 Resend OTP triggered");
+    console.log("🔁 Resend OTP triggered via", req.method);
+    console.log("Session:", req.session); // Debug session contents
 
     const adminData = req.session.adminData;
     const lastSentTime = req.session.lastOtpSentTime;
