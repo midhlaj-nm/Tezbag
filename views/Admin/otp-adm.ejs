@@ -38,144 +38,140 @@
 </div>
 
 <script>
-
 toastr.options = {
-      "closeButton": true,
-      "debug": false,
-      "newestOnTop": false,
-      "progressBar": false,
-      "positionClass": "toast-bottom-right",
-      "preventDuplicates": false,
-      "onclick": null,
-      "showDuration": "300",
-      "hideDuration": "1000",
-      "timeOut": "5000",
-      "extendedTimeOut": "1000",
-      "showEasing": "swing",
-      "hideEasing": "linear",
-      "showMethod": "fadeIn",
-      "hideMethod": "fadeOut"
+  "closeButton": true,
+  "debug": false,
+  "newestOnTop": false,
+  "progressBar": false,
+  "positionClass": "toast-bottom-right",
+  "preventDuplicates": false,
+  "onclick": null,
+  "showDuration": "300",
+  "hideDuration": "1000",
+  "timeOut": "5000",
+  "extendedTimeOut": "1000",
+  "showEasing": "swing",
+  "hideEasing": "linear",
+  "showMethod": "fadeIn",
+  "hideMethod": "fadeOut"
+}
+
+let timer = 60;
+const timerEl = document.getElementById("timer");
+const resendLink = document.getElementById("resend-link");
+const errMsg = document.getElementById("err1");
+const inputs = document.querySelectorAll(".otp-field");
+
+// Countdown timer
+const startCountdown = () => {
+  resendLink.disabled = true;
+  resendLink.style.color = "grey";
+  resendLink.style.cursor = "not-allowed";
+
+  const countdown = setInterval(() => {
+    timer--;
+    timerEl.textContent = timer;
+
+    if (timer <= 0) {
+      clearInterval(countdown);
+      resendLink.disabled = false;
+      resendLink.style.color = "#00B207";
+      resendLink.style.cursor = "pointer";
+      resendLink.textContent = "Click to resend";
     }
+  }, 1000);
+};
 
-  let timer = 60;
-  const timerEl = document.getElementById("timer");
-  const resendLink = document.getElementById("resend-link");
-  const errMsg = document.getElementById("err1");
-  const inputs = document.querySelectorAll(".otp-field");
+// Get OTP from input fields
+const getOtpFromInputs = () => {
+  let otp = "";
+  inputs.forEach(input => otp += input.value);
+  return otp;
+};
 
-  // Countdown timer
-  const startCountdown = () => {
-    resendLink.disabled = true;
-    resendLink.style.color = "grey";
-    resendLink.style.cursor = "not-allowed";
+// Validate and submit OTP
+function validateOTPform() {
+  const otpInput = getOtpFromInputs();
+  errMsg.textContent = "";
 
-    const countdown = setInterval(() => {
-      timer--;
-      timerEl.textContent = timer;
-
-      if (timer <= 0) {
-        clearInterval(countdown);
-        resendLink.disabled = false;
-        resendLink.style.color = "#00B207";
-        resendLink.style.cursor = "pointer";
-        resendLink.textContent = "Click to resend";
-      }
-    }, 1000);
-  };
-
-  // Get OTP from input fields
-  const getOtpFromInputs = () => {
-    let otp = "";
-    inputs.forEach(input => otp += input.value);
-    return otp;
-  };
-
-  // Validate and submit OTP
-  function validateOTPform() {
-    const otpInput = getOtpFromInputs();
-    errMsg.textContent = "";
-
-    if (otpInput.length < 4 || !/^\d{4}$/.test(otpInput)) {
-      errMsg.textContent = "Please enter a valid 4-digit OTP.";
-      return false;
-    }
-
-    $.ajax({
-      type: "POST",
-      url: "/tezgrani/verify-otp", // Change URL as needed
-      data: { otp: otpInput },
-      xhrFields: {
-        withCredentials: true  // ✅ This tells the browser to include cookies
-      },
-      success: function (response) {
-        if (response.message === "Session expired") {
-          toastr.error("Timeout. Please retry again.");
-          setTimeout(() => {
-            window.location.href = "/tezgrani/login"; // Or wherever your flow restarts
-          }, 1000);
-          return;
-        }
-
-        if (response.success) {
-          toastr.success("OTP verified!");
-          setTimeout(() => {
-            window.location.href = response.redirectUrl;
-          }, 1000);
-        } else {
-          toastr.error(response.message || "Invalid OTP");
-        }
-      },
-      error: function (xhr, status, error) {
-        console.error("AJAX error:", error);
-        toastr.error("Something went wrong");
-      }
-    });
-
+  if (otpInput.length < 4 || !/^\d{4}$/.test(otpInput)) {
+    errMsg.textContent = "Please enter a valid 4-digit OTP.";
     return false;
   }
 
-  // Resend OTP
-  function resendOtp() {
-    if (timer > 0) return;
-
-    timer = 60;
-    resendLink.textContent = "Resend";
-    timerEl.textContent = timer;
-    startCountdown();
-
-    fetch("/resend-otp")
-      .then(res => res.json())
-      .then(data => {
-        if (data.message === "Session expired") {
-          toastr.error("Timeout. Please retry again.");
-          setTimeout(() => {
-            window.location.href = "/tezgrani/login"; // Or wherever your flow restarts
-          }, 1000);
-          return;
-        }
-
-        data.success
-          ? toastr.success("OTP resent successfully!")
-          : toastr.error("Failed to resend OTP.");
-      })
-      .catch(() => toastr.error("Something went wrong"));
-  }
-
-  // Auto focus behavior
-  inputs.forEach((input, index) => {
-    input.addEventListener("input", (e) => {
-      if (e.target.value.length === 1 && index < inputs.length - 1) {
-        inputs[index + 1].focus();
+  $.ajax({
+    type: "POST",
+    url: "/tezgrani/verify-otp",
+    data: { otp: otpInput },
+    xhrFields: {
+      withCredentials: true
+    },
+    success: function (response) {
+      if (response.success) {
+        toastr.success("OTP verified!");
+        setTimeout(() => {
+          window.location.href = response.redirectUrl;
+        }, 1000);
+      } else {
+        toastr.error(response.message || "Invalid OTP");
       }
-    });
-
-    input.addEventListener("keydown", (e) => {
-      if (e.key === "Backspace" && !e.target.value && index > 0) {
-        inputs[index - 1].focus();
-      }
-    });
+    },
+    error: function (xhr, status, error) {
+      console.error("AJAX error:", error);
+      toastr.error("Something went wrong");
+    }
   });
 
-  resendLink.addEventListener("click", resendOtp);
-  window.onload = startCountdown;
+  return false;
+}
+
+// Resend OTP
+function resendOtp() {
+  if (timer > 0) return;
+
+  timer = 60;
+  resendLink.textContent = "Resend";
+  timerEl.textContent = timer;
+  startCountdown();
+
+  fetch("/tezgrani/resend-verify-otp", {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json"
+    }
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.message === "Session expired") {
+      toastr.error("Timeout. Please retry again.");
+      setTimeout(() => {
+        window.location.href = "/tezgrani/login";
+      }, 1000);
+      return;
+    }
+    data.success
+      ? toastr.success("OTP resent successfully!")
+      : toastr.error("Failed to resend OTP.");
+  })
+  .catch(() => toastr.error("Something went wrong"));
+}
+
+// Auto focus behavior
+inputs.forEach((input, index) => {
+  input.addEventListener("input", (e) => {
+    if (e.target.value.length === 1 && index < inputs.length - 1) {
+      inputs[index + 1].focus();
+    }
+  });
+
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Backspace" && !e.target.value && index > 0) {
+      inputs[index - 1].focus();
+    }
+  });
+});
+
+resendLink.addEventListener("click", resendOtp);
+window.onload = startCountdown;
 </script>

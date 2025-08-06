@@ -18,7 +18,7 @@ router.get('/login', adminController.loadLogin);
 router.post('/login', adminController.verifyLogin);
 router.get('/verifyotp', adminController.loadOtp);
 router.post('/verify-otp', adminController.verifyOtp);
-router.post('/resend-otp', adminController.resendOtp);
+router.post('/resend-verify-otp', adminController.resendOtp);
 router.get('/dashboard', adminAuth, adminController.loadDashboard);
 router.patch('/punch-in', adminAuth, adminController.storePunchin);
 router.patch('/punch-out', adminAuth, adminController.storePunchout);
