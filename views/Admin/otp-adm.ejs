@@ -108,14 +108,6 @@ toastr.options = {
         withCredentials: true  // ✅ This tells the browser to include cookies
       },
       success: function (response) {
-        if (response.message === "Session expired") {
-          toastr.error("Timeout. Please retry again.");
-          setTimeout(() => {
-            window.location.href = "/tezgrani/login"; // Or wherever your flow restarts
-          }, 1000);
-          return;
-        }
-
         if (response.success) {
           toastr.success("OTP verified!");
           setTimeout(() => {
