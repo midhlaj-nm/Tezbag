@@ -36,6 +36,7 @@
     "passport-google-oauth20": "^2.0.0",
     "path": "^0.12.7",
     "pdfkit": "^0.15.0",
+    "puppeteer": "^24.16.0",
     "razorpay": "^2.9.6",
     "Router": "^2.1.0",
     "sharp": "^0.34.1",
