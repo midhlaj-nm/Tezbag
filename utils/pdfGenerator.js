@@ -34,8 +34,15 @@ const pdfGenerator = async (invoice, order) => {
   console.log('Rendered HTML content length:', htmlContent.length);
 
   const browser = await puppeteer.launch({
-    args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
+      '--single-process',
+      '--no-zygote'
+    ],
     headless: 'new',
+    executablePath: '/usr/bin/chromium-browser'
   });
   const page = await browser.newPage();
   await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
