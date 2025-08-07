@@ -4,7 +4,7 @@ const app = express();
 const path = require('path');
 const session = require('express-session');
 const flash = require('connect-flash');
-const nocache = require('nocache');
+// const nocache = require('nocache');
 const env = require('dotenv').config();
 const morgan = require('morgan');
 const db = require('./config/db');
@@ -17,7 +17,7 @@ const breadcrump = require('./middlewares/breadcump');
 
 db();
 
-app.use(nocache());
+// app.use(nocache());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
